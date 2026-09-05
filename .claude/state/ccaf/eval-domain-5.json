@@ -2,6 +2,6 @@
   "domain": 5,
   "verdict": "approve",
   "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
-  "findings": [{"item": "Non-blocking (exempt, in marked unverified callout): 'finance' listed among sections referencing INC-2023-Q4-011 though literal ID is only in software+cybersecurity sections.", "where": "5 - Context Management & Reliability.md Beyond-the-sources callout under 5.6"}],
-  "timestamp": "2026-09-05T11:27:21Z"
+  "findings": [{"item": "Re-approved post-repair: 12 cards (>=12), every task 5.1-5.6 has a trap. Non-blocking Traps-header provenance wording FIXED by orchestrator (matches D4). Callouts intact."}],
+  "timestamp": "2026-09-05T13:02:05Z"
 }

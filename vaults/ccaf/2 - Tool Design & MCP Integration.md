@@ -6,7 +6,7 @@ tags:
   - mcp
 domain: 2
 weight: 18
-flashcards_min: 12
+flashcards_min: 16
 ---
 
 # 2 - Tool Design & MCP Integration
@@ -341,6 +341,14 @@ obvious-wrongness will not save you — reason about the mechanism.
 - **Building a custom MCP server for a standard integration** like Jira when a
   maintained community server already exists. Reserve custom servers for
   team-specific workflows.
+- **Reaching for `Edit` when the anchor text is not unique.** `Edit` needs a
+  single unique match, so a repeated snippet either fails or risks changing the
+  wrong spot. The reliable move is to Read the whole file and Write it back with
+  your change — not to keep retrying `Edit`.
+- **Using `Grep` to find files by name (or `Glob` to search inside them).** Grep
+  searches file *contents* and Glob matches file *paths*; swapping them sends you
+  looking for a filename in the wrong place. Match the tool to whether you are
+  after text or a path.
 
 ---
 
@@ -479,4 +487,38 @@ one?
 Use a community server for standard integrations (Jira, GitHub) — they are
 maintained and tested. Reserve custom servers for genuinely team-specific
 workflows that no existing server covers.
+#flashcards/domain-2
+
+Question
+You have one `analyze_document` tool, and the model uses it inconsistently —
+sometimes to pull out data points, sometimes to summarize, sometimes to
+fact-check. What is the design fix, and why is a longer description not enough?
+?
+Split the over-generic tool into purpose-specific tools, each with a defined
+input/output contract — for example `extract_data_points`, `summarize_content`,
+and `verify_claim_against_source`. A single vague tool forces the model to guess
+which job you mean; giving each job its own tool with one clear purpose is what
+makes selection reliable, not padding one description.
+#flashcards/domain-2
+
+Question
+You need to locate every test file matching `**/*.test.tsx` across a large repo,
+no matter which directory they sit in. Do you use `Grep` or `Glob`, and why?
+?
+Use `Glob` — it matches file *paths* by name or extension pattern. `Grep`
+searches file *contents*, so it is the wrong tool for finding files by name.
+Reach for `Grep` only when you need text inside files, such as a function name,
+an error string, or an import statement.
+#flashcards/domain-2
+
+Question
+You want an MCP resource that can serve any document by its id, not just one
+fixed dataset. Which resource form do you use, and how does it differ from a
+direct resource?
+?
+Use a resource *template* — a parameterized URI like `docs://documents/{doc_id}`
+that answers a whole family of queries and supports auto-completion. A direct
+resource is a fixed URI (like `docs://documents`) pointing at one specific piece
+of data. Both are application-controlled context addressed by URI; the template
+just lets one definition cover many items.
 #flashcards/domain-2

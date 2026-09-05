@@ -6,7 +6,7 @@ tags:
   - agents
 domain: 1
 weight: 27
-flashcards_min: 12
+flashcards_min: 16
 ---
 
 # 1 - Agentic Architecture & Orchestration
@@ -374,6 +374,24 @@ Why must an agent be able to inspect its environment, and what file-editing habi
 Claude acts blind and cannot tell whether an action succeeded without observing the result — this is why computer use returns a screenshot after each action. The habit is *read before write*: read a file's current contents before editing it.
 #flashcards/domain-1
 
+Question
+Your coordinator pushes every incoming request through all of its subagents, even trivial ones, which wastes time and tokens. What does a well-designed coordinator do instead?
+?
+It analyses what the query actually needs and dynamically selects only the relevant subagents, rather than always routing through the full pipeline. Decomposition, delegation, and subagent selection should scale to the complexity of the request.
+#flashcards/domain-1
+
+Question
+A synthesis subagent returns a polished report, but every claim has lost track of which document it came from, so you can no longer verify attribution. How should the coordinator have passed the upstream findings?
+?
+As structured data that separates content from metadata — keeping source URLs, document names, and page numbers attached to each finding — so provenance survives the handoff. Passing findings as raw prose loses attribution between agents.
+#flashcards/domain-1
+
+Question
+An agent hits a case it cannot resolve and must escalate to a human who never saw the conversation. What should it send, and why is dumping the raw transcript the wrong move?
+?
+Send a structured handoff summary — the customer id, the root-cause analysis, the amount in question, and the recommended action — so the human can act without redoing the investigation. Because the human never saw the transcript, an unstructured dump forces them to re-derive everything from scratch.
+#flashcards/domain-1
+
 ## Traps & distractors
 
 These are the wrong-but-plausible answers this domain engineers. Each is a
@@ -409,3 +427,33 @@ the mechanism.
   thorough but can leave gaps between them, so a broad research task ends up with
   incomplete coverage. The mitigation is an iterative refinement loop, not finer
   slicing.
+
+- **Forgetting `Task` in `allowedTools`, or handing a subagent context it never
+  received (1.3).** A coordinator can only spawn subagents if its `allowedTools`
+  includes `Task`; if it is not delegating, check that first. And because
+  subagents start with isolated context, any answer that expects one to "just
+  know" prior findings — without those findings being placed in its prompt as
+  structured data with attribution intact — is wrong. There is no shared memory
+  and no automatic inheritance.
+
+- **Using PostToolUse to block a policy-violating action (1.5).** PostToolUse
+  fires *after* the tool has already run, so it is too late to stop anything — it
+  can only transform the result (data normalisation). The only event that can
+  stop an action before it happens is PreToolUse, which returns a
+  `permissionDecision` of `allow`, `deny`, or `ask`. Picking PostToolUse for
+  enforcement is a distractor that swaps the two events.
+
+- **Reaching for adaptive decomposition — or one giant prompt — when the steps
+  are already predictable (1.6).** When you can picture the exact steps, prompt
+  chaining (a fixed sequential pipeline) is the fit; adaptive decomposition is
+  for open-ended investigation you cannot plan up front. Cramming every
+  requirement into a single mega-prompt is also wrong, because attention dilution
+  makes Claude drop constraints — split the work into focused passes instead.
+
+- **Resuming on top of stale tool results instead of starting fresh (1.7).** When
+  the prior tool results have gone stale, resuming the old session is *less*
+  reliable than starting a new session seeded with a structured summary. Resume
+  only when the prior context is mostly still valid, and when you do resume after
+  files changed, tell the agent exactly which files changed. Note too that
+  `fork_session` is for exploring divergent *what-ifs* from a shared baseline, not
+  for continuing one line of work — that is what `--resume` is for.

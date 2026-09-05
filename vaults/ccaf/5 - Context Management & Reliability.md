@@ -9,7 +9,7 @@ tags:
   - provenance
 domain: 5
 weight: 15
-flashcards_min: 8
+flashcards_min: 12
 ---
 
 # 5 - Context Management & Reliability
@@ -346,8 +346,9 @@ financial data as tables, news as prose, technical findings as structured lists
 ## Traps & distractors
 
 These are the wrong-but-plausible answers this domain invites. Each is grounded
-in an anti-pattern stated in the official exam guide (or a doc-verified exam
-intel entry), not in any mock question.
+in the official exam guide — either a stated anti-pattern or a wrong answer
+implied by a task's knowledge and skills — or a doc-verified exam-intel entry,
+never in any mock question.
 
 - **Escalating on customer sentiment or the model's self-reported confidence.**
   An angry tone or a low self-reported confidence score feels like a signal to
@@ -373,6 +374,15 @@ intel entry), not in any mock question.
 - **Trusting a 97% aggregate accuracy number.** A high overall score can mask
   poor performance on a specific document type or field. Validate accuracy by
   segment before reducing human review.
+
+- **Pushing through a degrading exploration session instead of managing its
+  context.** When a long codebase session starts giving inconsistent answers and
+  falling back on "typical patterns" rather than the specific classes it found,
+  the wrong move is to keep asking questions and hope it recovers. That is
+  context degradation, and it does not fix itself. Persist findings to a
+  scratchpad file, delegate verbose discovery to a subagent, or run a steered
+  `/compact` (with instructions naming what to keep) to reclaim room — do not
+  rely on an unsteered `/compact`, which can drop the one detail you needed.
 
 - **Summarizing away the numbers.** Progressive summarization that folds exact
   amounts, percentages, dates, and customer-stated expectations into vague prose
@@ -510,4 +520,17 @@ On the API, context accumulates and previous turns are preserved completely —
 nothing is dropped for you. Only chat interfaces (like claude.ai) can roll the
 window first-in-first-out. On the API you must implement an explicit strategy
 (server-side compaction or context editing) or you will hit the limit.
+#flashcards/domain-5
+
+Question
+A search subagent hands its results to a downstream synthesis subagent that has
+a small context budget. Right now it passes along its full verbose reasoning
+chain and raw tool output. What should the upstream agent return instead, and
+why does it matter here?
+?
+Have the upstream agent return structured data — key facts, citations, and
+relevance scores — rather than verbose prose and reasoning. When the downstream
+agent has a limited context budget, verbose upstream output crowds out room for
+its own work, so passing only the distilled, structured facts (with attribution
+preserved) keeps the synthesis agent both informed and within budget.
 #flashcards/domain-5

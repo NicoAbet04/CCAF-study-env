@@ -237,14 +237,25 @@ be routed to the low-confidence ones.
 ## Traps & distractors
 
 These are the wrong-but-plausible answers this domain is built to tempt you with.
-Each is grounded in a stated anti-pattern from the official exam guide's Domain 4
-tasks.
+Each is grounded in the official exam guide's Domain 4 tasks — either a stated
+anti-pattern or a wrong answer implied by what a task's knowledge and skills
+require.
 
 - **"Be conservative" or "only report high-confidence findings."** These vague
   instructions feel like precision controls but do not improve precision compared
   with specific categorical criteria (task 4.1). If an option fixes false
   positives by softening the tone rather than naming exactly what to flag, it is
   the distractor.
+
+- **Fixing inconsistent output by writing ever-longer instructions.** When
+  detailed written instructions have already produced inconsistent formatting or
+  judgment, piling on more prose rarely helps — few-shot examples are the most
+  effective technique at that point (task 4.2). A companion trap is assuming
+  examples only correct formatting: they also teach judgment on ambiguous cases
+  and let the model generalize to novel patterns, so an option that adds a couple
+  of worked examples usually beats one that only lengthens the instructions, and
+  an option that says "just add one example per input type" misses that examples
+  generalize rather than match cases one-for-one.
 
 - **Marking a field required to "make sure it's always filled in."** When the
   source may not contain the information, a required field forces the model to
@@ -389,6 +400,18 @@ Use a multi-pass structure: run per-file local analysis passes focused on issues
 within each file, then a separate cross-file integration pass for data flow
 between files. Splitting the work prevents attention dilution and the
 contradictory findings that a single all-at-once pass produces.
+#flashcards/domain-4
+
+Question
+A classification schema forces every document into one of five fixed category
+values, and the model keeps mislabeling documents that fit none of them. What
+schema change fixes this without inviting a wrong guess?
+?
+Add an escape hatch to the enum: an `"other"` value paired with a detail string
+for categories outside the fixed list, plus an `"unclear"` value for genuinely
+ambiguous cases. That gives the model an honest option instead of forcing a
+document into the nearest fixed category, and the detail string preserves what
+the real category was so you can extend the list later.
 #flashcards/domain-4
 
 Question

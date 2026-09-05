@@ -1,5 +1,5 @@
-# Coverage Gaps (generated 2026-09-05T11:51:46.158612+00:00)
+# Coverage Gaps (generated 2026-09-05T13:02:18.098364+00:00)
 
-**Gap count: 1**
+**Gap count: 0**
 
-- domain 1 has 14/16 flashcards
+_No gaps._

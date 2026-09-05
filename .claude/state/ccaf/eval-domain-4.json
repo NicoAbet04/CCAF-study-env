@@ -2,6 +2,6 @@
   "domain": 4,
   "verdict": "approve",
   "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
-  "findings": [{"item": "Non-blocking (FIXED by orchestrator): quoted the mermaid root-node label to make the '&' render-safe.", "where": "4 - Prompt Engineering & Structured Output.md mermaid root node"}],
-  "timestamp": "2026-09-05T11:27:21Z"
+  "findings": [{"item": "Re-approved post-repair: 12 cards (>=12), every task 4.1-4.6 has a trap. Non-blocking provenance-wording overstatement in Traps header FIXED by orchestrator (now says traps derive from anti-patterns OR required-behavior bullets)."}],
+  "timestamp": "2026-09-05T13:01:31Z"
 }

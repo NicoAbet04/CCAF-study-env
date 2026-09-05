@@ -2,6 +2,6 @@
   "domain": 1,
   "verdict": "approve",
   "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
-  "findings": [],
-  "timestamp": "2026-09-05T11:24:13Z"
+  "findings": [{"item": "Re-approved post-repair: 17 cards (>=16), every task 1.1-1.7 has a trap, graph TD, correct glossary links."}],
+  "timestamp": "2026-09-05T13:02:05Z"
 }

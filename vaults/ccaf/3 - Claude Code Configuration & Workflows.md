@@ -372,6 +372,15 @@ the kind a real engineer makes. Reason about who sees a file and when it loads.
   tempted by the answer that "just add it to CLAUDE.md" without checking *which*
   CLAUDE.md.
 
+- **Scoping a shared slash command or skill to your user directory.** A command
+  in `~/.claude/commands/` — or a skill in `~/.claude/skills/` — is personal and
+  never reaches teammates through version control. A team's standard command (a
+  shared `/review`, say) belongs in the project's `.claude/commands/`; user scope
+  is only for a personal variant you deliberately keep to yourself. This is the
+  same scope logic as the `CLAUDE.md` trap, applied to commands and skills, and
+  the exam likes to hide it behind a command that "works for me but not for the
+  team."
+
 - **Choosing `--system-prompt` when `--append-system-prompt` was needed.**
   `--system-prompt` throws away Claude Code's default behaviour; if the scenario
   only needs an extra, stage-specific instruction, appending is correct and
@@ -399,6 +408,14 @@ the kind a real engineer makes. Reason about who sees a file and when it loads.
   execution on a 45-file migration. The mode should match complexity: plan for
   architectural, multi-approach, multi-file work; execute directly for a
   well-understood single-file fix.
+
+- **Answering a poor result with vague feedback.** When a first attempt is close
+  but wrong, telling Claude to "handle edge cases" or "be more careful" is far
+  weaker than showing it what you mean. If prose keeps being read inconsistently,
+  give two or three concrete input/output example pairs; if a specific case is
+  failing, hand over the exact failing input — the null value that breaks the
+  migration script, say — rather than a general instruction. The distractor is
+  more or vaguer prose; the fix is concrete examples and a real failing case.
 
 - **Trusting a session to review its own code.** The generating session is biased
   by its own reasoning; an independent instance catches more. Likewise, don't
@@ -467,4 +484,16 @@ Question
 When giving Claude feedback on several problems at once, when do you batch them into one message versus fix them sequentially?
 ?
 Batch them into a single detailed message when the problems **interact** (fixing one affects another), so Claude can reason about them together. Fix them **sequentially** when the problems are **independent**, keeping each change isolated and clean.
+#flashcards/domain-3
+
+Question
+You built a handy `/review` slash command, but a teammate who pulled the repo says the command doesn't exist for them. Where did you put it, and where should it go?
+?
+You almost certainly saved it under **`~/.claude/commands/`**, which is user-scoped and personal — it lives only on your machine and is never shared through version control. Move the Markdown file into the project's **`.claude/commands/`** so it is checked in and every teammate gets it. User scope is only for a personal variant you don't want to push onto the team.
+#flashcards/domain-3
+
+Question
+You need Claude Code to run unattended in a pipeline where no human is present to approve permission prompts, but you don't want it running with all safety checks off. Which permission mode fits, and which one would be a mistake?
+?
+Use **Don't ask**: it allows only the tools you pre-approved and auto-denies everything else, so nothing hangs waiting for approval and nothing unapproved runs. **Bypass permissions** would be the mistake here — it skips all checks entirely and is only appropriate inside an isolated container or VM, not a general pipeline.
 #flashcards/domain-3
