@@ -58,7 +58,7 @@ buried, dropped, or blurred. Three failure modes show up on the exam.
 turns into a summary to save room, you tend to turn hard facts into soft ones.
 A refund of `$47.03` becomes "a small refund," an order date becomes "recently,"
 and a customer's stated expectation ("I was promised a replacement by Friday")
-becomes "the customer is unhappy." [[Glossary|Progressive summarization]] is
+becomes "the customer is unhappy." [[Glossary#Progressive summarization|Progressive summarization]] is
 useful for narrative context but dangerous for numbers, percentages, dates, and
 customer-stated commitments.
 
@@ -67,7 +67,7 @@ customer-stated commitments.
 middle. So the fix is not just "include everything" — it is *where* you put
 things. Place a key-findings summary at the top, and organize the details under
 explicit section headers so nothing important lives only in the murky middle.
-[[Glossary|Lost in the middle]] is a positional effect, not a token-limit
+[[Glossary#Lost in the middle|Lost in the middle]] is a positional effect, not a token-limit
 effect.
 
 **Tool results pile up out of proportion to their value.** An order lookup might
@@ -102,7 +102,7 @@ verbose prose and reasoning chains.
 
 ### RAG: managing context by retrieving only what you need
 
-[[Glossary|Retrieval Augmented Generation]] (RAG) is the main mechanical answer
+[[Glossary#Retrieval Augmented Generation (RAG)|Retrieval Augmented Generation]] (RAG) is the main mechanical answer
 to "the document is bigger than the prompt." Instead of stuffing an 800-page
 report into one prompt — which hits length limits, costs more, runs slower, and
 makes the model less effective — you chunk the document ahead of time and, at
@@ -124,22 +124,22 @@ so match it to your content:
   the most accurate and the most computationally expensive.
 
 **Embeddings and semantic search** find relevant chunks by meaning rather than
-exact words. An [[Glossary|embedding]] is a list of numbers representing the
+exact words. An [[Glossary#Embedding|embedding]] is a list of numbers representing the
 meaning of a piece of text; each number is a learned feature we cannot directly
 interpret. You embed every chunk, store the vectors in a
-[[Glossary|vector database]], then embed the user's question and ask the
+[[Glossary#Vector database|vector database]], then embed the user's question and ask the
 database for the closest chunks. Closeness is measured by
-[[Glossary|cosine similarity]] — the cosine of the angle between two vectors,
+[[Glossary#Cosine similarity|cosine similarity]] — the cosine of the angle between two vectors,
 ranging from -1 (opposite) to 1 (nearly identical); cosine *distance* is simply
 `1 - similarity`.
 
 Semantic search alone misses exact strings. If a user searches for an incident
 ID like `INC-2023-Q4-011`, semantic search may return conceptually related
-sections that never contain the literal ID. [[Glossary|BM25]] is a lexical
+sections that never contain the literal ID. [[Glossary#BM25|BM25]] is a lexical
 (keyword) search that weights rare, specific terms highly and ignores common
 words, so it nails exact matches for IDs, error codes, and technical terms. A
 hybrid pipeline runs semantic and BM25 search in parallel and merges their
-rankings with [[Glossary|reciprocal rank fusion]] (RRF), which combines each
+rankings with [[Glossary#Reciprocal rank fusion (RRF)|reciprocal rank fusion]] (RRF), which combines each
 chunk's rank from both lists using `score = Σ 1 / (k + rank)`.
 
 Two further accuracy techniques from the source notebooks:
@@ -156,7 +156,7 @@ Two further accuracy techniques from the source notebooks:
 
 ### Prompt caching for repeated context
 
-[[Glossary|Prompt caching]] reuses the preprocessing work Claude does on content
+[[Glossary#Prompt caching|Prompt caching]] reuses the preprocessing work Claude does on content
 you send repeatedly, which lowers cost and latency when the same large block
 appears again and again (document Q&A, iterative editing). Caching is not
 automatic: you place a cache breakpoint (`cache_control: {"type": "ephemeral"}`)
@@ -244,7 +244,7 @@ must both refuse to flatten distinct failures into one generic status.
 ## 5.4 Manage context in large codebase exploration
 
 Long exploration sessions degrade in a specific, recognizable way:
-[[Glossary|context degradation]] shows up as the model giving inconsistent
+[[Glossary#Context degradation|context degradation]] shows up as the model giving inconsistent
 answers and starting to reference "typical patterns" instead of the specific
 classes and files it actually discovered earlier in the session. When you see
 generic hand-waving replace concrete references, context has rotted.
@@ -252,7 +252,7 @@ generic hand-waving replace concrete references, context has rotted.
 The countermeasures, from most to least aggressive:
 
 - **Scratchpad files.** Have the agent write key findings to a
-  [[Glossary|scratchpad]] file and refer back to it for later questions. This
+  [[Glossary#Scratchpad|scratchpad]] file and refer back to it for later questions. This
   persists facts across context boundaries so they survive even when the
   conversation itself is trimmed.
 - **Subagent delegation.** Spawn a subagent to answer a specific question —
@@ -285,7 +285,7 @@ number.
 To keep measuring once a system is live, use **stratified random sampling**:
 sample from the high-confidence extractions specifically, so you keep measuring
 their true error rate and can catch novel error patterns that emerge over time.
-[[Glossary|Stratified random sampling]] deliberately samples within strata (here,
+[[Glossary#Stratified random sampling|Stratified random sampling]] deliberately samples within strata (here,
 the confidence bands) rather than uniformly.
 
 Route reviewer attention with **field-level confidence scores**. Have the model
@@ -304,7 +304,7 @@ looks at.
 
 ## 5.6 Preserve provenance in multi-source synthesis
 
-[[Glossary|Provenance]] means knowing which source each claim came from.
+[[Glossary#Provenance|Provenance]] means knowing which source each claim came from.
 Synthesis is where it gets lost: when a summarization step compresses findings
 without carrying the claim-to-source mapping along, the final report states facts
 with no way to trace them back.

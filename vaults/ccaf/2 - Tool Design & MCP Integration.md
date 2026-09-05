@@ -20,9 +20,9 @@ about making tool use predictable.
 
 A quick vocabulary anchor before the tasks. A **tool** is a function you expose
 to the model so it can act on the outside world, described to the model by a
-[[Glossary|tool schema]] — a name, a description, and a
-[[Glossary|JSON Schema]] for its inputs. The **Model Context Protocol**
-([[Glossary|MCP]]) is a standard way to package tools, data, and prompt
+[[Glossary#Tool schema|tool schema]] — a name, a description, and a
+[[Glossary#JSON Schema|JSON Schema]] for its inputs. The **Model Context Protocol**
+([[Glossary#MCP (Model Context Protocol)|MCP]]) is a standard way to package tools, data, and prompt
 templates in a reusable server that any MCP-aware client — Claude Code, the
 desktop app, or your own script — can connect to. This domain leans on the
 [[1 - Agentic Architecture & Orchestration|agentic loop]] from Domain 1 and
@@ -54,10 +54,10 @@ graph TD
 
 Every task in this domain sits on top of one loop, so it helps to have it clear
 first. You send Claude a request with a list of tool schemas. Claude replies
-with a message made of [[Glossary|content blocks]]: a text block
+with a message made of [[Glossary#Content block|content blocks]]: a text block
 explaining its thinking, and one or more **tool_use** blocks naming a tool and
 the input it wants. You detect this by reading the response's
-[[Glossary|stop_reason]]: when it equals `"tool_use"`, Claude is asking you to run
+[[Glossary#stop_reason|stop_reason]]: when it equals `"tool_use"`, Claude is asking you to run
 something. You execute the tool, then send the result back inside a user message
 as a **tool_result** block whose `tool_use_id` matches the request. The loop
 repeats until `stop_reason` is `"end_turn"`. This is the same loop that
@@ -197,7 +197,7 @@ alternative. Swap a wide-open `fetch_url` for a `load_document` tool that
 validates document URLs, and the agent can no longer wander off to arbitrary
 pages.
 
-The other half of this task is [[Glossary|tool_choice]], which
+The other half of this task is [[Glossary#tool_choice|tool_choice]], which
 controls whether and how the model must call a tool:
 
 - **`auto`** — the model decides; it may return plain text instead of calling a

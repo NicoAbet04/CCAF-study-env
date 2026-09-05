@@ -13,7 +13,7 @@ sees a given instruction, when it loads, and how much context it costs. Most
 distractors in this domain are a plausible-but-wrong scope choice.
 
 Reported exam intel from passers (unverified calibration, not from the exam
-guide) suggests this domain gets specific about [[Glossary|CLAUDE.md]]
+guide) suggests this domain gets specific about [[Glossary#CLAUDE.md|CLAUDE.md]]
 structure. Either way, it pays to know each config file's exact location and
 audience, not just its name.
 
@@ -72,7 +72,7 @@ Keep the file lean. `CLAUDE.md` is guidance, not enforced configuration — ever
 line competes with every other line for Claude's attention, so the longer the
 file grows the less reliably any single rule is followed. When a rule *must*
 never be broken, it does not belong in `CLAUDE.md` at all; it belongs in a
-[[Glossary|hook]], which is code that actually runs (see
+[[Glossary#Hook|hook]], which is code that actually runs (see
 [[1 - Agentic Architecture & Orchestration]] for hooks as an enforcement
 mechanism).
 

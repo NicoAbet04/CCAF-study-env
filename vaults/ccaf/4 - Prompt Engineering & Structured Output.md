@@ -21,7 +21,7 @@ plausible-sounding fixes that do not address the real cause.
 The domain builds on the API foundations from module 02. Two of those
 foundations matter throughout. First, the Anthropic API keeps no memory of a
 conversation: to hold a multi-turn exchange you must resend the whole message
-list every request. Second, [[Glossary|temperature]] controls how random Claude's
+list every request. Second, [[Glossary#Temperature|temperature]] controls how random Claude's
 token choices are — near 0 it is nearly deterministic and picks the highest-
 probability token every time, near 1 it spreads probability across many tokens
 for more varied output. Low temperature is what you reach for when you want the
@@ -70,11 +70,11 @@ example so the classification is repeatable.
 ## 4.2 — Few-shot examples for consistency and judgment
 
 When detailed instructions alone still produce inconsistent output, **few-shot
-prompting is the most effective technique**. A [[Glossary|few-shot prompt]] is one
+prompting is the most effective technique**. A [[Glossary#Few-shot prompt|few-shot prompt]] is one
 that includes a small number of worked examples — input paired with the ideal
 output — before the real task. The course frames the same idea as one-shot
 (a single example) versus multi-shot (several), and recommends wrapping examples
-in [[Glossary|XML tags]] like `<example>` so their structure is unambiguous.
+in [[Glossary#XML tags|XML tags]] like `<example>` so their structure is unambiguous.
 
 Examples do more than fix formatting. They teach *judgment on ambiguous cases*.
 Two to four targeted examples that show the reasoning for why one action was
@@ -109,7 +109,7 @@ around a code block. You then read the structured data straight from the
 `tool_use` block of the response. (See [[2 - Tool Design & MCP Integration]] for
 how the same tool machinery is used to give agents real capabilities.)
 
-You control whether and which tool Claude uses through [[Glossary|tool_choice]]:
+You control whether and which tool Claude uses through [[Glossary#tool_choice|tool_choice]]:
 
 - `auto` — Claude may call a tool or may just return text. Use it when a tool is
   optional.
@@ -222,7 +222,7 @@ code **retains its reasoning context from generation**, which makes it less
 likely to question its own decisions in the same session. So the reliable pattern
 is a **second, independent Claude instance** with no prior reasoning context —
 that fresh instance catches subtle issues better than any "now review your work"
-instruction or even [[Glossary|extended thinking]]. This connects to the
+instruction or even [[Glossary#Extended thinking|extended thinking]]. This connects to the
 independent-review idea in [[1 - Agentic Architecture & Orchestration]] and the
 confidence-calibration workflows in [[5 - Context Management & Reliability]].
 

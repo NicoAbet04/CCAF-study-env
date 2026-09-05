@@ -13,7 +13,7 @@ flashcards_min: 16
 
 This is the heaviest domain on the exam — 27% of your score — and the one
 passers report being hardest. It is about how you get Claude to do work that
-takes more than one request: running an [[Glossary|agentic loop]], splitting a
+takes more than one request: running an [[Glossary#Agentic loop|agentic loop]], splitting a
 job across several agents, and keeping those agents coordinated, compliant, and
 recoverable. Most questions here describe a symptom ("the loop never stops," "the
 synthesis agent has no idea what search found") and ask you to pick the mechanism
@@ -42,7 +42,7 @@ graph TD
 
 ## 1.1 Design and implement agentic loops for autonomous task execution
 
-An [[Glossary|agentic loop]] is the engine underneath every agent. You give
+An [[Glossary#Agentic loop|agentic loop]] is the engine underneath every agent. You give
 Claude a goal and some [[2 - Tool Design & MCP Integration|tools]], then repeat a
 cycle: send the request, look at what Claude asked for, run any tools it
 requested, hand the results back, and send again. Claude decides what to do next;
@@ -91,8 +91,8 @@ action worked?" and give it a way to see.
 ## 1.2 Orchestrate multi-agent systems with coordinator-subagent patterns
 
 When a task is too big for one agent, you split it across several. The standard
-shape is **hub-and-spoke**: one [[Glossary|coordinator]] agent at the hub and
-several [[Glossary|subagent]]s on the spokes. The rule that defines the pattern
+shape is **hub-and-spoke**: one [[Glossary#Coordinator|coordinator]] agent at the hub and
+several [[Glossary#Subagent|subagent]]s on the spokes. The rule that defines the pattern
 is that **all communication flows through the coordinator**. Subagents do not
 talk to each other directly. The coordinator handles routing, error handling,
 and every handoff. You route everything through the hub on purpose — it gives you
@@ -117,7 +117,7 @@ effort. Watch the opposite failure too: if you decompose a broad research topic
 too narrowly, the union of the pieces may miss whole areas, leaving gaps. The fix
 is an **iterative refinement loop**: after synthesis, evaluate the combined
 output for gaps, send targeted follow-up queries to fill them, and re-run
-synthesis until coverage is good enough. This is the [[Glossary|evaluator-optimizer]]
+synthesis until coverage is good enough. This is the [[Glossary#Evaluator-optimizer|evaluator-optimizer]]
 pattern (a producer creates output, a grader checks it, feedback loops back until
 the grader is satisfied) applied at the system level.
 
@@ -126,13 +126,13 @@ is the sibling technique: instead of one agent juggling many criteria, fan the
 same input out to several specialised evaluations at once and aggregate the
 results. Each parallel branch can have its own prompt and tools. You get focused
 attention per branch, independent optimisation, and easy scaling. Delegation — a
-core [[Glossary|AI fluency]] skill — is the mindset behind all of this: decide
+core [[Glossary#AI fluency|AI fluency]] skill — is the mindset behind all of this: decide
 deliberately what you do yourself, what you do with AI, and what you hand to AI
 entirely, and distribute the work to each party's strengths.
 
 ## 1.3 Configure subagent invocation, context passing, and spawning
 
-Spawning a subagent is done with the **[[Glossary|Task tool]]**. For a
+Spawning a subagent is done with the **[[Glossary#Task tool|Task tool]]**. For a
 coordinator to be *able* to spawn subagents, its `allowedTools` must include
 `Task`. If a coordinator is not delegating, the first thing to check is whether
 `Task` is in its allowed tools at all.
@@ -150,7 +150,7 @@ attribution survives the handoff between agents. Losing provenance during
 handoffs is a recurring reliability failure (see
 [[5 - Context Management & Reliability]]).
 
-Each subagent type is described by an **[[Glossary|AgentDefinition]]**: a
+Each subagent type is described by an **[[Glossary#AgentDefinition|AgentDefinition]]**: a
 description, a system prompt, and a set of tool restrictions. Scope the tools to
 the role. Write the coordinator's prompts to state the **research goals and
 quality criteria**, not a rigid step-by-step procedure — goals let a subagent
@@ -168,7 +168,7 @@ you *enforce* the ordering. You have two options, and the exam wants you to know
 their difference in reliability. **Prompt-based guidance** — telling Claude in
 the system prompt "always verify the customer before issuing a refund" — is only
 *probabilistic*. It works most of the time, but it carries a non-zero failure
-rate. **Programmatic enforcement** — a [[Glossary|hook]] or a prerequisite gate
+rate. **Programmatic enforcement** — a [[Glossary#Hook|hook]] or a prerequisite gate
 in code — is *deterministic*. It cannot be talked out of.
 
 So when deterministic compliance is genuinely required — identity verification
@@ -191,7 +191,7 @@ all — belong to [[5 - Context Management & Reliability]].
 
 ## 1.5 Apply Agent SDK hooks for tool call interception and data normalization
 
-A [[Glossary|hook]] is deterministic code that runs at a fixed point in the
+A [[Glossary#Hook|hook]] is deterministic code that runs at a fixed point in the
 agentic loop. A CLAUDE.md instruction is a *request*; a hook is a *guarantee*.
 That contrast — hooks give deterministic guarantees, prompts give only
 probabilistic compliance — is the heart of this task and reappears across the
@@ -199,7 +199,7 @@ domain.
 
 Two hook events carry most of the weight:
 
-- **[[Glossary|PreToolUse]]** fires *before* a tool call and is the enforcement
+- **[[Glossary#PreToolUse|PreToolUse]]** fires *before* a tool call and is the enforcement
   primitive — it is the only one that can stop an action before it happens. It
   returns a `permissionDecision` of `allow`, `deny`, or `ask` (hand it to the
   user). Use it to block a policy-violating action — say, a refund above a
@@ -208,7 +208,7 @@ Two hook events carry most of the weight:
   *rewrite* the call — for example, strip a secret out of a bash command and let
   the sanitised version run. Note that `updatedInput` replaces the whole input
   object, so echo back the fields you are not changing.
-- **[[Glossary|PostToolUse]]** fires *after* a tool call succeeds. Because the
+- **[[Glossary#PostToolUse|PostToolUse]]** fires *after* a tool call succeeds. Because the
   tool already ran, it is too late to stop the call — but it can transform the
   result before the model ever sees it. This is where **data normalisation**
   lives: when several MCP tools return dates in different shapes (a Unix
@@ -266,7 +266,7 @@ Long-running work spans multiple sittings, so you need to manage session state.
 script can start the work and another resume it later with full context — handy
 when a first pass produces a plan and a second pass carries it out.
 
-**[[Glossary|fork_session]]** creates an *independent branch* from a shared
+**[[Glossary#fork_session|fork_session]]** creates an *independent branch* from a shared
 baseline so you can explore divergent approaches without them interfering — for
 example, comparing two refactoring or testing strategies that both start from the
 same analysis you have already done. Forking is for parallel *what-ifs* from one
