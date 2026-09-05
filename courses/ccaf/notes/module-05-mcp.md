@@ -1,17 +1,29 @@
-# Module 05 — Introduction to Model Context Protocol
+# MCP — protocol reference and Domain 2 gap-fill
 
-> **What this file is.** The CCAF prep track has seven courses; my notes cover
-> five. This file stands in for the *Introduction to Model Context Protocol*
-> course I did not take, so Domain 2 (Tool Design & MCP Integration, 18% of the
-> exam and one of the two highest-failure domains) is not built on a gap.
+> **CORRECTION (2026-09-05).** An earlier version of this file claimed the MCP
+> course notes were missing. They are not. **`docs/02_building_with_claude_api/
+> Claude_API.md` lines 890–1576 already contain full MCP notes** whose headings
+> map one-to-one onto the *Introduction to Model Context Protocol* syllabus:
+> Introducing MCP → MCP client → Project setup → MCP SDK → The server inspector
+> → Implementing a client → Defining resources → Accessing resources → Defining
+> prompts → Prompts in the client → MCP review. The course material was taken;
+> it was simply filed under module 02 rather than as a separate module.
 >
-> It follows that course's published syllabus and is written from two sources
-> only: the official MCP documentation (modelcontextprotocol.io) and the MCP
-> project I actually built in the *Building with the Claude API* course
-> (`src/02_building_with_claude_api/mcp/cli_project/`). Treat it as a PRIMARY
-> source like any other course note.
+> **So this file is no longer a stand-in for a missing course.** It is kept for
+> two narrower jobs, both genuinely absent from those notes:
 >
-> Doc references: [Server concepts](https://modelcontextprotocol.io/docs/learn/server-concepts).
+> 1. **Protocol-level vocabulary** — the wire operation names (`tools/list`,
+>    `resources/templates/list`, …) that the exam may use, where the course
+>    notes use SDK-level names.
+> 2. **The Claude Code integration layer** — MCP server *scoping*, credential
+>    handling, and *structured error responses*. These are exam guide tasks 2.2
+>    and 2.4, and a grep of my course notes finds no mention of `.mcp.json`,
+>    `~/.claude.json`, `isError`, or `errorCategory`. That is the real Domain 2
+>    gap, and §5 below is the part of this file that fills it.
+>
+> Sources: official MCP docs ([server concepts](https://modelcontextprotocol.io/docs/learn/server-concepts)),
+> the official CCAF exam guide, and my own MCP project
+> (`src/02_building_with_claude_api/mcp/cli_project/`).
 
 ---
 
@@ -214,20 +226,59 @@ or a command palette, which is the UI expression of "user-controlled."
 
 ---
 
-## 5. Where this connects to the exam
+## 5. The actual Domain 2 gap — integration and errors
 
-Domain 2 tests judgment, not syntax. The bridges from this module:
+Everything above restates what my `Claude_API.md` notes already cover. **This
+section does not.** These are exam guide tasks 2.2 and 2.4, and the API course
+never reached them because they belong to the Claude Code integration layer
+rather than the protocol itself.
 
-- **Scoping** — project-level `.mcp.json` for shared team tooling versus
-  user-level `~/.claude.json` for personal or experimental servers; environment
-  variable expansion (`${GITHUB_TOKEN}`) so credentials are never committed.
-- **Descriptions decide selection.** A capable MCP tool with a thin description
-  loses to a built-in like Grep, because the model picks on description quality.
-- **Resources vs tools** is a design decision, not a formality: passive context
-  belongs in resources, actions belong in tools.
-- **Prefer existing community servers** for standard integrations (Jira,
-  GitHub); build custom servers for team-specific workflows.
-- **Structured errors** are Domain 2's other half — the MCP `isError` flag plus
-  an error category and a retryable flag, so the agent can decide between
-  retrying, explaining, and escalating. A uniform "Operation failed" strips the
-  agent of any basis for that decision.
+### Server scoping and credentials (task 2.4)
+
+Where you register a server determines who gets it:
+
+- **`.mcp.json` at the project root** — project scope, committed to the repo,
+  shared with the whole team. This is where shared team tooling belongs.
+- **`~/.claude.json`** — user scope, personal to you. This is where personal or
+  experimental servers belong, and nothing here reaches teammates.
+
+Credentials never get committed: `.mcp.json` supports **environment variable
+expansion**, so you write `${GITHUB_TOKEN}` and the value resolves at load time.
+
+Two more facts with exam-shaped consequences:
+
+- Tools from **all configured servers are discovered at connection time** and
+  are available simultaneously. More servers means a larger tool set competing
+  for the model's selection.
+- **Thin MCP tool descriptions lose to built-ins.** If your MCP tool's
+  description is vague, the model will reach for `Grep` instead, even when the
+  MCP tool is more capable. The fix is a better description, not a prompt patch.
+- **Prefer an existing community server** for standard integrations (Jira,
+  GitHub); reserve custom servers for team-specific workflows.
+
+My course notes cover the Claude Code registration command
+(`claude mcp add [name] [command]`) but not this scoping model — which is the
+part the exam actually asks about.
+
+### Structured error responses (task 2.2)
+
+MCP signals failure with the **`isError`** flag. What matters for the exam is
+what you put *alongside* it, because the agent's recovery decision depends
+entirely on that metadata:
+
+- **`errorCategory`** — transient (timeout, service unavailable), validation
+  (bad input), business (policy violation), or permission.
+- **`isRetryable`** — a boolean, so the agent doesn't burn attempts retrying
+  something that can never succeed.
+- **A human-readable description** — for business-rule violations, phrased so
+  the agent can relay it to a user.
+
+The named anti-pattern: **a uniform generic error ("Operation failed") strips
+the agent of any basis for choosing between retrying, explaining, and
+escalating.** Related distinction the exam likes: an *access failure* (timeout,
+needs a retry decision) is not the same as a *valid empty result* (the query
+succeeded and found nothing).
+
+In a multi-agent system, subagents should recover locally from transient
+failures and propagate to the coordinator only what they cannot resolve —
+including what was attempted and any partial results.

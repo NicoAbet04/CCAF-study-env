@@ -17,7 +17,10 @@ sources:                                 # PRIMARY tier: inventoried + coverage-
   - path: ~/Projects/PyCharmProjects/CCAF
   - path: courses/ccaf/sources-cache/exam-guide.pdf   # official Exam Guide — COMPLETE 39-page edition
   - path: courses/ccaf/notes/exam-intel.md            # doc-verified exam intel from passers (§0.5) — created Phase 0.5
-  - path: courses/ccaf/notes/module-05-mcp.md         # synthesized Intro-to-MCP notes (§9.10) — created Phase 0.5
+  - path: courses/ccaf/notes/module-05-mcp.md         # MCP protocol vocabulary + Domain 2 integration gap-fill
+                                                      #   (.mcp.json scoping, structured errors). NOTE: the MCP
+                                                      #   COURSE notes already exist in Claude_API.md L890-1576 —
+                                                      #   this file supplements them, it does not replace them.
 
 references:                              # linked/cited from notes, NEVER inventoried
   - name: Claude Cookbooks
