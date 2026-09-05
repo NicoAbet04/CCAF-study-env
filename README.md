@@ -179,6 +179,8 @@ of practice material, the writing-style contract) and the complete state model.
 ## Notes on version control
 
 The generated vault is committed on purpose — it gives history and rollback for the
-notes. Obsidian's per-session UI state (`.obsidian/workspace.json`) is **gitignored**
-because it churns on every open; the plugin and theme config under `.obsidian/` is
-kept tracked so a fresh clone opens with the right setup.
+notes. The vault's `.obsidian/` folder is **gitignored** in full: it holds only
+editor-local state — personal preferences, per-session UI layout, and large
+third-party plugin/theme binaries — none of which is study content. On a fresh
+clone, open `vaults/ccaf/` in Obsidian and re-enable the **Spaced Repetition**
+community plugin (the flashcards read fine as text until you do).
