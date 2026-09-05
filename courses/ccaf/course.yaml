@@ -35,8 +35,12 @@ crosscheck:                             # compared post-generation, NEVER ingest
     url: https://github.com/paullarionov/claude-certified-architect
 
 practice:                               # quarantined from notes/flashcards; feed Weak Areas.md only
-  - name: cert-exam skill (77Q)         # local, adopted into .claude/skills/cert-exam.md
-  - name: exam guide §9 sample questions  # official worked examples — QUARANTINED like any mock
+  - name: cert-exam skill (89Q)         # local, .claude/skills/cert-exam/SKILL.md (path fixed 2026-09-05:
+                                        #   was a flat file, which Claude Code doesn't load as a skill)
+                                        #   Q1-77: community bank (unofficial, sourcing unstated).
+                                        #   Q78-89: courses/ccaf/practice/exam-guide-sample-questions.md,
+                                        #   transcribed from the official Exam Guide's own §9 (cited, 2026-09-05)
+  - name: exam guide §9 sample questions  # official worked examples — now materialized as Q78-89 above
   - name: CyberSkill timed mock
     url: https://ccaf.cyberskill.world/exam
   - name: CosX AI mocks (3x60Q)

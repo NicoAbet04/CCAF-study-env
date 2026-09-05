@@ -12,21 +12,32 @@ Run an interactive practice exam for the Claude Certified Architect – Foundati
 
 ## Step 1: Setup
 
-Read the full exam file: `/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md`
+Read both exam files and concatenate their questions into one bank:
+
+1. `/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md`
+   — Q1-Q77, community-authored practice bank (PRACTICE tier, unofficial —
+   author and sourcing unstated; see `courses/ccaf/course.yaml`).
+2. `courses/ccaf/practice/exam-guide-sample-questions.md` — Q78-Q89, transcribed
+   verbatim from the official Exam Guide's own §9 "Sample Questions" (PRACTICE
+   tier, but each question carries a real citation to the guide).
 
 <!-- Path fixed on adoption (§0.1): the original skill referenced a relative
      `Claude Certification/Claude Certification Exam.md` that does not resolve
      from study-env. This points at repo 1's exam file — the same PRIMARY source
      listed in courses/ccaf/course.yaml. -->
 
-Parse all questions from the file. Questions follow this pattern:
+Parse all questions from both files. Questions follow this pattern:
 - Start with `**Q[number].**`
 - Followed by scenario context and question stem
 - Then options `A) ... B) ... C) ... D) ...`
 - Then `**Correct Answer: X**`
 - Then explanation
 
-Build an internal list: question number, scenario, stem, options A-D, correct answer letter, explanation.
+Build one internal list of 89 questions: question number, scenario, stem,
+options A-D, correct answer letter, explanation, and (if present) a
+`*Citation: ...*` line — surface the citation in feedback when a question has
+one, so the user knows which answers are backed by an official source versus
+the unofficial bank.
 
 If the user provided an argument (e.g., `/cert-exam 20`), use that as the question count. Otherwise default to 20.
 
@@ -36,7 +47,7 @@ Use ONE AskUserQuestion call with up to 3 questions:
 
 **Question 1** — How many questions?
 - header: "Questions"
-- Options: "10 questions", "20 questions" (Recommended), "40 questions", "All 77"
+- Options: "10 questions", "20 questions" (Recommended), "40 questions", "All 89"
 
 **Question 2** — Domain focus?
 - header: "Domain"

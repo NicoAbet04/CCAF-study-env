@@ -187,6 +187,15 @@ nobody else needs. `.mcp.json` also supports environment-variable expansion (e.g
 
 ## P
 
+### Parallelisation
+
+Fanning the same input out to several specialised
+evaluations at once — each with its own prompt, tools, and criteria — then
+aggregating the results, instead of one pass trying to juggle every criterion
+together. Contrast with [[Glossary#Routing|routing]], which picks one path for
+a request rather than running several at once. See
+[[1 - Agentic Architecture & Orchestration#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|1 - Agentic Architecture & Orchestration]].
+
 ### Path-specific rules (`.claude/rules/`)
 
 Rule files with a YAML `paths:` glob
@@ -213,11 +222,33 @@ A hook that fires before a tool runs and can allow, deny, or ask —
 and can rewrite the tool's input (e.g. redact a value). The enforcement point for
 deterministic policy. See [[1 - Agentic Architecture & Orchestration]].
 
+### Prerequisite gate
+
+Code — typically a `PreToolUse` hook — that blocks a tool
+call until an earlier required step has actually completed and returned proof
+(an id, a status, an approval token). Example: refuse `process_refund` unless a
+prior `get_customer` call returned a verified customer id; refuse
+`deploy_to_production` unless a prior `run_test_suite` call returned a pass.
+Unlike a system-prompt instruction, which is only probabilistic, a gate is a
+deterministic boolean check wired in front of the sensitive tool call. See
+[[1 - Agentic Architecture & Orchestration#1.4 Implement multi-step workflows with enforcement and handoff patterns|Domain 1, §1.4]].
+
 ### Progressive summarization
 
 Repeatedly condensing conversation history to save
 tokens. The risk is losing exact figures, dates, and stated expectations, so pull
 those into a persistent facts block kept outside the summary. See [[5 - Context Management & Reliability]].
+
+### Prompt chaining
+
+A fixed, sequential pipeline: predetermined steps that each
+build on the previous one's output, with optional non-LLM processing between
+them. Used when the steps are known in advance — e.g. reviewing each file in a
+pull request individually, then running a separate cross-file pass — because
+splitting the work avoids attention dilution from one giant multi-requirement
+prompt. Contrast with dynamic (adaptive) decomposition, which discovers its
+steps as it goes. See
+[[1 - Agentic Architecture & Orchestration#1.6 Design task decomposition strategies for complex workflows|Domain 1, §1.6]].
 
 ### Prompt caching
 
@@ -245,6 +276,18 @@ semantic search. See [[5 - Context Management & Reliability]].
 Answering with the help of retrieved
 source passages: chunk the corpus, embed and index it, retrieve the most relevant
 chunks for a query, and give them to the model as context. See [[5 - Context Management & Reliability]].
+
+### Routing
+
+Classifying an incoming request first, then sending it down one
+specialised path instead of running every request through the same
+one-size-fits-all pipeline. At the coordinator level this means selecting only
+the subagents a query actually needs (a simple FAQ question does not need a
+billing subagent invoked); at the prompt level it means categorising a request
+and picking the matching handler prompt. Contrast with
+[[Glossary#Parallelisation|parallelisation]], which runs several paths at once
+instead of choosing one. See
+[[1 - Agentic Architecture & Orchestration#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|1 - Agentic Architecture & Orchestration]].
 
 ### REVIEW.md
 

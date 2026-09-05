@@ -35,6 +35,8 @@ graph TD
     T1 --> T1b[Append tool results to history each turn]
     T2 --> T2a[Coordinator routes all inter-agent messages]
     T2 --> T2b[Subagents have isolated context]
+    T2 --> T2c[Routing: pick one subagent path per request]
+    T2 --> T2d[Parallelisation: fan out to many paths at once]
     T5 --> T5a[Hooks are deterministic; prompts are only probabilistic]
     T6 --> T6a[Prompt chaining for predictable multi-aspect work]
     T6 --> T6b[Dynamic decomposition for open-ended investigation]
@@ -101,10 +103,16 @@ and control over what information moves where.
 
 The coordinator's job is **decomposition, delegation, and aggregation**: break
 the request into pieces, decide which subagents to invoke, and merge their
-results into one answer. A good coordinator is *dynamic* — it looks at what the
-query actually needs and selects only the relevant subagents, instead of shoving
-every request through the full pipeline every time. This is [[4 - Prompt Engineering & Structured Output|routing]]
-applied to agents.
+results into one answer.
+
+**Routing** is the name for that selection step: instead of always running the
+same fixed pipeline, the coordinator looks at what the query actually needs and
+sends it only to the relevant subagents. A support coordinator that gets "what
+are your hours?" should not spin up a billing subagent and a refunds subagent
+just because a full-pipeline run always includes them — it should recognise the
+query as a simple lookup and route it to a single FAQ subagent, or answer it
+directly. Routing is what keeps a multi-agent system from paying the latency and
+token cost of every subagent on every request. See [[Glossary#Routing|Routing]].
 
 The single most tested fact about subagents: **each subagent has isolated
 context.** A subagent does *not* automatically inherit the coordinator's
@@ -121,11 +129,18 @@ synthesis until coverage is good enough. This is the [[Glossary#Evaluator-optimi
 pattern (a producer creates output, a grader checks it, feedback loops back until
 the grader is satisfied) applied at the system level.
 
-[[1 - Agentic Architecture & Orchestration#1.6 Design task decomposition strategies for complex workflows|Parallelisation]]
-is the sibling technique: instead of one agent juggling many criteria, fan the
-same input out to several specialised evaluations at once and aggregate the
-results. Each parallel branch can have its own prompt and tools. You get focused
-attention per branch, independent optimisation, and easy scaling. Delegation — a
+**Parallelisation** is the sibling technique: instead of one agent juggling many
+criteria in a single pass, fan the same input out to several specialised
+evaluations at once and aggregate the results. For example, reviewing a pull
+request for security issues, style violations, and test coverage as one
+combined prompt tends to shortchange whichever concern comes last; running
+three subagents in parallel — one per concern, each with its own tightly scoped
+prompt — and then merging their findings gets deeper coverage on each axis. Each
+parallel branch can have its own prompt and tools, so you get focused attention
+per branch, independent optimisation, and easy scaling. This differs from
+routing: routing *picks one* path for a request, parallelisation *fans out to
+several* paths for the same request and combines what comes back. See
+[[Glossary#Parallelisation|Parallelisation]]. Delegation — a
 core [[Glossary#AI fluency|AI fluency]] skill — is the mindset behind all of this: decide
 deliberately what you do yourself, what you do with AI, and what you hand to AI
 entirely, and distribute the work to each party's strengths.
@@ -173,10 +188,24 @@ in code — is *deterministic*. It cannot be talked out of.
 
 So when deterministic compliance is genuinely required — identity verification
 before a financial operation is the canonical example — you do not rely on the
-prompt. You build a **prerequisite gate**: block the downstream tool call until
-the prior step has actually completed. For instance, block `process_refund` from
-running until `get_customer` has returned a verified customer id. The gate is
-code, so it holds every time.
+prompt. You build a **prerequisite gate**: a piece of code, not a Claude
+decision, that checks whether an earlier step already ran and refuses to let a
+later one proceed if it did not. Concretely, a `PreToolUse` hook (§1.5) can look
+at the conversation so far, and if `process_refund` is being called without a
+prior successful `get_customer` call recorded, it returns `deny` — the tool call
+never reaches your backend, no matter what Claude's reasoning was. The gate has
+nothing to do with wording; it is a boolean check ("did step A already
+succeed?") wired in front of step B.
+
+A second example makes the shape clearer outside the refund case: in a CI/CD
+pipeline, you gate `deploy_to_production` on `run_test_suite` having returned a
+passing result — the deploy tool call is refused if no green test run is on
+record for that commit, even if the agent's plan says "tests probably pass." A
+third: an onboarding agent gates `provision_database_access` on
+`verify_manager_approval` having returned an approval id — no approval id
+recorded, no access granted, regardless of how convincingly the agent argues the
+request is routine. In every case the gate holds an *identity or status token*
+returned by step A and refuses to run step B without it.
 
 For requests that raise several concerns at once, the pattern is to **decompose
 into distinct items, investigate each in parallel with shared context, then
@@ -244,9 +273,12 @@ dependencies surface.
 
 The choice is the skill: prompt chaining for predictable multi-aspect work,
 dynamic decomposition for open-ended exploration. A related pattern is
-[[1 - Agentic Architecture & Orchestration#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|routing]]:
-categorise an incoming request first, then send it down one specialised pipeline
-rather than a one-size-fits-all prompt.
+[[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|routing]]
+(§1.2 above): categorise an incoming request first, then send it down one
+specialised pipeline rather than a one-size-fits-all prompt. Chaining picks a
+fixed *sequence* of steps; routing picks a *branch* based on what the request
+is; [[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|parallelisation]]
+(also §1.2) runs several branches *at once* instead of choosing one.
 
 The broader framing from the course is **workflows versus agents**. A workflow is
 a predetermined series of Claude calls; an agent is a goal plus tools where
@@ -295,96 +327,112 @@ Your agent's loop never terminates — it keeps calling tools forever. You are e
 ?
 Stop parsing natural-language signals entirely. Drive the loop off the `stop_reason` field: continue while `stop_reason == "tool_use"` and break as soon as it is `end_turn`. The stop condition is a structured field, not the wording of Claude's prose.
 #flashcards/domain-1
+<!--SR:!2026-09-09,4,270-->
 
 Question
 Between iterations of an agentic loop, what must you do with each tool's output, and where exactly does it go?
 ?
 Append the output to the conversation history so it enters Claude's reasoning on the next turn. It goes inside a *user* message as a `tool_result` block whose `tool_use_id` matches the originating request. Claude keeps no memory between calls, so you resend the full history each time.
 #flashcards/domain-1
+<!--SR:!2026-09-06,1,230-->
 
 Question
 A coordinator delegates a synthesis step to a subagent, but the synthesis agent behaves as if it never saw the earlier search results and document analysis. What is the underlying cause and the fix?
 ?
 Subagents run with isolated context and do not inherit the coordinator's conversation history. The fix is to pass the complete prior findings explicitly in the synthesis subagent's prompt — there is no shared memory or automatic inheritance.
 #flashcards/domain-1
+<!--SR:!2026-09-09,4,270-->
 
 Question
 You want three subagents to run in parallel from the coordinator, but they keep executing one after another. What is wrong?
 ?
 The coordinator is emitting the `Task` calls across separate turns. To run subagents in parallel, it must emit multiple `Task` calls in a single response. (Also confirm `Task` is in the coordinator's `allowedTools`, or it cannot spawn subagents at all.)
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 A refund agent must verify the customer's identity before issuing any refund, and the business needs this to be guaranteed, not usually-correct. Why is a system-prompt instruction insufficient, and what do you build instead?
 ?
 Prompt instructions are only probabilistic — they carry a non-zero failure rate. For deterministic compliance, build a programmatic prerequisite gate that blocks `process_refund` from running until `get_customer` has returned a verified id. Code enforces it every time.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 Several MCP tools return timestamps in different formats — one Unix epoch, one ISO 8601, one a numeric status code — and the agent keeps mishandling them. Which hook event solves this and how?
 ?
 A PostToolUse hook. It fires after each tool call succeeds and can transform the result before the model sees it, normalising all the formats into one consistent shape so the agent reasons over clean data.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 You need to block a refund above a policy threshold *before* it executes and route the case to a human. Which hook event, and what values can it return?
 ?
 A PreToolUse hook — the only event that can stop an action before it happens. It returns a `permissionDecision` of `allow`, `deny`, or `ask`. To sanitise rather than block (e.g. strip a secret from a command), it can instead return `updatedInput` to rewrite the call.
 #flashcards/domain-1
+<!--SR:!2026-09-06,1,230-->
 
 Question
 You are choosing a decomposition strategy for a large multi-file code review with well-understood aspects. Prompt chaining or dynamic decomposition — and how do you split it?
 ?
 Prompt chaining, because the steps are predictable. Analyse each file in its own local pass, then run a separate cross-file integration pass. Splitting it this way avoids attention dilution from trying to hold the whole codebase in one pass.
 #flashcards/domain-1
+<!--SR:!2026-09-06,1,230-->
 
 Question
 The task is an open-ended investigation where you cannot plan the steps in advance. Which decomposition approach fits, and what is its shape?
 ?
 Dynamic (adaptive) decomposition, which generates subtasks from what each step discovers. Map the structure first, identify the high-impact areas, then build a prioritised plan that keeps adapting as dependencies surface.
 #flashcards/domain-1
+<!--SR:!2026-09-05,0,230-->
 
 Question
 You broke a broad research topic into very narrow subagent tasks, and the final report has whole areas missing. What went wrong and how do you recover coverage?
 ?
 Overly narrow decomposition left gaps between the pieces. Use an iterative refinement loop: evaluate the synthesised output for gaps, send targeted follow-up queries to fill them, and re-run synthesis until coverage is sufficient.
 #flashcards/domain-1
+<!--SR:!2026-09-06,1,230-->
 
 Question
 You resumed a session to keep working on a codebase, but the files were modified since the last session and Claude gives stale, inconsistent answers. What are your two options and how do you choose?
 ?
 Either resume and explicitly tell the agent which files changed so it re-analyses just those spots, or — if the prior tool results are broadly stale — start a fresh session seeded with a structured summary, which is more reliable than resuming on top of stale data.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 You want to compare two refactoring strategies that both start from the same analysis you have already completed, without the branches interfering. What mechanism fits?
 ?
 `fork_session`: it creates an independent branch from a shared baseline so you can explore divergent approaches in parallel from one common starting point.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 When should you build an agent (goal plus tools, Claude figures out the steps) rather than a workflow (a predetermined series of calls)?
 ?
 Use a workflow when you can picture the exact steps or your UX constrains users to fixed tasks; use an agent only when you cannot predict the task or its parameters. Default to workflows for reliability and reach for agents only when the flexibility is truly required.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 Why must an agent be able to inspect its environment, and what file-editing habit follows from it?
 ?
 Claude acts blind and cannot tell whether an action succeeded without observing the result — this is why computer use returns a screenshot after each action. The habit is *read before write*: read a file's current contents before editing it.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 Your coordinator pushes every incoming request through all of its subagents, even trivial ones, which wastes time and tokens. What does a well-designed coordinator do instead?
 ?
 It analyses what the query actually needs and dynamically selects only the relevant subagents, rather than always routing through the full pipeline. Decomposition, delegation, and subagent selection should scale to the complexity of the request.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 A synthesis subagent returns a polished report, but every claim has lost track of which document it came from, so you can no longer verify attribution. How should the coordinator have passed the upstream findings?
 ?
 As structured data that separates content from metadata — keeping source URLs, document names, and page numbers attached to each finding — so provenance survives the handoff. Passing findings as raw prose loses attribution between agents.
 #flashcards/domain-1
+<!--SR:!2026-09-08,3,250-->
 
 Question
 An agent hits a case it cannot resolve and must escalate to a human who never saw the conversation. What should it send, and why is dumping the raw transcript the wrong move?
