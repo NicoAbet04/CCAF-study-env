@@ -24,6 +24,19 @@ The loop is driven by the model's decisions, not by parsing its prose. See [[1 -
 for working effectively with AI: deciding what to hand off, describing it well,
 judging the output, and doing so responsibly. See [[4 - Prompt Engineering & Structured Output]].
 
+**allowedTools** — The configuration field that scopes which tools an agent or
+subagent may call. A coordinator needs `Task` in its `allowedTools` before it can
+spawn subagents at all — the first thing to check when delegation silently fails.
+See [[1 - Agentic Architecture & Orchestration]].
+
+**`--append-system-prompt` vs `--system-prompt`** — Two CLI flags that look
+interchangeable and are not. `--append-system-prompt` adds text to the end of
+Claude Code's default system prompt, keeping default behaviour — the right choice
+for temporary, stage-specific CI instructions. `--system-prompt` replaces the
+default prompt entirely; use it only to override default behaviour outright.
+`CLAUDE.md` is the third option, for persistent context shared across CI runs and
+ordinary sessions. See [[3 - Claude Code Configuration & Workflows]].
+
 ## B
 
 **BM25** — A lexical (keyword) ranking function that scores documents by exact term
@@ -48,6 +61,11 @@ aggregates results (a hub-and-spoke pattern). See [[1 - Agentic Architecture & O
 **Cosine similarity** — A measure of how close two embedding vectors point in the
 same direction, from -1 to 1; cosine distance is `1 - similarity`. Used to rank
 semantic matches in retrieval. See [[5 - Context Management & Reliability]].
+
+**custom_id** — A field you attach to each request in a Message Batches API
+submission so you can match responses back to requests and, on partial failure,
+resubmit only the documents that failed rather than the whole batch. See
+[[4 - Prompt Engineering & Structured Output]].
 
 ## E
 
@@ -93,7 +111,32 @@ start and end of a long input while under-using material buried in the middle.
 Mitigated by putting key findings first and using clear section headers. See
 [[5 - Context Management & Reliability]].
 
+## M
+
+**MCP structured error response** — Returning a tool failure with `isError` set,
+plus an `errorCategory` (transient, validation, business, or permission) and an
+`isRetryable` boolean, so the agent has a basis for deciding whether to retry,
+explain, or escalate. A uniform "Operation failed" strips away that basis. See
+[[2 - Tool Design & MCP Integration]].
+
+**`.mcp.json` and `~/.claude.json`** — Two places to register MCP servers with
+different reach. `.mcp.json` at the project root is committed and shared with the
+whole team; `~/.claude.json` is user-scoped and personal, for experimental servers
+nobody else needs. `.mcp.json` also supports environment-variable expansion (e.g.
+`${GITHUB_TOKEN}`) so credentials are never committed. See
+[[2 - Tool Design & MCP Integration]].
+
 ## P
+
+**Path-specific rules (`.claude/rules/`)** — Rule files with a YAML `paths:` glob
+in their frontmatter, so a convention loads only when you're editing a matching
+file (e.g. all `**/*.test.tsx` files) instead of always, or instead of needing a
+directory-level `CLAUDE.md` for conventions that span many directories. See
+[[3 - Claude Code Configuration & Workflows]].
+
+**permissionDecision** — The field a `PreToolUse` hook returns to control a tool
+call: `allow`, `deny`, or `ask` (hand the decision to the user). See
+[[1 - Agentic Architecture & Orchestration]].
 
 **PostToolUse** — A hook that fires after a tool runs; useful for normalising or
 transforming a tool's result before the model sees it. It cannot stop the tool,
@@ -126,7 +169,22 @@ semantic search. See [[5 - Context Management & Reliability]].
 source passages: chunk the corpus, embed and index it, retrieve the most relevant
 chunks for a query, and give them to the model as context. See [[5 - Context Management & Reliability]].
 
+**REVIEW.md** — A root-level file that configures Claude's managed GitHub Code
+Review specifically: what to flag, severity levels, exclusions, and reporting
+preferences. `CLAUDE.md` supplies general project context to the same review;
+`REVIEW.md` is the review-specific knob. See [[3 - Claude Code Configuration & Workflows]].
+
 ## S
+
+**SKILL.md** — The file defining a skill in `.claude/skills/`, with frontmatter
+options including `context: fork` (run the skill in an isolated subagent context
+so its output doesn't clutter the main conversation), `allowed-tools`, and
+`argument-hint`. See [[3 - Claude Code Configuration & Workflows]].
+
+**stop_reason** — The field on a Claude API response that drives the agentic
+loop. `tool_use` means keep going; `end_turn` means stop. `max_tokens` means the
+output was cut off, and `stop_sequence` means a stop string you supplied was hit
+— the only other legitimate values. See [[1 - Agentic Architecture & Orchestration]].
 
 **Scratchpad** — A file the agent writes key findings to so they survive context
 boundaries and long sessions, and can be re-read later. See [[5 - Context Management & Reliability]].
@@ -152,6 +210,20 @@ See [[4 - Prompt Engineering & Structured Output]].
 **tool_choice** — The setting that controls tool calling: `auto` (model may answer in
 text), `any` (must call some tool), or forced (`{"type":"tool","name":...}` — must
 call that specific tool). See [[2 - Tool Design & MCP Integration]] and [[4 - Prompt Engineering & Structured Output]].
+
+**tool_result block** — What you send back after running a tool: a `user` message
+containing a block with the tool's output, an `is_error` flag, and a `tool_use_id`
+that matches the request it answers — matching the id matters because results can
+arrive out of order when several tools were requested at once. See
+[[1 - Agentic Architecture & Orchestration]].
+
+## U
+
+**updatedInput** — The field a `PreToolUse` hook returns to rewrite a tool call
+instead of blocking it outright — for example, stripping a secret out of a bash
+command and letting the sanitised version run. It replaces the whole input object,
+so echo back the fields you aren't changing. See
+[[1 - Agentic Architecture & Orchestration]].
 
 ## V
 
