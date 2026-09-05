@@ -2,3 +2,10 @@ __pycache__/
 *.pyc
 .DS_Store
 .idea/
+
+# Obsidian per-session UI state — churns on every open, not part of the vault.
+# Plugin/theme config under .obsidian/ is kept tracked so the vault is
+# reproducible on clone (Spaced Repetition etc. arrive configured).
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/cache
