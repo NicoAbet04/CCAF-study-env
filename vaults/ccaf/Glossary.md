@@ -49,6 +49,12 @@ search. See [[5 - Context Management & Reliability]].
 context. It loads in a hierarchy (user, project, directory) and, unlike command-line
 system-prompt flags, persists across sessions and CI runs. See [[3 - Claude Code Configuration & Workflows]].
 
+**Content block** — One piece of an API message: a text block (Claude's visible
+reasoning or reply), a `tool_use` block (naming a tool and its input), or a
+`tool_result` block (a tool's output sent back). A single message can carry
+several blocks — for example, text followed by two `tool_use` blocks. See
+[[2 - Tool Design & MCP Integration]].
+
 **Context degradation** — The decline in answer quality over a long session: the
 model starts giving inconsistent answers and citing "typical patterns" instead of
 the specific things it discovered earlier. Countered with scratchpads, subagents,
@@ -112,6 +118,13 @@ Mitigated by putting key findings first and using clear section headers. See
 [[5 - Context Management & Reliability]].
 
 ## M
+
+**MCP (Model Context Protocol)** — A protocol that lets an AI application connect
+to outside capabilities through a server, instead of every app hand-rolling its
+own integration. A server exposes three primitives — tools (model-controlled),
+resources (application-controlled), and prompts (user-controlled) — and any
+MCP-aware client, including Claude Code, can use them. See
+[[2 - Tool Design & MCP Integration]].
 
 **MCP structured error response** — Returning a tool failure with `isError` set,
 plus an `errorCategory` (transient, validation, business, or permission) and an
@@ -202,6 +215,11 @@ passed explicitly. See [[1 - Agentic Architecture & Orchestration]].
 **Task tool** — The mechanism a coordinator uses to spawn subagents; the coordinator
 must have `Task` in its allowed tools. Emitting several `Task` calls in one response
 runs subagents in parallel. See [[1 - Agentic Architecture & Orchestration]].
+
+**Tool schema** — What you give the model to describe a tool: a name, a
+description, and a [[Glossary|JSON Schema]] for its inputs. The description is
+the model's primary basis for choosing between tools, so it carries more weight
+than the name. See [[2 - Tool Design & MCP Integration]].
 
 **Temperature** — A sampling setting: near 0 makes output deterministic (favours the
 highest-probability token); higher values spread probability for more varied output.

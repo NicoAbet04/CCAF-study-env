@@ -53,9 +53,13 @@ Every domain note is `<N> - <Domain Name>.md` in the vault and contains:
 - Prose **condensed in your own words**, structured around the domain's
   **blueprint task list** (what the exam tests), not the source files' order.
 - **`[[wikilinks]]`** to related concepts; every term of art linked to
-  `[[Glossary]]` on first use.
-- **Exactly one mermaid diagram** (`graph TD` or `mindmap`) of the domain's
-  sub-topics, with node labels understandable on their own.
+  `[[Glossary|the term itself]]` on first use — the term is the link, never a
+  bare mention followed by a parenthetical `(see [[Glossary]])` (found and
+  fixed in Domain 2, 2026-09-05).
+- **Exactly one mermaid diagram, `graph TD` only** (not `mindmap` — its
+  auto-colored branches can render illegible in a dark theme; found and fixed
+  in Domain 2, 2026-09-05) of the domain's sub-topics, with node labels
+  understandable on their own.
 - At least `flashcards_min` **spaced-repetition flashcards** in the Obsidian
   *Spaced Repetition* plugin format — `Question` / `?` / `Answer` on their own
   lines — tagged `#flashcards/domain-N`. Cards skew toward **scenario

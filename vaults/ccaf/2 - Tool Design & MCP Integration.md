@@ -20,9 +20,9 @@ about making tool use predictable.
 
 A quick vocabulary anchor before the tasks. A **tool** is a function you expose
 to the model so it can act on the outside world, described to the model by a
-**tool schema** (see [[Glossary]]) — a name, a description, and a
-[[Glossary|JSON Schema]] for its inputs. The **Model Context Protocol (MCP)**
-(see [[Glossary]]) is a standard way to package tools, data, and prompt
+[[Glossary|tool schema]] — a name, a description, and a
+[[Glossary|JSON Schema]] for its inputs. The **Model Context Protocol**
+([[Glossary|MCP]]) is a standard way to package tools, data, and prompt
 templates in a reusable server that any MCP-aware client — Claude Code, the
 desktop app, or your own script — can connect to. This domain leans on the
 [[1 - Agentic Architecture & Orchestration|agentic loop]] from Domain 1 and
@@ -30,30 +30,22 @@ feeds the reliability patterns in
 [[5 - Context Management & Reliability|Domain 5]].
 
 ```mermaid
-mindmap
-  root((Tool Design and MCP))
-    Interfaces 2.1
-      Descriptions drive tool selection
-      Split generic tools into specific ones
-      System prompt keywords can override descriptions
-    Structured errors 2.2
-      isError flag signals failure
-      errorCategory transient validation business permission
-      isRetryable boolean saves wasted retries
-      Access failure vs valid empty result
-    Tool distribution 2.3
-      Scope tools to each agent role
-      Too many tools degrades selection
-      tool_choice auto any forced
-    MCP integration 2.4
-      Project .mcp.json vs user ~/.claude.json
-      Env var expansion for secrets
-      Resources cut exploratory tool calls
-      Prefer community servers over custom
-    Built-in tools 2.5
-      Grep for content Glob for paths
-      Read Write Edit
-      Edit fails then Read plus Write
+graph TD
+    D2[Domain 2: Tool Design and MCP Integration]
+    D2 --> I1[2.1 Interfaces: descriptions drive tool selection]
+    D2 --> I2[2.2 Structured errors: isError, errorCategory, isRetryable]
+    D2 --> I3[2.3 Tool distribution: scope tools to each agent role]
+    D2 --> I4[2.4 MCP integration: .mcp.json vs user config, secrets]
+    D2 --> I5[2.5 Built-in tools: Grep, Glob, Read, Write, Edit]
+    I1 --> I1a[Split generic tools into specific ones]
+    I1 --> I1b[System prompt keywords can override descriptions]
+    I2 --> I2a[Access failure vs valid empty result]
+    I3 --> I3a[Too many tools degrades selection]
+    I3 --> I3b[tool_choice: auto, any, or forced]
+    I4 --> I4a[Prefer community servers over custom]
+    I4 --> I4b[Resources cut exploratory tool calls]
+    I5 --> I5a[Grep for content, Glob for paths]
+    I5 --> I5b[Edit fails on non-unique match then Read plus Write]
 ```
 
 ---
@@ -62,10 +54,10 @@ mindmap
 
 Every task in this domain sits on top of one loop, so it helps to have it clear
 first. You send Claude a request with a list of tool schemas. Claude replies
-with a message made of **content blocks** (see [[Glossary]]): a text block
+with a message made of [[Glossary|content blocks]]: a text block
 explaining its thinking, and one or more **tool_use** blocks naming a tool and
-the input it wants. You detect this by reading the response's **stop_reason**
-(see [[Glossary]]): when it equals `"tool_use"`, Claude is asking you to run
+the input it wants. You detect this by reading the response's
+[[Glossary|stop_reason]]: when it equals `"tool_use"`, Claude is asking you to run
 something. You execute the tool, then send the result back inside a user message
 as a **tool_result** block whose `tool_use_id` matches the request. The loop
 repeats until `stop_reason` is `"end_turn"`. This is the same loop that
@@ -205,7 +197,7 @@ alternative. Swap a wide-open `fetch_url` for a `load_document` tool that
 validates document URLs, and the agent can no longer wander off to arbitrary
 pages.
 
-The other half of this task is **`tool_choice`** (see [[Glossary]]), which
+The other half of this task is [[Glossary|tool_choice]], which
 controls whether and how the model must call a tool:
 
 - **`auto`** — the model decides; it may return plain text instead of calling a

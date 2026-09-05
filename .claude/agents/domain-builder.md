@@ -24,10 +24,20 @@ Rules:
 - Write `<N> - <Domain Name>.md` in the vault following the conventions in
   CLAUDE.md: condensed in your own words (never pasted verbatim), YAML
   frontmatter with tags and domain, `[[wikilinks]]` to related concepts, one
-  mermaid diagram (`graph TD` or `mindmap`) of the domain's sub-topics, and at
-  least the minimum number of spaced-repetition flashcards
-  (`Question` / `?` / `Answer` on their own lines, tagged
-  `#flashcards/domain-N`).
+  mermaid diagram of the domain's sub-topics, and at least the minimum number
+  of spaced-repetition flashcards (`Question` / `?` / `Answer` on their own
+  lines, tagged `#flashcards/domain-N`).
+
+- Mermaid diagram: **`graph TD` only.** Do not use `mindmap` — it auto-assigns
+  a rotating color per branch that can render illegible against Obsidian's dark
+  theme (found in Domain 2, fixed 2026-09-05). `graph TD` uses the theme's
+  default node styling uniformly and is guaranteed readable.
+
+- Glossary links: make **the term itself** the clickable link —
+  `[[Glossary|term]]` — never a bare mention followed by a parenthetical
+  `(see [[Glossary]])`. If a term of art has no existing Glossary entry, add one
+  (Glossary.md is orchestrator-owned, but flag the addition in your log so it's
+  visible) rather than linking to a page with nothing to land on.
 
 - Structure the note around the domain's TASK LIST from the blueprint, not
   around the source files' own organization — the tasks are what the exam
