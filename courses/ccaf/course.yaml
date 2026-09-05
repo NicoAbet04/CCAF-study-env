@@ -1,0 +1,198 @@
+# courses/ccaf/course.yaml
+# The course manifest — the ONLY file a new course must author. Everything else
+# (agents, hooks, commands, loop body) is shared and parameterized by this file.
+#
+# NOTE ON AUTHORITY: this YAML is the human-authored input. At build time,
+# /course-build Phase 0 resolves it into machine-authoritative JSON state under
+# .claude/state/ccaf/ (run.json carries vault + blueprint + max_cycles;
+# inventory.json carries the file inventory). The deterministic audit reads that
+# JSON, never this YAML — see CLAUDE.md "Build state model".
+
+name: CCAF
+title: "Claude Certified Architect – Foundations"
+vault: vaults/ccaf                       # §9.1 — inside the repo (path relative to study-env root)
+
+sources:                                 # PRIMARY tier: inventoried + coverage-gated + condensed into notes
+  - path: ~/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main
+  - path: ~/Projects/PyCharmProjects/CCAF
+  - path: courses/ccaf/sources-cache/exam-guide.pdf   # official Exam Guide (§0.4) — cached copy (added Phase 0)
+  - path: courses/ccaf/notes/exam-intel.md            # doc-verified exam intel from passers (§0.5) — created Phase 0.5
+  - path: courses/ccaf/notes/module-05-mcp.md         # synthesized Intro-to-MCP notes (§9.10) — created Phase 0.5
+
+references:                              # linked/cited from notes, NEVER inventoried
+  - name: Claude Cookbooks
+    url: https://github.com/anthropics/claude-cookbooks
+  - name: Claude Code docs
+    url: https://code.claude.com/docs
+  - name: Model Context Protocol docs
+    url: https://modelcontextprotocol.io
+
+crosscheck:                             # compared post-generation, NEVER ingested (see §0.4 licensing)
+  - name: CCA Playbook Anki decks
+    url: https://github.com/paullarionov/claude-certified-architect
+
+practice:                               # quarantined from notes/flashcards; feed Weak Areas.md only
+  - name: cert-exam skill (77Q)         # local, adopted into .claude/skills/cert-exam.md
+  - name: CyberSkill timed mock
+    url: https://ccaf.cyberskill.world/exam
+  - name: CosX AI mocks (3x60Q)
+    url: https://www.cosx.ai/ccaf-guide
+  - name: ccaf-exam-tutorial labs
+    url: https://github.com/jamesbuckett/ccaf-exam-tutorial
+  - name: claudecertificationguide.com  # trap boxes endorsed by a passer (§0.5.3)
+
+exclude:                                # gitignore syntax, applied at ANY depth (§0.1)
+  - "**/.git/**"
+  - "**/.idea/**"
+  - "**/.venv/**"
+  - "**/venv/**"
+  - "**/__pycache__/**"
+  - "**/.trees/**"                      # leftover course-exercise worktrees (full doc duplicates)
+  - "**/node_modules/**"
+  - "**/uv.lock"
+  - "**/*.lock"
+  - "**/tests/fixtures/**"
+
+content_extensions: [md, ipynb]         # swept during inventory
+read_referenced_images: true            # §9.8 — an image is read iff an assigned md/ipynb references it
+                                        #   (both docs/ figures AND the ~120 notebook screenshots)
+
+blueprint:                              # canonical domain ordering = exam repo's (§0.1, confirmed by official guide §0.4)
+# TASK PROVENANCE — the task list IS the completeness definition the evaluator
+# checks against, so each task records where it came from:
+#   source: official   → verbatim task statement from the official Exam Guide
+#                        (its "Knowledge of" / "Skills in" bullets, condensed)
+#   source: community  → the community exam repo's domain-task index, used where
+#                        the public Exam Guide PDF truncates (after task 1.6)
+# If a complete Exam Guide turns up behind the registration portal (§9.13),
+# re-derive the `community` entries from it and flip their source.
+  - id: 1
+    name: "Agentic Architecture & Orchestration"
+    weight: 27
+    flashcards_min: 12                  # highest-failure domain → more cards
+    tasks:
+      - id: "1.1"
+        name: "Design and implement agentic loops for autonomous task execution"
+        source: official
+        knowledge:
+          - "Agentic loop lifecycle: send request, inspect stop_reason ('tool_use' vs 'end_turn'), execute tools, return results for the next iteration"
+          - "Tool results are appended to conversation history so the model can reason about the next action"
+          - "Model-driven decision-making vs pre-configured decision trees or fixed tool sequences"
+        skills:
+          - "Loop control flow that continues on stop_reason 'tool_use' and terminates on 'end_turn'"
+          - "Adding tool results to context between iterations"
+          - "ANTI-PATTERNS: parsing natural-language signals to decide termination; arbitrary iteration caps as the PRIMARY stopping mechanism; checking assistant text content as a completion indicator"
+      - id: "1.2"
+        name: "Orchestrate multi-agent systems with coordinator-subagent patterns"
+        source: official
+        knowledge:
+          - "Hub-and-spoke architecture: the coordinator manages all inter-subagent communication, error handling, and routing"
+          - "Subagents run with isolated context — they do NOT inherit the coordinator's conversation history"
+          - "Coordinator role: task decomposition, delegation, result aggregation, deciding which subagents to invoke by query complexity"
+          - "Risk of overly narrow decomposition: incomplete coverage of broad topics"
+        skills:
+          - "Coordinators that dynamically select subagents rather than always routing through the full pipeline"
+          - "Partitioning scope across subagents to minimize duplication (distinct subtopics or source types)"
+          - "Iterative refinement loops: evaluate synthesis for gaps, re-delegate with targeted queries, re-invoke until coverage suffices"
+          - "Routing all subagent communication through the coordinator for observability and controlled information flow"
+      - id: "1.3"
+        name: "Configure subagent invocation, context passing, and spawning"
+        source: official
+        knowledge:
+          - "The Task tool spawns subagents; allowedTools must include 'Task' for a coordinator to invoke them"
+          - "Subagent context must be provided explicitly in the prompt — no automatic inheritance or shared memory between invocations"
+          - "AgentDefinition configuration: descriptions, system prompts, per-type tool restrictions"
+          - "Fork-based session management for exploring divergent approaches from a shared baseline"
+        skills:
+          - "Including complete prior-agent findings directly in the subagent's prompt"
+          - "Structured data formats that separate content from metadata (source URLs, document names, page numbers) to preserve attribution"
+          - "Spawning parallel subagents by emitting multiple Task calls in a SINGLE response, not across turns"
+          - "Coordinator prompts that specify goals and quality criteria rather than step-by-step procedure"
+      - id: "1.4"
+        name: "Implement multi-step workflows with enforcement and handoff patterns"
+        source: official
+        knowledge:
+          - "Programmatic enforcement (hooks, prerequisite gates) vs prompt-based guidance for workflow ordering"
+          - "When deterministic compliance is required (e.g. identity verification before financial operations), prompt instructions alone have a non-zero failure rate"
+          - "Structured handoff protocols for mid-process escalation: customer details, root cause, recommended actions"
+        skills:
+          - "Programmatic prerequisites that block downstream tool calls until prior steps complete (e.g. block process_refund until get_customer returned a verified ID)"
+          - "Decomposing multi-concern requests, investigating each in parallel with shared context, then synthesizing one resolution"
+          - "Compiling structured handoff summaries for human agents who lack the transcript"
+      - id: "1.5"
+        name: "Apply Agent SDK hooks for tool call interception and data normalization"
+        source: official
+        knowledge:
+          - "Hook patterns (e.g. PostToolUse) that intercept tool results for transformation before the model sees them"
+          - "Hook patterns that intercept outgoing tool calls to enforce compliance rules (e.g. blocking refunds above a threshold)"
+          - "Hooks give deterministic guarantees; prompt instructions give probabilistic compliance"
+        skills:
+          - "PostToolUse hooks normalizing heterogeneous formats (Unix timestamps, ISO 8601, numeric status codes) across MCP tools"
+          - "Interception hooks that block policy-violating actions and redirect to alternative workflows (e.g. human escalation)"
+          - "Choosing hooks over prompt-based enforcement when business rules require guaranteed compliance"
+      - id: "1.6"
+        name: "Design task decomposition strategies for complex workflows"
+        source: official
+        knowledge:
+          - "Fixed sequential pipelines (prompt chaining) vs dynamic adaptive decomposition based on intermediate findings"
+          - "Prompt chaining that breaks reviews into sequential steps (analyze each file, then a cross-file integration pass)"
+          - "The value of adaptive investigation plans that generate subtasks from what each step discovers"
+        skills:
+          - "Selecting the decomposition pattern that fits the workflow: prompt chaining for predictable multi-aspect reviews, dynamic decomposition for open-ended investigation"
+      - id: "1.7"
+        name: "Session state, resumption, and forking"
+        source: community          # public Exam Guide PDF truncates after 1.6 (§9.13)
+        knowledge: []
+        skills: []
+  - id: 2
+    name: "Tool Design & MCP Integration"
+    weight: 18
+    flashcards_min: 12                  # other highest-failure domain
+    tasks:
+      - {id: "2.1", name: "Tool interface design with clear descriptions", source: community}
+      - {id: "2.2", name: "Structured error responses for MCP tools", source: community}
+      - {id: "2.3", name: "Tool distribution across agents and tool_choice", source: community}
+      - {id: "2.4", name: "MCP server integration into Claude Code", source: community}
+      - {id: "2.5", name: "Built-in tools (Read, Write, Edit, Bash, Grep, Glob)", source: community}
+  - id: 3
+    name: "Claude Code Configuration & Workflows"
+    weight: 20
+    flashcards_min: 8
+    tasks:
+      - {id: "3.1", name: "CLAUDE.md hierarchy, scoping, modular organization", source: community}
+      - {id: "3.2", name: "Custom slash commands and skills", source: community}
+      - {id: "3.3", name: "Path-specific rules for conditional convention loading", source: community}
+      - {id: "3.4", name: "Plan mode vs direct execution", source: community}
+      - {id: "3.5", name: "Iterative refinement techniques", source: community}
+      - id: "3.6"
+        name: "Claude Code in CI/CD pipelines"
+        source: community
+        knowledge:
+          # Seeded from exam-intel (§0.5) — doc-verified, reported on the exam.
+          - "--append-system-prompt (temporary, stage-specific, KEEPS default behavior) vs --system-prompt (REPLACES it) vs CLAUDE.md (persistent shared context across CI runs and normal sessions)"
+          - "Managed GitHub Code Review reads CLAUDE.md for general project context AND a root-level REVIEW.md for review-specific instructions (what to flag, severity levels, exclusions, reporting preferences)"
+  - id: 4
+    name: "Prompt Engineering & Structured Output"
+    weight: 20
+    flashcards_min: 8
+    tasks:
+      - {id: "4.1", name: "Explicit criteria for precision and false-positive reduction", source: community}
+      - {id: "4.2", name: "Few-shot prompting for consistency and quality", source: community}
+      - {id: "4.3", name: "Structured output using tool use and JSON schemas", source: community}
+      - {id: "4.4", name: "Validation, retry, and feedback loops", source: community}
+      - {id: "4.5", name: "Batch processing strategies", source: community}
+      - {id: "4.6", name: "Multi-instance and multi-pass review architectures", source: community}
+  - id: 5
+    name: "Context Management & Reliability"
+    weight: 15
+    flashcards_min: 8
+    tasks:
+      - {id: "5.1", name: "Conversation context preservation", source: community}
+      - {id: "5.2", name: "Escalation and ambiguity resolution", source: community}
+      - {id: "5.3", name: "Error propagation across multi-agent systems", source: community}
+      - {id: "5.4", name: "Context management in large codebase exploration", source: community}
+      - {id: "5.5", name: "Human review workflows and confidence calibration", source: community}
+      - {id: "5.6", name: "Information provenance and uncertainty", source: community}
+
+conventions: a4                         # formatting profile (A.4 baked into CLAUDE.md / builder prompt)
+max_gap_fill_cycles: 3                  # safety valve (§4.5 / §9.6)
