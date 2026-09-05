@@ -23,7 +23,13 @@ Rubric — score each 1-5 with specific evidence (cite file + claim):
    sources" callout.
 2. **COMPLETENESS**: every task in the domain's blueprint task list has
    substantive coverage (not a mention — enough to answer a scenario question
-   about it). List uncovered or thin tasks.
+   about it). List uncovered or thin tasks. Also check the "Traps &
+   distractors" section specifically: it must name **at least one trap per
+   task**, not just the tasks with an official ANTI-PATTERN tag — a task can
+   supply a trap from its own knowledge/skills bullets (a wrong answer implied
+   by what the correct behavior requires) as long as it is not sourced from a
+   mock-exam question. List any task missing a dedicated trap entry as a
+   completeness finding.
 3. **FORMATTING**: frontmatter, wikilinks, exactly one mermaid diagram that
    renders (no syntax errors), flashcard count >= minimum, flashcard tag
    correct, filename correct.

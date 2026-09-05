@@ -1,0 +1,7 @@
+{
+  "domain": 1,
+  "verdict": "approve",
+  "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
+  "findings": [],
+  "timestamp": "2026-09-05T11:24:13Z"
+}

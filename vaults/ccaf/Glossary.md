@@ -1,0 +1,164 @@
+---
+tags: [ccaf, glossary]
+---
+
+# Glossary
+
+Short, plain definitions for the terms of art used across the CCAF domain notes.
+Each entry says what the term means and, where useful, which domain note develops
+it. Definitions are kept faithful to how the course sources and the official exam
+guide use each term.
+
+## A
+
+**AgentDefinition** — The configuration object that describes a subagent type: its
+description, system prompt, and the tools it is allowed to use. Lets a coordinator
+spawn specialised subagents with scoped behaviour. See [[1 - Agentic Architecture & Orchestration]].
+
+**Agentic loop** — The cycle where you send a request, inspect the `stop_reason`,
+run any tool the model asked for, append the result to the conversation, and send
+again — continuing while `stop_reason` is `tool_use` and stopping on `end_turn`.
+The loop is driven by the model's decisions, not by parsing its prose. See [[1 - Agentic Architecture & Orchestration]].
+
+**AI fluency** — The framework (Delegation, Description, Discernment, Diligence)
+for working effectively with AI: deciding what to hand off, describing it well,
+judging the output, and doing so responsibly. See [[4 - Prompt Engineering & Structured Output]].
+
+## B
+
+**BM25** — A lexical (keyword) ranking function that scores documents by exact term
+matches. Strong on rare identifiers and codes; combined with embeddings in a hybrid
+search. See [[5 - Context Management & Reliability]].
+
+## C
+
+**CLAUDE.md** — A Markdown file that gives Claude Code persistent project or user
+context. It loads in a hierarchy (user, project, directory) and, unlike command-line
+system-prompt flags, persists across sessions and CI runs. See [[3 - Claude Code Configuration & Workflows]].
+
+**Context degradation** — The decline in answer quality over a long session: the
+model starts giving inconsistent answers and citing "typical patterns" instead of
+the specific things it discovered earlier. Countered with scratchpads, subagents,
+and `/compact`. See [[5 - Context Management & Reliability]].
+
+**Coordinator** — In a multi-agent system, the agent that decomposes the task,
+delegates to subagents, routes all inter-agent communication, handles errors, and
+aggregates results (a hub-and-spoke pattern). See [[1 - Agentic Architecture & Orchestration]].
+
+**Cosine similarity** — A measure of how close two embedding vectors point in the
+same direction, from -1 to 1; cosine distance is `1 - similarity`. Used to rank
+semantic matches in retrieval. See [[5 - Context Management & Reliability]].
+
+## E
+
+**Embedding** — A list of numbers representing the meaning of a piece of text, so
+that semantically similar texts sit close together in vector space. The individual
+dimensions are not human-interpretable. See [[5 - Context Management & Reliability]].
+
+**Evaluator-optimizer** — An agentic pattern where one step produces output and
+another evaluates it for gaps, feeding targeted follow-up work until coverage is
+sufficient. See [[1 - Agentic Architecture & Orchestration]].
+
+**Extended thinking** — A mode where the model produces explicit reasoning before
+its final answer, improving hard multi-step problems at the cost of extra tokens.
+See [[5 - Context Management & Reliability]].
+
+## F
+
+**Few-shot prompt** — A prompt that includes a handful of worked examples to
+demonstrate the format and judgment you want, so the model generalises to new cases
+rather than matching only pre-specified ones. See [[4 - Prompt Engineering & Structured Output]].
+
+**fork_session** — Creating an independent branch from a shared analysis baseline so
+you can explore divergent approaches without disturbing the original session. See
+[[1 - Agentic Architecture & Orchestration]].
+
+## H
+
+**Hook** — A configured script that fires on a lifecycle event (e.g. `PreToolUse`,
+`PostToolUse`, `Stop`) to intercept, transform, or block behaviour. Hooks give
+deterministic guarantees where prompt instructions give only probabilistic
+compliance. See [[1 - Agentic Architecture & Orchestration]] and [[3 - Claude Code Configuration & Workflows]].
+
+## J
+
+**JSON Schema** — A formal description of the shape of a JSON object (fields, types,
+which are required). Used with tool definitions to force schema-compliant output and
+eliminate JSON syntax errors. See [[4 - Prompt Engineering & Structured Output]].
+
+## L
+
+**Lost in the middle** — The tendency of models to reliably use information at the
+start and end of a long input while under-using material buried in the middle.
+Mitigated by putting key findings first and using clear section headers. See
+[[5 - Context Management & Reliability]].
+
+## P
+
+**PostToolUse** — A hook that fires after a tool runs; useful for normalising or
+transforming a tool's result before the model sees it. It cannot stop the tool,
+which already ran. See [[1 - Agentic Architecture & Orchestration]].
+
+**PreToolUse** — A hook that fires before a tool runs and can allow, deny, or ask —
+and can rewrite the tool's input (e.g. redact a value). The enforcement point for
+deterministic policy. See [[1 - Agentic Architecture & Orchestration]].
+
+**Progressive summarization** — Repeatedly condensing conversation history to save
+tokens. The risk is losing exact figures, dates, and stated expectations, so pull
+those into a persistent facts block kept outside the summary. See [[5 - Context Management & Reliability]].
+
+**Prompt caching** — Reusing the model's processing of a stable prefix (tools,
+system prompt, long context) across requests to cut cost and latency. Order matters
+(tools, then system, then messages) and small edits invalidate the cache. See
+[[5 - Context Management & Reliability]].
+
+**Provenance** — Keeping track of which source each claim came from as findings pass
+through summarisation and synthesis, so attribution and conflicts are preserved
+rather than flattened. See [[5 - Context Management & Reliability]].
+
+## R
+
+**Reciprocal rank fusion (RRF)** — A method for merging several ranked result lists
+into one by summing `1/(k + rank)` across lists, used to combine lexical and
+semantic search. See [[5 - Context Management & Reliability]].
+
+**Retrieval Augmented Generation (RAG)** — Answering with the help of retrieved
+source passages: chunk the corpus, embed and index it, retrieve the most relevant
+chunks for a query, and give them to the model as context. See [[5 - Context Management & Reliability]].
+
+## S
+
+**Scratchpad** — A file the agent writes key findings to so they survive context
+boundaries and long sessions, and can be re-read later. See [[5 - Context Management & Reliability]].
+
+**Stratified random sampling** — Sampling within segments (e.g. by document type)
+to measure error rates and catch novel failures that an aggregate accuracy number
+would hide. See [[5 - Context Management & Reliability]].
+
+**Subagent** — A separate agent invoked for a scoped task with its own isolated
+context; it does not inherit the caller's conversation history, so context must be
+passed explicitly. See [[1 - Agentic Architecture & Orchestration]].
+
+## T
+
+**Task tool** — The mechanism a coordinator uses to spawn subagents; the coordinator
+must have `Task` in its allowed tools. Emitting several `Task` calls in one response
+runs subagents in parallel. See [[1 - Agentic Architecture & Orchestration]].
+
+**Temperature** — A sampling setting: near 0 makes output deterministic (favours the
+highest-probability token); higher values spread probability for more varied output.
+See [[4 - Prompt Engineering & Structured Output]].
+
+**tool_choice** — The setting that controls tool calling: `auto` (model may answer in
+text), `any` (must call some tool), or forced (`{"type":"tool","name":...}` — must
+call that specific tool). See [[2 - Tool Design & MCP Integration]] and [[4 - Prompt Engineering & Structured Output]].
+
+## V
+
+**Vector database** — A store that indexes embeddings and returns the nearest ones to
+a query vector, enabling fast semantic retrieval. See [[5 - Context Management & Reliability]].
+
+## X
+
+**XML tags** — Using tags like `<document>` and `<instructions>` to structure a
+prompt so the model can tell content apart cleanly. See [[4 - Prompt Engineering & Structured Output]].

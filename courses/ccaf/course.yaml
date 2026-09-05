@@ -89,7 +89,7 @@ blueprint:
   - id: 1
     name: "Agentic Architecture & Orchestration"
     weight: 27
-    flashcards_min: 12                  # highest-failure domain → more cards
+    flashcards_min: 16                  # highest-failure domain → more cards (raised from 12, 2026-09-05)
     tasks:
       - id: "1.1"
         name: "Design and implement agentic loops for autonomous task execution"
@@ -180,7 +180,7 @@ blueprint:
   - id: 2
     name: "Tool Design & MCP Integration"
     weight: 18
-    flashcards_min: 12                  # other highest-failure domain
+    flashcards_min: 16                  # other highest-failure domain (raised from 12, 2026-09-05)
     tasks:
       - id: "2.1"
         name: "Design effective tool interfaces with clear descriptions and boundaries"
@@ -254,7 +254,7 @@ blueprint:
   - id: 3
     name: "Claude Code Configuration & Workflows"
     weight: 20
-    flashcards_min: 8
+    flashcards_min: 12                  # raised from 8, 2026-09-05
     tasks:
       - id: "3.1"
         name: "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization"
@@ -342,7 +342,7 @@ blueprint:
   - id: 4
     name: "Prompt Engineering & Structured Output"
     weight: 20
-    flashcards_min: 8
+    flashcards_min: 12                  # raised from 8, 2026-09-05
     tasks:
       - id: "4.1"
         name: "Design prompts with explicit criteria to improve precision and reduce false positives"
@@ -425,7 +425,7 @@ blueprint:
   - id: 5
     name: "Context Management & Reliability"
     weight: 15
-    flashcards_min: 8
+    flashcards_min: 12                  # raised from 8, 2026-09-05
     tasks:
       - id: "5.1"
         name: "Manage conversation context to preserve critical information across long interactions"

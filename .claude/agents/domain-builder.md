@@ -42,11 +42,17 @@ Rules:
   surrounding text. If a source sentence is clumsy, fix the phrasing, not just
   the facts.
 
-- End the note with a "Traps & distractors" section: the wrong-but-plausible
-  answers this domain invites, grounded ONLY in the official exam guide's stated
-  anti-patterns and doc-verified exam-intel entries (never in mock-exam
-  questions). Render exam-intel items in a `> [!tip] 📌 Reported on the exam`
-  callout with their doc citation.
+- End the note with a "Traps & distractors" section covering **every task in
+  the domain — at least one trap per task, no exceptions.** Ground each trap in
+  one of: (a) the exam guide's explicitly-tagged ANTI-PATTERN bullets, (b) a
+  wrong answer implied by a task's own knowledge/skills bullets (e.g. a bullet
+  saying "X requires explicit configuration" implies the trap "assuming X
+  happens automatically" — derive it, don't invent unrelated content), or (c)
+  doc-verified exam-intel entries. NEVER ground a trap in a mock-exam question
+  — that tier is quarantined. Render exam-intel items in a
+  `> [!tip] 📌 Reported on the exam` callout with their doc citation. If a task
+  genuinely has no plausible wrong answer worth naming, say so explicitly in
+  the log rather than skipping it silently.
 
 - Write `.claude/state/<course>/domain-<N>-log.json`: for every assigned file,
   one entry `{path, status: used|irrelevant|partial|failed, contribution,

@@ -1,0 +1,104 @@
+[
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+    "status": "used",
+    "contribution": "Domain 2 task statements 2.1-2.5 and the ANTI-PATTERN bullets (generic 'Operation failed' errors, overlapping tool descriptions, 18 tools vs 4-5, cross-specialization tool misuse). These are already transcribed into course.yaml; used as the authoritative task/anti-pattern spine and the grounding for the Traps & distractors section.",
+    "sections_covered": ["Domain 2 tasks 2.1", "2.2", "2.3", "2.4", "2.5", "Domain 2 anti-patterns"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+    "status": "used",
+    "contribution": "Primary source for the tool-use mechanism (schemas from JSON Schema, content blocks, stop_reason, tool_result with is_error, multiple tool calls, tool_use_id matching, manual history management) from L270-343; and the full MCP protocol layer (client/server, transport-agnostic stdio, ListTools/CallTool, FastMCP tools, inspector, direct vs templated resources, prompts, the three-primitive review) from L890-1576; plus Claude Code + computer use and 'Enhancements with MCP' (claude mcp add, three primitives) from L1577-1730.",
+    "sections_covered": ["Tool use L270-343", "Model Context Protocol L890-1576", "Anthropic apps + Enhancements with MCP L1577-1730"]
+  },
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/notes/module-05-mcp.md",
+    "status": "used",
+    "contribution": "The Domain-2 MCP gap-fill: .mcp.json project scope vs ~/.claude.json user scope, environment-variable expansion for credentials, tools discovered at connection time and available simultaneously, thin MCP descriptions losing to built-ins, prefer community servers over custom, and the structured-error model (isError, errorCategory taxonomy, isRetryable, access-failure vs valid-empty-result). Also the three-primitive control model (tool/resource/prompt) and resources reducing exploratory tool calls.",
+    "sections_covered": ["Introducing MCP", "Three server primitives", "Server scoping and credentials (task 2.4)", "Structured error responses (task 2.2)"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/03_claude_on_google_cloud/Claude_Google_Cloud.md",
+    "status": "used",
+    "contribution": "Computer use section L90-125: the tiny computer_20250124 schema (display size) that expands into mouse/keyboard/screenshot actions, that computer use follows the same tool-use flow, and that the caller supplies the environment (Docker container). Fed the built-in server-side tools subsection under task 2.1.",
+    "sections_covered": ["Computer use L90-125"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/004_code_execution.ipynb",
+    "status": "used",
+    "contribution": "Code execution tool schema (code_execution_20250825), the sandboxed-container model, and the clean-slate-per-execution behavior (must re-import libraries each run). Fed the built-in server-side tools subsection under task 2.1.",
+    "sections_covered": ["code execution tool schema", "clean-slate execution semantics"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/001_tools.ipynb",
+    "status": "used",
+    "contribution": "Core tool-use mechanism illustrated in code: tool schema shape (name/description/input_schema), multi-block messages, stop_reason == 'tool_use' loop control, tool_result blocks with tool_use_id and is_error, run_tools error-wrapping pattern, and using multiple tools. Also the concrete lesson that a longer/clearer description improves selection (the two get_current_datetime schema variants). Grounds the 'How tool use actually works' section and task 2.1.",
+    "sections_covered": ["Tool functions", "Tool schemas", "Handling message blocks", "Sending tool results", "Multi-turn conversations", "Using multiple tools"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/002_tools_streaming.ipynb",
+    "status": "used",
+    "contribution": "Fine-grained tool calling / tool streaming: InputJsonEvent partial_json vs snapshot, API buffering-and-validating top-level key/value pairs, fine-grained beta disabling that validation (faster chunks but caller must handle invalid JSON), and forced tool_choice usage in the run loop. Supporting detail for tool_choice (2.3) and tool anatomy.",
+    "sections_covered": ["Fine-grained tool calling", "JSON validation behavior", "tool_choice in streaming loop"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/003_text_editor_tool.ipynb",
+    "status": "used",
+    "contribution": "Text editor tool: built-in schema (text_editor_20250728 / str_replace_based_edit_tool) whose implementation you still supply; capabilities (view, str_replace, create, insert, undo_edit) and path validation. Fed the built-in server-side tools subsection under task 2.1.",
+    "sections_covered": ["Text editor tool capabilities", "schema is built-in but implementation is yours"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/004_web_search_tool.ipynb",
+    "status": "used",
+    "contribution": "Web search tool: schema web_search_20250305 with max_uses and allowed_domains; Claude runs the whole search itself and returns results with citations. Fed the built-in server-side tools subsection under task 2.1.",
+    "sections_covered": ["Web search tool schema", "max_uses / allowed_domains", "citations in results"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/mcp/cli_project/README.md",
+    "status": "used",
+    "contribution": "Hands-on MCP CLI project context: @document mention (resource retrieval) and /command prompt invocation with tab auto-complete, illustrating resources (app-controlled) and prompts (user-controlled) as slash commands. Corroborates the three-primitive control model and the .env credential handling used in task 2.4.",
+    "sections_covered": ["Document retrieval via @", "Commands via /", "env var / .env config"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/cli_project_COMPLETE/README.md",
+    "status": "partial",
+    "contribution": "Near-duplicate of the module-02 MCP CLI README. Only Vertex-specific delta extracted: the project authenticates via GCP_PROJECT_ID and GCP_REGION env vars instead of ANTHROPIC_API_KEY (Vertex deployment path). The MCP behavior (@ mentions, / commands, resources/prompts) is identical to the module-02 project already covered.",
+    "sections_covered": ["Vertex delta: GCP_PROJECT_ID / GCP_REGION env auth"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools.ipynb",
+    "status": "partial",
+    "contribution": "Vertex near-duplicate of tool_use/001_tools.ipynb. Only delta is the client: AnthropicVertex(region=..., project_id=...) with @-style model IDs (claude-sonnet-4@20250514). Tool-use content is identical to the module-02 exercise already condensed.",
+    "sections_covered": ["Vertex delta: AnthropicVertex client + @ model id"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_007.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-duplicate of the module-02 tool exercises; the only difference from 001_tools.ipynb is the AnthropicVertex client instantiation, already captured. No additional Domain-2 concept.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_008.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-duplicate of the module-02 tool exercises; only the AnthropicVertex client differs, already captured. No additional Domain-2 concept.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_009.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-duplicate of the module-02 tool exercises; only the AnthropicVertex client differs, already captured. No additional Domain-2 concept.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_text_editor_tool.ipynb",
+    "status": "partial",
+    "contribution": "Vertex near-duplicate of tool_use/003_text_editor_tool.ipynb. Delta extracted: the text-editor tool schema type is versioned per model (text_editor_20250124 for claude-3-7-sonnet, text_editor_20241022 for claude-3-5-sonnet), reinforcing that the built-in schema type is model-version-specific. Otherwise identical.",
+    "sections_covered": ["Vertex delta: model-version-to-text-editor-schema mapping"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_web_search.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-duplicate of tool_use/004_web_search_tool.ipynb; only the AnthropicVertex client differs. Web-search content already condensed from the module-02 exercise.",
+    "sections_covered": []
+  }
+]

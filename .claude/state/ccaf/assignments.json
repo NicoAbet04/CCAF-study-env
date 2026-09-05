@@ -1,0 +1,321 @@
+{
+  "domains": {
+    "1": [
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+        "sections": "Domain 1 task statements (Knowledge of / Skills in)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§Agents and workflows L1729-2065 (agentic loop, parallel/chain/route, agents vs workflows, env inspection)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/04_claude_code_in_action/Claude_Code.md",
+        "sections": "§Hooks L274-372 (Agent SDK hook interception); §Automate Repeat Work + Routines and Headless L371-491 (subagents, decomposition); §Steering Long Sessions L5-70 (Rewind/checkpoints/summarize + --resume session state — for TASK 1.7 session state/resumption/forking)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§Tool use L270-343 (agentic loop mechanics: stop_reason tool_use vs end_turn, sending tool results back)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/001_tools.ipynb",
+        "note": "the agentic tool loop in code — for task 1.1"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/002_tools_streaming.ipynb",
+        "note": "multi-turn tool loop — for task 1.1"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/03_claude_on_google_cloud/Claude_Google_Cloud.md",
+        "sections": "§Parallelizing Claude Code L17-74; §Automated debugging L75-89 (multi-agent parallelization)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/01_ai_fluency/AI_fluency.md",
+        "sections": "§5 Delegation L139-150 (delegation framing for agentic work)"
+      }
+    ],
+    "2": [
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+        "sections": "Domain 2 task statements (Knowledge of / Skills in)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§Tool use L270-343; §Model Context Protocol L890-1576; §Anthropic apps + Enhancements with MCP L1689-1730"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/03_claude_on_google_cloud/Claude_Google_Cloud.md",
+        "sections": "§Computer use L90-125 (computer-use tool)"
+      },
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/notes/module-05-mcp.md",
+        "sections": "whole file (MCP protocol vocabulary, .mcp.json scoping, structured errors — Domain 2 gap-fill)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/004_code_execution.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/001_tools.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/002_tools_streaming.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/003_text_editor_tool.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/004_web_search_tool.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_007.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_008.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_009.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_text_editor_tool.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_web_search.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/mcp/cli_project/README.md",
+        "sections": "MCP CLI project (hands-on MCP server/client)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/cli_project_COMPLETE/README.md",
+        "sections": "completed MCP CLI project"
+      }
+    ],
+    "3": [
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+        "sections": "Domain 3 task statements (Knowledge of / Skills in)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§Claude Code setup L1610-1688"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/04_claude_code_in_action/Claude_Code.md",
+        "sections": "whole doc L1-734 (Steer, Configure/CLAUDE.md/permission modes, Hooks, Routines/Headless, GitHub Actions/Code Review, Plugins)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/03_claude_on_google_cloud/Claude_Google_Cloud.md",
+        "sections": "§Parallelizing Claude Code L17-74 (git worktrees workflow)"
+      },
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/notes/exam-intel.md",
+        "sections": "whole file (CI/CD flag semantics, REVIEW.md — doc-verified, render as 'Reported on the exam' callouts)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/README.md"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/04_claude_code_in_action/app_starter/README.md"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/CLAUDE.local.md",
+        "sections": "example CLAUDE.md config"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/.claude/commands/create_worktree.md",
+        "sections": "custom slash command example (worktrees)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/.claude/commands/merge_worktree.md",
+        "sections": "custom slash command example (worktrees)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/06_claude_with_amazon_bedrock/Claude_Amazon_Bedrock.md",
+        "sections": "deployment context only — quiz questions are practice-tier, QUARANTINE them; log 'partial' or 'irrelevant' accordingly"
+      }
+    ],
+    "4": [
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+        "sections": "Domain 4 task statements (Knowledge of / Skills in)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§Accessing the API L15-120 (requests, system prompts, structured data); §Prompt evaluation L121-216; §Prompt engineering L217-269"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/01_ai_fluency/AI_fluency.md",
+        "sections": "§7 Effective prompting techniques L164-182; §6 Description L151-163"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/001_requests.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/002_system_prompt.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/003_temperature.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/004_streaming.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/005_structured_data.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/002_images.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_engineering/001_prompting.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_engineering/003_exercise.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_evaluation/001_prompt_evals.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals_complete.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals_fns.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_requests.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_images.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_prompting_completed.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_structured_data_completed.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_exercise.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      }
+    ],
+    "5": [
+      {
+        "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+        "sections": "Domain 5 task statements (Knowledge of / Skills in)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+        "sections": "§RAG and Agentic Search L344-587; §Features of Claude L588-889 (extended thinking, images, PDF, citations, prompt caching, code execution)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/04_claude_code_in_action/Claude_Code.md",
+        "sections": "§Steering Long Sessions L5-70 (/compact, scratchpads, context degradation)"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/001_thinking.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/003_caching.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/001_chunking.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/002_embeddings.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/003_vectordb.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/004_bm25.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/005_hybrid.ipynb"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_chunking.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_thinking.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_citations_complete.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_embeddings.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_caching.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_vectordb.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/004_bm25.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_hybrid.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_reranking.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/007_contextual.ipynb",
+        "note": "Vertex re-do of a module-02 exercise — extract only Vertex-specific deltas; log 'partial' or 'irrelevant' if it only duplicates module 02"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/report.md",
+        "sections": "RAG evaluation report"
+      },
+      {
+        "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/report.md",
+        "sections": "RAG/eval report (Vertex)"
+      }
+    ]
+  },
+  "irrelevant": [
+    {
+      "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md",
+      "reason": "77 practice questions = PRACTICE tier (quarantined from notes/flashcards); its blueprint already transcribed into course.yaml"
+    },
+    {
+      "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/README.md",
+      "reason": "blueprint summary superseded by the official 39-page exam guide"
+    },
+    {
+      "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/.claude/skills/cert-exam.md",
+      "reason": "a tool (adopted into .claude/skills/), not note content"
+    },
+    {
+      "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/References.md",
+      "reason": "link list = Reference tier, never inventoried for note content"
+    }
+  ]
+}

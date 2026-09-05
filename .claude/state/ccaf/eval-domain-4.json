@@ -1,0 +1,7 @@
+{
+  "domain": 4,
+  "verdict": "approve",
+  "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
+  "findings": [{"item": "Non-blocking (FIXED by orchestrator): quoted the mermaid root-node label to make the '&' render-safe.", "where": "4 - Prompt Engineering & Structured Output.md mermaid root node"}],
+  "timestamp": "2026-09-05T11:27:21Z"
+}

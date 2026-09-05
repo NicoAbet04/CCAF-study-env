@@ -60,9 +60,12 @@ Every domain note is `<N> - <Domain Name>.md` in the vault and contains:
   *Spaced Repetition* plugin format — `Question` / `?` / `Answer` on their own
   lines — tagged `#flashcards/domain-N`. Cards skew toward **scenario
   judgment**, not recall.
-- A closing **"Traps & distractors"** section: the wrong-but-plausible answers
-  the domain invites, grounded ONLY in the official guide's stated anti-patterns
-  and doc-verified exam-intel entries (never in mock questions).
+- A closing **"Traps & distractors"** section covering **every task in the
+  domain, at least one trap each** (raised from "official anti-patterns only"
+  to close a real gap found by inspection, 2026-09-05): ground each trap in an
+  official ANTI-PATTERN bullet, a wrong answer implied by a task's own
+  knowledge/skills bullets, or a doc-verified exam-intel entry — never in a
+  mock question, which stays quarantined.
 
 Vault-wide files (written only by the orchestrator / audit, never by a builder):
 `SOURCE_INVENTORY.md`, `COVERAGE_GAPS.md`, `Glossary.md`, `<Course> MOC.md`,

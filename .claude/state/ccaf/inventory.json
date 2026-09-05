@@ -1,0 +1,480 @@
+[
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      0
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/README.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      0
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/.claude/skills/cert-exam.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      0
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/References.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      0
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/01_ai_fluency/AI_fluency.md",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/03_claude_on_google_cloud/Claude_Google_Cloud.md",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/04_claude_code_in_action/Claude_Code.md",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      3,
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/06_claude_with_amazon_bedrock/Claude_Amazon_Bedrock.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_chunking.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals_complete.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_prompt_evals_fns.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_requests.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_007.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_008.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_tools_009.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_prompting_completed.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_structured_data_completed.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_exercise.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_text_editor_tool.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_web_search.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/report.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_embeddings.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_vectordb.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/004_bm25.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_hybrid.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_reranking.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/007_contextual.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_thinking.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_images.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_citations_complete.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_caching.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/cli_project_COMPLETE/README.md",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/README.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/CLAUDE.local.md",
+    "status": "covered",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/.claude/commands/create_worktree.md",
+    "status": "covered",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/app_starter/.claude/commands/merge_worktree.md",
+    "status": "covered",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/04_claude_code_in_action/app_starter/README.md",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      3
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/001_requests.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/002_system_prompt.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/003_temperature.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/004_streaming.ipynb",
+    "status": "logged-irrelevant",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/accesing_claude_with_API/005_structured_data.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_evaluation/001_prompt_evals.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_engineering/001_prompting.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_engineering/003_exercise.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/001_tools.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/002_tools_streaming.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/003_text_editor_tool.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/tool_use/004_web_search_tool.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/001_chunking.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/002_embeddings.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/003_vectordb.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/004_bm25.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/005_hybrid.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/report.md",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/001_thinking.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/002_images.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      4
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/003_caching.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/004_code_execution.ipynb",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/mcp/cli_project/README.md",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+    "status": "covered",
+    "claimed_by": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/notes/exam-intel.md",
+    "status": "covered",
+    "claimed_by": [
+      3,
+      5
+    ]
+  },
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/notes/module-05-mcp.md",
+    "status": "covered",
+    "claimed_by": [
+      2
+    ]
+  }
+]

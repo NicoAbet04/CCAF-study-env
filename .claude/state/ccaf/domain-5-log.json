@@ -1,0 +1,140 @@
+[
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/sources-cache/exam-guide.pdf",
+    "status": "used",
+    "contribution": "Domain 5 task statements 5.1-5.6 (pp. read via text extraction around 'Domain 5: Context Management & Reliability'). Confirmed the course.yaml transcription is faithful and supplied the domain overview framing ('sound escalation and reliability decisions, including error handling, human-in-the-loop'). Grounded every ANTI-PATTERN in the Traps section. Sample questions (lines ~1006-1163) were deliberately NOT used (quarantined practice).",
+    "sections_covered": ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/02_building_with_claude_api/Claude_API.md",
+    "status": "used",
+    "contribution": "RAG mechanics for 5.1 (chunking strategies, embeddings, cosine similarity, vector DB, BM25, hybrid multi-index) and Claude features (extended thinking, prompt caching rules: breakpoints, ordering tools>system>messages, 1024-token min, 1-hour TTL). Fed the '5.1 RAG' and 'prompt caching' subsections.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/04_claude_code_in_action/Claude_Code.md",
+    "status": "used",
+    "contribution": "Steering long sessions for task 5.4: /compact behavior and the need to steer it with post-command instructions, rewind checkpoints, and plan mode as read-only scoping. Only L1-75 (Steering Long Sessions) was in scope and used.",
+    "sections_covered": ["5.4"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/001_thinking.ipynb",
+    "status": "partial",
+    "contribution": "Only markdown was a bare '# Extended thinking' heading; the substantive extended-thinking content lives in Claude_API.md L588-647, which was used. Notebook itself added no new prose beyond code demos, so contribution is minimal.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/features/003_caching.ipynb",
+    "status": "used",
+    "contribution": "Caching-order note used in the prompt-caching subsection (5.1): changing tools invalidates cache; changing system prompt yields partial cache read + cache write; order is tools, system prompts, messages.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/001_chunking.ipynb",
+    "status": "used",
+    "contribution": "Confirmed chunking strategy taxonomy (sentence-based, structure-based) backing the 5.1 chunking subsection; prose detail came from Claude_API.md L412-483.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/002_embeddings.ipynb",
+    "status": "partial",
+    "contribution": "No markdown cells; only code demonstrating embedding generation. Concept covered from Claude_API.md L485-514. Notebook added no extractable prose.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/003_vectordb.ipynb",
+    "status": "used",
+    "contribution": "RAG flow implementation and the motivating example that semantic search alone misses exact IDs like INC-2023-Q4-011 (motivates BM25) — used in the 5.1 embeddings/BM25 subsections.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/004_bm25.ipynb",
+    "status": "used",
+    "contribution": "BM25 lexical-search mechanics (tokenize, term frequency, rare-term weighting, exact-match strength) and the hybrid parallel-then-merge strategy — used in the 5.1 BM25 subsection.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/005_hybrid.ipynb",
+    "status": "used",
+    "contribution": "Reciprocal Rank Fusion formula and the Retriever coordinator wrapping VectorIndex + BM25Index — used in the 5.1 hybrid-pipeline subsection.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/rag/report.md",
+    "status": "used",
+    "contribution": "Multi-source synthesis test fixture (ten-department report with cross-referenced IDs like INC-2023-Q4-011). Used as an illustration of why exact-match retrieval and preserved provenance matter, quarantined into a 'Beyond the sources (unverified)' callout under 5.6 since it is course test data, not an authoritative claim.",
+    "sections_covered": ["5.6"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/report.md",
+    "status": "irrelevant",
+    "contribution": "Byte-for-byte identical to the module-02 rag/report.md fixture. No Vertex delta; not separately cited to avoid duplication.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_chunking.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 001_chunking.ipynb with no markdown cells and no Vertex-specific delta relevant to Domain 5. Chunking concept already covered.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/001_thinking.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe; no markdown cells, no Domain 5 delta beyond module-02 thinking content.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_citations_complete.ipynb",
+    "status": "irrelevant",
+    "contribution": "No markdown cells extractable; citations are a Domain 4/structured-output feature, not a Domain 5 context/reliability mechanic. No Vertex delta relevant here.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/002_embeddings.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 embeddings notebook; no markdown, no Vertex delta for Domain 5.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_caching.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 caching notebook; no markdown cells, no Vertex-specific caching delta relevant to Domain 5.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/003_vectordb.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 vectordb notebook; no markdown, no Vertex delta for Domain 5.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/004_bm25.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 bm25 notebook; no markdown cells, no Vertex delta.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/005_hybrid.ipynb",
+    "status": "irrelevant",
+    "contribution": "Vertex near-dupe of module-02 hybrid notebook; no markdown cells, no Vertex delta.",
+    "sections_covered": []
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/006_reranking.ipynb",
+    "status": "used",
+    "contribution": "Vertex DELTA (no module-02 equivalent): LLM-based re-ranking — pass merged VectorIndex+BM25 results back to Claude to reorder by relevance, improving accuracy at the cost of latency. Used in the 5.1 retrieval-accuracy subsection.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/03_claude_on_google_cloud/007_contextual.ipynb",
+    "status": "used",
+    "contribution": "Vertex DELTA (no module-02 equivalent): contextual retrieval — add a Claude-generated snippet situating each chunk in the whole document before indexing; reduced-context strategy for large docs. Used in the 5.1 retrieval-accuracy subsection.",
+    "sections_covered": ["5.1"]
+  },
+  {
+    "path": "/home/nico/Projects/study-env/courses/ccaf/notes/exam-intel.md",
+    "status": "used",
+    "contribution": "Rolling-window context entry (5.1) rendered as a doc-verified '📌 Reported on the exam' callout, and reused as a Traps entry. Domain 3 entries were out of scope and not used.",
+    "sections_covered": ["5.1"]
+  }
+]

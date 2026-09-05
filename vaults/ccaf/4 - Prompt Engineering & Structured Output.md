@@ -1,0 +1,403 @@
+---
+tags:
+  - ccaf
+  - domain-4
+  - prompt-engineering
+  - structured-output
+domain: 4
+---
+
+# 4 - Prompt Engineering & Structured Output
+
+This domain is worth 20% of the exam. It is about getting Claude to produce
+output you can *trust and parse*: precise judgments with few false positives,
+consistently formatted results, and machine-readable data that obeys a schema.
+The questions rarely ask you to recall a definition. They give you a scenario —
+an extraction pipeline that keeps inventing values, a code reviewer developers
+have stopped trusting, a nightly report that costs too much — and ask which
+technique actually fixes it. Study the *mechanism*, because the wrong answers are
+plausible-sounding fixes that do not address the real cause.
+
+The domain builds on the API foundations from module 02. Two of those
+foundations matter throughout. First, the Anthropic API keeps no memory of a
+conversation: to hold a multi-turn exchange you must resend the whole message
+list every request. Second, [[Glossary|temperature]] controls how random Claude's
+token choices are — near 0 it is nearly deterministic and picks the highest-
+probability token every time, near 1 it spreads probability across many tokens
+for more varied output. Low temperature is what you reach for when you want the
+same structured result every run.
+
+```mermaid
+graph TD
+    D4["Domain 4: Prompt Engineering & Structured Output"]
+    D4 --> T1["4.1 Explicit criteria: name exactly what to flag, not 'be careful'"]
+    D4 --> T2["4.2 Few-shot examples: show 2-4 worked cases for ambiguous decisions"]
+    D4 --> T3["4.3 Structured output: tool use + JSON schema for guaranteed shape"]
+    D4 --> T4["4.4 Validation & retry: feed specific errors back, but only when fixable"]
+    D4 --> T5["4.5 Batch processing: 50% cheaper, up to 24h, no latency guarantee"]
+    D4 --> T6["4.6 Multi-instance review: a fresh Claude reviews better than self-review"]
+    T3 --> TC["tool_choice: auto vs any vs forced"]
+    T3 --> SEM["Schemas stop syntax errors, not semantic errors"]
+    T4 --> ABS["Retry fails when the info is simply absent from the source"]
+    T6 --> PASS["Multi-pass: per-file locals + one cross-file integration pass"]
+```
+
+## 4.1 — Write explicit criteria, not vague warnings
+
+The core lesson is that **specific, categorical criteria beat vague
+instructions**. Telling Claude to "check that comments are accurate" produces
+noisy, inconsistent results. Telling it to "flag a comment only when its claimed
+behavior contradicts what the code actually does" gives it a concrete test it can
+apply the same way every time.
+
+The exam's favourite trap here is the vague-reassurance instruction. Adding "be
+conservative" or "only report high-confidence findings" *does not* improve
+precision compared with specific categorical criteria. These phrases feel like
+they should help, but they give the model nothing concrete to decide on, so the
+false-positive rate barely moves.
+
+False positives are not just noise — they destroy trust. When one category of a
+reviewer produces many wrong flags, developers stop trusting the accurate
+categories too. So the fix for a distrusted reviewer is not a softer instruction.
+You write explicit review criteria that say which issues to report (real bugs,
+security problems) and which to skip (minor style, local conventions), rather
+than filtering by a confidence threshold. If one category is badly calibrated,
+you can temporarily disable it to restore trust while you improve its prompt,
+instead of letting it poison confidence in the rest. And when you need
+consistent severity labels, you define each severity level with a concrete code
+example so the classification is repeatable.
+
+## 4.2 — Few-shot examples for consistency and judgment
+
+When detailed instructions alone still produce inconsistent output, **few-shot
+prompting is the most effective technique**. A [[Glossary|few-shot prompt]] is one
+that includes a small number of worked examples — input paired with the ideal
+output — before the real task. The course frames the same idea as one-shot
+(a single example) versus multi-shot (several), and recommends wrapping examples
+in [[Glossary|XML tags]] like `<example>` so their structure is unambiguous.
+
+Examples do more than fix formatting. They teach *judgment on ambiguous cases*.
+Two to four targeted examples that show the reasoning for why one action was
+chosen over a plausible alternative let the model generalize that judgment to
+new, unseen patterns — not just match the exact cases you listed. That
+generalization is the point: you are demonstrating how to decide, not
+enumerating every input.
+
+Few-shot examples are also the antidote to two specific extraction failures.
+They cut hallucination when documents come in varied structures (inline
+citations versus a bibliography, a methodology section versus details buried in
+prose) by showing correct handling of each shape. And they fix empty or null
+extraction of required fields by including examples that pull the value correctly
+out of an awkward format. Good examples also nail down the output format itself —
+show a finding as `location, issue, severity, suggested fix` and the model
+follows that shape.
+
+The course's "be clear and direct" and "be specific" techniques support this
+task. Lead with a plain statement of the task, use action verbs ("Write",
+"Identify"), and either list the qualities the output should have or give the
+steps to follow. Examples plus clear direction plus XML structure is the reliable
+combination.
+
+## 4.3 — Enforce structured output with tool use and JSON schemas
+
+When you need output that is *guaranteed* to match a shape, the most reliable
+approach is **tool use with a JSON schema**. You define a tool whose
+`input_schema` describes the fields you want, and Claude fills that schema when
+it "calls" the tool. Because the SDK constrains the output to the schema, this
+eliminates JSON syntax errors entirely — no more missing commas or stray prose
+around a code block. You then read the structured data straight from the
+`tool_use` block of the response. (See [[2 - Tool Design & MCP Integration]] for
+how the same tool machinery is used to give agents real capabilities.)
+
+You control whether and which tool Claude uses through [[Glossary|tool_choice]]:
+
+- `auto` — Claude may call a tool or may just return text. Use it when a tool is
+  optional.
+- `any` — Claude must call a tool but chooses which one. This is how you
+  *guarantee* structured output when several extraction schemas exist and you do
+  not know the document type in advance.
+- forced, written `{"type": "tool", "name": "extract_metadata"}` — Claude must
+  call that one named tool. Use it to make a specific extraction run first, for
+  example pulling metadata before an enrichment step.
+
+The Vertex course notebook shows the pattern directly: an `article_summary` tool
+whose schema requires `title`, `author`, and a `key_insights` array, invoked with
+a forced `tool_choice` so the extraction is guaranteed to run and the result is
+read from `response.content[0].input`.
+
+The critical limit to remember: **strict schemas eliminate syntax errors but not
+semantic errors**. The JSON will always be well-formed, but the model can still
+put line items that do not sum to the stated total, or place a value in the wrong
+field. Schema validity is not correctness — semantic checks are task 4.4's job.
+
+Two schema-design habits come up repeatedly. Make a field **optional (nullable)
+whenever the source document might not contain it**. If you mark a field required
+when the information may be absent, you are forcing the model to fabricate a value
+to satisfy the schema. And for categories that will not fit a fixed list, add an
+enum value like `"other"` with a companion detail string, plus `"unclear"` for
+genuinely ambiguous cases — that gives the model an honest escape hatch instead
+of a wrong guess. Finally, put format-normalization rules in the prompt alongside
+the schema so inconsistent source formatting (dates, units) is cleaned up on the
+way in.
+
+> A simpler, non-schema technique from module 02 is worth knowing for lightweight
+> cases: prefill the assistant message with an opening fence such as ` ```json `
+> and set a stop sequence of ` ``` `. Claude then emits only the content between
+> them, with no surrounding commentary. It strips wrapper text but gives none of
+> tool use's schema guarantees, so prefer tool use when the shape must be
+> enforced.
+
+## 4.4 — Validation, retry, and feedback loops
+
+Structured output can be syntactically perfect and still wrong, so extraction
+pipelines need a validation-and-retry layer. The main technique is
+**retry-with-error-feedback**: when validation fails, send a follow-up request
+containing the original document, the failed extraction, and the *specific*
+validation errors, so the model can correct itself. Vague "try again" does
+nothing; the named errors are what guide the fix.
+
+The single most important judgment in this task is knowing **when a retry cannot
+help**. Retries succeed for format mismatches and structural output errors —
+things the model can fix by looking again at material it already has. Retries are
+useless when the required information is *simply absent from the source
+document*. If the answer lives only in an external document you never provided,
+no amount of retrying will conjure it; you need to supply the missing source, not
+loop. Recognizing "the data isn't here" versus "the data is here but formatted
+wrong" is the exam-tested distinction.
+
+Design your validation to catch the semantic errors that schemas cannot. Extract
+a `calculated_total` alongside the document's `stated_total` and flag any
+discrepancy. Add a `conflict_detected` boolean when the source itself is
+inconsistent. And add a `detected_pattern` field to each finding that records
+which code construct triggered it — when developers dismiss findings, that field
+lets you analyze which patterns are causing false positives so you can fix the
+prompt systematically.
+
+The course's **prompt evaluation** workflow is the disciplined version of this
+loop. Rather than testing a prompt once (which breaks on unexpected inputs) or a
+few times, you run it through an evaluation pipeline: draft a prompt, build a
+dataset of representative inputs, feed each through Claude, grade the outputs, and
+iterate. Grading comes in two flavours. **Model-based grading** uses a second
+Claude call to score an answer against solution criteria on a 1–10 scale — good
+for judging quality and correctness that code cannot easily check. **Code-based
+grading** runs deterministic checks, such as parsing the output to confirm it is
+valid JSON, Python, or a regex, scoring 10 or 0. The course combines both by
+averaging a model score with a syntax score. Model-based grading judges meaning;
+code-based grading judges structure.
+
+## 4.5 — Batch processing strategies
+
+The **Message Batches API** trades latency for cost. It gives **50% cost savings**
+and processes within an **up to 24-hour window**, but comes with **no guaranteed
+latency SLA** — you cannot count on any particular result arriving quickly.
+
+That trade-off decides where it belongs. Batch is right for **non-blocking,
+latency-tolerant workloads**: overnight reports, weekly audits, nightly test
+generation — work where nobody is waiting on a screen. It is **wrong for blocking
+workflows** like a pre-merge check, where a developer or pipeline is stalled until
+the answer comes back. The exam likes to offer "switch everything to batch for the
+savings" as a tempting but wrong answer; the correct move is to keep the
+synchronous API for the blocking path and use batch only for the tolerant one.
+
+Two more facts are exam-tested. The batch API **does not support multi-turn tool
+calling within a single request** — it cannot execute a tool mid-request and feed
+the result back, so an agentic loop that needs tools cannot run inside one batch
+request. And **`custom_id` fields correlate each request with its response**;
+because results do not come back in order, the `custom_id` is how you match them
+up.
+
+The skills are practical arithmetic and hygiene. Match the API to the latency
+requirement — synchronous for pre-merge, batch for overnight. Calculate
+submission frequency from your SLA: with a 24-hour processing window, submitting
+on 4-hour intervals keeps you inside a 30-hour SLA. When a batch partially fails,
+resubmit **only** the failed documents, identified by `custom_id`, with
+appropriate fixes such as chunking a document that exceeded the context limit.
+And refine your prompt on a small sample set before committing a large volume, so
+you maximize first-pass success and avoid paying to resubmit.
+
+## 4.6 — Multi-instance and multi-pass review architectures
+
+When Claude reviews its own work, it is handicapped. A model that just generated
+code **retains its reasoning context from generation**, which makes it less
+likely to question its own decisions in the same session. So the reliable pattern
+is a **second, independent Claude instance** with no prior reasoning context —
+that fresh instance catches subtle issues better than any "now review your work"
+instruction or even [[Glossary|extended thinking]]. This connects to the
+independent-review idea in [[1 - Agentic Architecture & Orchestration]] and the
+confidence-calibration workflows in [[5 - Context Management & Reliability]].
+
+For large reviews, use a **multi-pass** structure. Split the work into per-file
+local analysis passes, each focused on issues within one file, plus a separate
+cross-file integration pass that examines data flow between files. Doing it all in
+one pass dilutes the model's attention and produces contradictory findings; the
+split keeps each pass focused. You can also run a verification pass where the
+model reports a confidence score alongside each finding, so review attention can
+be routed to the low-confidence ones.
+
+## Traps & distractors
+
+These are the wrong-but-plausible answers this domain is built to tempt you with.
+Each is grounded in a stated anti-pattern from the official exam guide's Domain 4
+tasks.
+
+- **"Be conservative" or "only report high-confidence findings."** These vague
+  instructions feel like precision controls but do not improve precision compared
+  with specific categorical criteria (task 4.1). If an option fixes false
+  positives by softening the tone rather than naming exactly what to flag, it is
+  the distractor.
+
+- **Marking a field required to "make sure it's always filled in."** When the
+  source may not contain the information, a required field forces the model to
+  fabricate a value to satisfy the schema (task 4.3). The correct design makes
+  such fields optional/nullable.
+
+- **Assuming a strict JSON schema guarantees a correct answer.** Schemas via tool
+  use eliminate *syntax* errors, not *semantic* ones — totals that do not add up
+  and values in the wrong field still get through (task 4.3). An option that
+  treats "schema-valid" as "correct" is wrong.
+
+- **Retrying when the information is absent.** Retry-with-error-feedback fixes
+  format and structural errors, but retries are useless when the required data is
+  simply not in the provided source (task 4.4). Looping instead of supplying the
+  missing document is the trap.
+
+- **Switching a blocking workflow to the Batch API for the cost savings.** Batch
+  is 50% cheaper but has up to a 24-hour window and no latency guarantee, so it is
+  wrong for pre-merge checks and other blocking work (task 4.5). Keep synchronous
+  calls for anything someone is waiting on.
+
+- **Expecting the batch API to run tools mid-request.** It does not support
+  multi-turn tool calling within a single request (task 4.5), so any option that
+  assumes an agentic tool loop inside one batch request is wrong.
+
+- **Trusting a model to review its own work with a "now check yourself"
+  instruction.** A model keeps its generation reasoning in the same session and
+  under-questions its own decisions; a fresh independent instance is what catches
+  subtle issues (task 4.6). Self-review instructions and extended thinking are the
+  plausible-but-weaker distractors.
+
+---
+
+## Flashcards
+
+Question
+A code-review prompt produces too many false positives and developers have
+started ignoring it. A teammate suggests adding "be conservative and only report
+high-confidence issues." Why is this unlikely to work, and what should you do
+instead?
+?
+Vague reassurances like "be conservative" or "only report high-confidence
+findings" do not improve precision compared with specific categorical criteria —
+they give the model nothing concrete to decide on. Instead, write explicit
+criteria naming which issues to report (real bugs, security) versus skip (minor
+style), and temporarily disable the worst-calibrated category to restore trust
+while you improve its prompt.
+#flashcards/domain-4
+
+Question
+Detailed written instructions still produce inconsistently formatted extraction
+output across varied document structures. Which single technique most reliably
+fixes this, and why does it also help on novel inputs?
+?
+Few-shot prompting — include 2-4 worked examples showing the ideal output for
+ambiguous or varied cases. It is the most effective technique when instructions
+alone fail, and because the examples demonstrate the *reasoning* for each choice,
+the model generalizes that judgment to new patterns rather than only matching the
+cases you listed.
+#flashcards/domain-4
+
+Question
+You need output guaranteed to match a shape, and several extraction schemas exist
+but you do not know the document type in advance. Which `tool_choice` setting do
+you use, and what does it guarantee?
+?
+Use `tool_choice: "any"`. It forces Claude to call one of the tools (so you are
+guaranteed structured output rather than free text) while letting it choose which
+schema fits the document. Use forced `{"type": "tool", "name": "..."}` only when
+you need one specific extraction to run.
+#flashcards/domain-4
+
+Question
+An invoice-extraction pipeline uses a strict JSON schema via tool use, yet some
+results have line items that do not add up to the stated total. Why did the
+schema not catch this, and how do you detect it?
+?
+Strict schemas eliminate syntax errors but not semantic errors — a
+schema-valid response can still contain wrong values. Detect it with a semantic
+check: extract a `calculated_total` alongside the `stated_total` and flag any
+discrepancy (and add a `conflict_detected` boolean for inconsistent sources).
+#flashcards/domain-4
+
+Question
+An extraction keeps returning null for a required field, so an engineer marks the
+field required in the schema to force a value. Why is this the wrong fix?
+?
+If the source document may not contain that information, marking the field
+required forces the model to fabricate a value just to satisfy the schema. The
+correct design makes the field optional/nullable, and you add few-shot examples
+showing correct extraction from the awkward formats where the value does exist.
+#flashcards/domain-4
+
+Question
+A retry loop appends validation errors and re-requests, but one class of
+extraction never improves no matter how many times it retries. What is the most
+likely cause, and when does retry actually work?
+?
+The required information is probably absent from the provided source — it exists
+only in an external document you never supplied, and no retry can conjure it.
+Retry-with-error-feedback works for format mismatches and structural output
+errors, not for missing data. The fix is to supply the missing source, not loop.
+#flashcards/domain-4
+
+Question
+A team runs Claude for both pre-merge PR checks and nightly technical-debt
+reports and wants to move both to the Message Batches API for the 50% savings.
+What is the right call and why?
+?
+Move only the nightly reports to batch. The Batch API is 50% cheaper but has an
+up-to-24-hour window and no latency guarantee, which suits non-blocking overnight
+work but not a pre-merge check where a pipeline is blocked waiting. Keep the
+synchronous API for the blocking path.
+#flashcards/domain-4
+
+Question
+You must guarantee a 30-hour SLA for a batch pipeline, and batches process within
+up to 24 hours. How do you set submission frequency, and how do you handle a
+batch where some documents failed?
+?
+Submit on a 4-hour cadence so that 4 hours of queueing plus the 24-hour window
+stays inside 30 hours. When a batch partially fails, resubmit only the failed
+documents — identified by their `custom_id` — with fixes such as chunking any
+document that exceeded the context limit.
+#flashcards/domain-4
+
+Question
+Why does asking the same Claude session that generated code to "now review your
+work" catch fewer subtle bugs than an alternative, and what is the alternative?
+?
+The generating session retains its own reasoning context, so it is less likely to
+question its own decisions. A second, independent Claude instance with no prior
+reasoning context catches subtle issues better — more reliably than self-review
+instructions or extended thinking.
+#flashcards/domain-4
+
+Question
+A large multi-file code review produces contradictory and shallow findings when
+done in one pass. What review architecture fixes this?
+?
+Use a multi-pass structure: run per-file local analysis passes focused on issues
+within each file, then a separate cross-file integration pass for data flow
+between files. Splitting the work prevents attention dilution and the
+contradictory findings that a single all-at-once pass produces.
+#flashcards/domain-4
+
+Question
+What is the difference between model-based grading and code-based grading in a
+prompt-evaluation pipeline, and when do you use each?
+?
+Model-based grading uses a second Claude call to score an output against solution
+criteria (e.g. 1–10) — best for judging meaning, quality, and correctness that
+code cannot easily check. Code-based grading runs deterministic checks such as
+parsing the output as valid JSON/Python/regex — best for judging structure. They
+are often combined by averaging the two scores.
+#flashcards/domain-4

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md",
+    "status": "irrelevant",
+    "contribution": "orchestrator curation — carries no note content by design",
+    "reason": "77 practice questions = PRACTICE tier (quarantined from notes/flashcards); its blueprint already transcribed into course.yaml",
+    "sections_covered": ""
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/README.md",
+    "status": "irrelevant",
+    "contribution": "orchestrator curation — carries no note content by design",
+    "reason": "blueprint summary superseded by the official 39-page exam guide",
+    "sections_covered": ""
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/.claude/skills/cert-exam.md",
+    "status": "irrelevant",
+    "contribution": "orchestrator curation — carries no note content by design",
+    "reason": "a tool (adopted into .claude/skills/), not note content",
+    "sections_covered": ""
+  },
+  {
+    "path": "/home/nico/Projects/PyCharmProjects/CCAF/docs/References.md",
+    "status": "irrelevant",
+    "contribution": "orchestrator curation — carries no note content by design",
+    "reason": "link list = Reference tier, never inventoried for note content",
+    "sections_covered": ""
+  }
+]

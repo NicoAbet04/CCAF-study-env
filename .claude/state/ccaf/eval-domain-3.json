@@ -1,0 +1,7 @@
+{
+  "domain": 3,
+  "verdict": "approve",
+  "scores": {"faithfulness": 5, "completeness": 5, "formatting": 5, "pedagogy": 5, "clarity": 5},
+  "findings": [{"item": "Blocking mis-attribution resolved on repair (intro now attributes calibration claim to unverified passer intel, not the exam guide).", "where": "3 - Claude Code Configuration & Workflows.md intro"}],
+  "timestamp": "2026-09-05T11:29:50Z"
+}

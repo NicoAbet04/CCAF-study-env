@@ -1,0 +1,411 @@
+---
+tags:
+  - ccaf
+  - domain/agentic-architecture
+  - orchestration
+  - agents
+domain: 1
+weight: 27
+flashcards_min: 12
+---
+
+# 1 - Agentic Architecture & Orchestration
+
+This is the heaviest domain on the exam — 27% of your score — and the one
+passers report being hardest. It is about how you get Claude to do work that
+takes more than one request: running an [[Glossary|agentic loop]], splitting a
+job across several agents, and keeping those agents coordinated, compliant, and
+recoverable. Most questions here describe a symptom ("the loop never stops," "the
+synthesis agent has no idea what search found") and ask you to pick the mechanism
+that actually fixes it. Study the mechanism, not the vocabulary.
+
+The domain has seven tasks. This note is organised around them.
+
+```mermaid
+graph TD
+    D1[Domain 1: Agentic Architecture and Orchestration]
+    D1 --> T1[1.1 Agentic loops driven by stop_reason]
+    D1 --> T2[1.2 Coordinator and subagents in a hub-and-spoke]
+    D1 --> T3[1.3 Spawning subagents and passing context explicitly]
+    D1 --> T4[1.4 Multi-step workflows with enforced prerequisites]
+    D1 --> T5[1.5 Agent SDK hooks that intercept tool calls]
+    D1 --> T6[1.6 Task decomposition: fixed chains vs adaptive plans]
+    D1 --> T7[1.7 Session state: resume, fork, or start fresh]
+    T1 --> T1a[Loop while stop_reason is tool_use]
+    T1 --> T1b[Append tool results to history each turn]
+    T2 --> T2a[Coordinator routes all inter-agent messages]
+    T2 --> T2b[Subagents have isolated context]
+    T5 --> T5a[Hooks are deterministic; prompts are only probabilistic]
+    T6 --> T6a[Prompt chaining for predictable multi-aspect work]
+    T6 --> T6b[Dynamic decomposition for open-ended investigation]
+```
+
+## 1.1 Design and implement agentic loops for autonomous task execution
+
+An [[Glossary|agentic loop]] is the engine underneath every agent. You give
+Claude a goal and some [[2 - Tool Design & MCP Integration|tools]], then repeat a
+cycle: send the request, look at what Claude asked for, run any tools it
+requested, hand the results back, and send again. Claude decides what to do next;
+you just execute and report.
+
+The loop is controlled entirely by one field on the response: **`stop_reason`**.
+When Claude wants to run a tool, `stop_reason` comes back as **`tool_use`**. When
+Claude is finished and has a final answer for the user, it comes back as
+**`end_turn`**. So the whole loop is: keep going while `stop_reason` is
+`tool_use`, and stop the moment it is anything else. In code this is literally a
+`while True` that breaks when `response.stop_reason != "tool_use"`.
+
+Each turn you must **append the tool results to the conversation history** before
+the next request. Claude does not remember anything between API calls — you
+resend the full history every time. A tool result goes back inside a *user*
+message as a `tool_result` block. That block carries three things: the
+`tool_use_id` that matches the request it answers, the tool's output serialised
+as a string, and an `is_error` flag. Matching the id matters when Claude requests
+several tools at once, because the results can come back in any order and Claude
+needs to know which answer belongs to which request. Feeding results back in is
+what lets new information enter Claude's reasoning for the next step.
+
+The power of the loop is that decisions are **model-driven**, not scripted. You
+do not write a decision tree that says "first call get_time, then call
+add_duration." You give Claude abstract, combinable tools and let it chain them.
+Asked "what's the time," Claude calls one tool; asked "what day is it in 11
+days," it chains a datetime lookup into a duration-adder; asked to set a reminder
+next week, it uses all three in sequence. Claude will even pause to ask you for
+missing information (like a purchase date it needs before computing a warranty
+expiry) rather than guessing. Abstract tools beat hyper-specialised ones for the
+same reason Claude Code ships `bash`, `read`, `edit`, and `grep` instead of a
+"refactor code" tool — the model composes primitives into behaviours you never
+explicitly programmed.
+
+For the loop to work, Claude has to be able to **inspect its environment** —
+observe the result of each action. Claude operates blind otherwise. This is why
+computer use returns a screenshot after every click, and why the reliable file
+pattern is *read before write*: Claude reads a file's current contents before
+editing it. When you design an agent, always ask "how will Claude know if this
+action worked?" and give it a way to see.
+
+> The one legitimate use of a `stop_reason` other than `tool_use`/`end_turn`:
+> `max_tokens` means the output was cut off, and `stop_sequence` means Claude hit
+> a stop string you supplied.
+
+## 1.2 Orchestrate multi-agent systems with coordinator-subagent patterns
+
+When a task is too big for one agent, you split it across several. The standard
+shape is **hub-and-spoke**: one [[Glossary|coordinator]] agent at the hub and
+several [[Glossary|subagent]]s on the spokes. The rule that defines the pattern
+is that **all communication flows through the coordinator**. Subagents do not
+talk to each other directly. The coordinator handles routing, error handling,
+and every handoff. You route everything through the hub on purpose — it gives you
+one place to observe what is happening, one place to handle errors consistently,
+and control over what information moves where.
+
+The coordinator's job is **decomposition, delegation, and aggregation**: break
+the request into pieces, decide which subagents to invoke, and merge their
+results into one answer. A good coordinator is *dynamic* — it looks at what the
+query actually needs and selects only the relevant subagents, instead of shoving
+every request through the full pipeline every time. This is [[4 - Prompt Engineering & Structured Output|routing]]
+applied to agents.
+
+The single most tested fact about subagents: **each subagent has isolated
+context.** A subagent does *not* automatically inherit the coordinator's
+conversation history. It starts fresh and knows only what you put in its prompt.
+Everything downstream in this domain follows from that one fact.
+
+When you partition the work, give each subagent a **distinct slice** — different
+subtopics or different source types — so they do not duplicate each other's
+effort. Watch the opposite failure too: if you decompose a broad research topic
+too narrowly, the union of the pieces may miss whole areas, leaving gaps. The fix
+is an **iterative refinement loop**: after synthesis, evaluate the combined
+output for gaps, send targeted follow-up queries to fill them, and re-run
+synthesis until coverage is good enough. This is the [[Glossary|evaluator-optimizer]]
+pattern (a producer creates output, a grader checks it, feedback loops back until
+the grader is satisfied) applied at the system level.
+
+[[1 - Agentic Architecture & Orchestration#1.6 Design task decomposition strategies for complex workflows|Parallelisation]]
+is the sibling technique: instead of one agent juggling many criteria, fan the
+same input out to several specialised evaluations at once and aggregate the
+results. Each parallel branch can have its own prompt and tools. You get focused
+attention per branch, independent optimisation, and easy scaling. Delegation — a
+core [[Glossary|AI fluency]] skill — is the mindset behind all of this: decide
+deliberately what you do yourself, what you do with AI, and what you hand to AI
+entirely, and distribute the work to each party's strengths.
+
+## 1.3 Configure subagent invocation, context passing, and spawning
+
+Spawning a subagent is done with the **[[Glossary|Task tool]]**. For a
+coordinator to be *able* to spawn subagents, its `allowedTools` must include
+`Task`. If a coordinator is not delegating, the first thing to check is whether
+`Task` is in its allowed tools at all.
+
+Because subagents start with isolated context, you have to **pass context
+explicitly in the prompt**. There is no shared memory between invocations and no
+automatic inheritance. Concretely: if a synthesis subagent needs the search
+results and document analysis that earlier agents produced, you paste those
+complete findings *into the synthesis subagent's prompt*. If you forget, the
+synthesis agent invents an answer from nothing.
+
+Pass that context as **structured data that separates content from metadata** —
+keep source URLs, document names, and page numbers attached to each finding — so
+attribution survives the handoff between agents. Losing provenance during
+handoffs is a recurring reliability failure (see
+[[5 - Context Management & Reliability]]).
+
+Each subagent type is described by an **[[Glossary|AgentDefinition]]**: a
+description, a system prompt, and a set of tool restrictions. Scope the tools to
+the role. Write the coordinator's prompts to state the **research goals and
+quality criteria**, not a rigid step-by-step procedure — goals let a subagent
+adapt; scripts make it brittle.
+
+One mechanical detail the exam likes: to run subagents **in parallel**, the
+coordinator must emit **multiple `Task` calls in a single response**. Splitting
+them across separate turns runs them one after another instead. Same idea as
+requesting several tools in one assistant message.
+
+## 1.4 Implement multi-step workflows with enforcement and handoff patterns
+
+Some workflow steps must happen in order, every single time. The question is how
+you *enforce* the ordering. You have two options, and the exam wants you to know
+their difference in reliability. **Prompt-based guidance** — telling Claude in
+the system prompt "always verify the customer before issuing a refund" — is only
+*probabilistic*. It works most of the time, but it carries a non-zero failure
+rate. **Programmatic enforcement** — a [[Glossary|hook]] or a prerequisite gate
+in code — is *deterministic*. It cannot be talked out of.
+
+So when deterministic compliance is genuinely required — identity verification
+before a financial operation is the canonical example — you do not rely on the
+prompt. You build a **prerequisite gate**: block the downstream tool call until
+the prior step has actually completed. For instance, block `process_refund` from
+running until `get_customer` has returned a verified customer id. The gate is
+code, so it holds every time.
+
+For requests that raise several concerns at once, the pattern is to **decompose
+into distinct items, investigate each in parallel with shared context, then
+synthesise one unified resolution** — not several disconnected replies.
+
+When a process must hand off to a human mid-stream (an escalation the agent
+cannot resolve), send a **structured handoff summary**, because the human never
+saw the transcript. Include the customer id, the root-cause analysis, the amount
+in question, and the recommended action. A good handoff lets the human act
+without re-doing the investigation. Escalation *triggers* — when to hand off at
+all — belong to [[5 - Context Management & Reliability]].
+
+## 1.5 Apply Agent SDK hooks for tool call interception and data normalization
+
+A [[Glossary|hook]] is deterministic code that runs at a fixed point in the
+agentic loop. A CLAUDE.md instruction is a *request*; a hook is a *guarantee*.
+That contrast — hooks give deterministic guarantees, prompts give only
+probabilistic compliance — is the heart of this task and reappears across the
+domain.
+
+Two hook events carry most of the weight:
+
+- **[[Glossary|PreToolUse]]** fires *before* a tool call and is the enforcement
+  primitive — it is the only one that can stop an action before it happens. It
+  returns a `permissionDecision` of `allow`, `deny`, or `ask` (hand it to the
+  user). Use it to block a policy-violating action — say, a refund above a
+  threshold — and redirect to an alternative workflow such as human escalation.
+  It has a subtler move too: instead of blocking, return `updatedInput` to
+  *rewrite* the call — for example, strip a secret out of a bash command and let
+  the sanitised version run. Note that `updatedInput` replaces the whole input
+  object, so echo back the fields you are not changing.
+- **[[Glossary|PostToolUse]]** fires *after* a tool call succeeds. Because the
+  tool already ran, it is too late to stop the call — but it can transform the
+  result before the model ever sees it. This is where **data normalisation**
+  lives: when several MCP tools return dates in different shapes (a Unix
+  timestamp from one, ISO 8601 from another, a numeric status code from a third),
+  a PostToolUse hook rewrites them into one consistent format so the agent reasons
+  over clean, uniform data.
+
+The decision rule: **choose hooks over prompt-based enforcement whenever a
+business rule requires guaranteed compliance.** If "usually" is not good enough,
+it goes in a hook. (Hooks are also central to [[3 - Claude Code Configuration & Workflows]];
+here the focus is using them to intercept tool traffic.)
+
+## 1.6 Design task decomposition strategies for complex workflows
+
+Breaking a big job into smaller ones comes in two flavours, and picking the wrong
+one is a classic exam trap.
+
+**Prompt chaining** is a *fixed sequential pipeline*: predetermined steps that
+each build on the last, with optional non-LLM processing in between. You use it
+when you can already picture the exact steps. Keeping Claude focused on one step
+at a time produces better results than one giant prompt that juggles every
+requirement — long prompts full of constraints tend to drop some. The worked
+example is a large code review: analyse each file individually in its own local
+pass, then run a *separate* cross-file integration pass. Splitting it this way
+avoids **attention dilution**, where trying to hold the whole codebase in one
+pass makes Claude miss things.
+
+**Dynamic (adaptive) decomposition** generates its subtasks *from what it
+discovers as it goes*. You use it for open-ended investigation where you cannot
+plan the steps up front. The pattern is: map the structure first, identify the
+high-impact areas, then build a prioritised plan that keeps adapting as
+dependencies surface.
+
+The choice is the skill: prompt chaining for predictable multi-aspect work,
+dynamic decomposition for open-ended exploration. A related pattern is
+[[1 - Agentic Architecture & Orchestration#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|routing]]:
+categorise an incoming request first, then send it down one specialised pipeline
+rather than a one-size-fits-all prompt.
+
+The broader framing from the course is **workflows versus agents**. A workflow is
+a predetermined series of Claude calls; an agent is a goal plus tools where
+Claude figures out the steps. Choose based on how well you understand the task:
+workflows when you can picture the exact flow, agents when you cannot predict the
+task or its parameters. The default advice is to **prefer workflows wherever
+possible and reach for agents only when the flexibility is truly required** —
+workflows are more reliable and predictable, and users care about a product that
+works, not about how clever the architecture is.
+
+## 1.7 Manage session state, resumption, and forking
+
+Long-running work spans multiple sittings, so you need to manage session state.
+
+**Resuming** continues a specific prior conversation with **`--resume <session-name>`**
+(or by capturing a session id from earlier JSON output and passing it back). One
+script can start the work and another resume it later with full context — handy
+when a first pass produces a plan and a second pass carries it out.
+
+**[[Glossary|fork_session]]** creates an *independent branch* from a shared
+baseline so you can explore divergent approaches without them interfering — for
+example, comparing two refactoring or testing strategies that both start from the
+same analysis you have already done. Forking is for parallel *what-ifs* from one
+common starting point.
+
+The judgement call the exam tests is **resume versus start fresh**. Resume when
+the prior context is *mostly still valid*. Start a **new session seeded with a
+structured summary** when the prior tool results have gone *stale* — a fresh
+session with an injected summary is more reliable than resuming on top of stale
+data. And when you resume after files have changed, **tell the agent exactly
+which files changed** so it re-analyses those targeted spots instead of trusting
+its now-outdated picture (or re-exploring everything from scratch).
+
+Claude Code gives you related steering tools for the same problem. **`/compact`**
+summarises the conversation, makes that summary the new context, and drops the
+old messages to free the context window — but add instructions after the command
+(`/compact Focus on the --version flag work`) so it keeps what matters, or it may
+drift. **Rewind** (double-tap escape) rolls back to a checkpoint — code,
+conversation, or both — and can *summarise from* or *up to* a checkpoint to
+compress a side conversation or a long setup phase while keeping the rest.
+
+## Flashcards
+
+Question
+Your agent's loop never terminates — it keeps calling tools forever. You are ending the loop by scanning Claude's text output for phrases like "I'm done" or "task complete." What is the correct fix?
+?
+Stop parsing natural-language signals entirely. Drive the loop off the `stop_reason` field: continue while `stop_reason == "tool_use"` and break as soon as it is `end_turn`. The stop condition is a structured field, not the wording of Claude's prose.
+#flashcards/domain-1
+
+Question
+Between iterations of an agentic loop, what must you do with each tool's output, and where exactly does it go?
+?
+Append the output to the conversation history so it enters Claude's reasoning on the next turn. It goes inside a *user* message as a `tool_result` block whose `tool_use_id` matches the originating request. Claude keeps no memory between calls, so you resend the full history each time.
+#flashcards/domain-1
+
+Question
+A coordinator delegates a synthesis step to a subagent, but the synthesis agent behaves as if it never saw the earlier search results and document analysis. What is the underlying cause and the fix?
+?
+Subagents run with isolated context and do not inherit the coordinator's conversation history. The fix is to pass the complete prior findings explicitly in the synthesis subagent's prompt — there is no shared memory or automatic inheritance.
+#flashcards/domain-1
+
+Question
+You want three subagents to run in parallel from the coordinator, but they keep executing one after another. What is wrong?
+?
+The coordinator is emitting the `Task` calls across separate turns. To run subagents in parallel, it must emit multiple `Task` calls in a single response. (Also confirm `Task` is in the coordinator's `allowedTools`, or it cannot spawn subagents at all.)
+#flashcards/domain-1
+
+Question
+A refund agent must verify the customer's identity before issuing any refund, and the business needs this to be guaranteed, not usually-correct. Why is a system-prompt instruction insufficient, and what do you build instead?
+?
+Prompt instructions are only probabilistic — they carry a non-zero failure rate. For deterministic compliance, build a programmatic prerequisite gate that blocks `process_refund` from running until `get_customer` has returned a verified id. Code enforces it every time.
+#flashcards/domain-1
+
+Question
+Several MCP tools return timestamps in different formats — one Unix epoch, one ISO 8601, one a numeric status code — and the agent keeps mishandling them. Which hook event solves this and how?
+?
+A PostToolUse hook. It fires after each tool call succeeds and can transform the result before the model sees it, normalising all the formats into one consistent shape so the agent reasons over clean data.
+#flashcards/domain-1
+
+Question
+You need to block a refund above a policy threshold *before* it executes and route the case to a human. Which hook event, and what values can it return?
+?
+A PreToolUse hook — the only event that can stop an action before it happens. It returns a `permissionDecision` of `allow`, `deny`, or `ask`. To sanitise rather than block (e.g. strip a secret from a command), it can instead return `updatedInput` to rewrite the call.
+#flashcards/domain-1
+
+Question
+You are choosing a decomposition strategy for a large multi-file code review with well-understood aspects. Prompt chaining or dynamic decomposition — and how do you split it?
+?
+Prompt chaining, because the steps are predictable. Analyse each file in its own local pass, then run a separate cross-file integration pass. Splitting it this way avoids attention dilution from trying to hold the whole codebase in one pass.
+#flashcards/domain-1
+
+Question
+The task is an open-ended investigation where you cannot plan the steps in advance. Which decomposition approach fits, and what is its shape?
+?
+Dynamic (adaptive) decomposition, which generates subtasks from what each step discovers. Map the structure first, identify the high-impact areas, then build a prioritised plan that keeps adapting as dependencies surface.
+#flashcards/domain-1
+
+Question
+You broke a broad research topic into very narrow subagent tasks, and the final report has whole areas missing. What went wrong and how do you recover coverage?
+?
+Overly narrow decomposition left gaps between the pieces. Use an iterative refinement loop: evaluate the synthesised output for gaps, send targeted follow-up queries to fill them, and re-run synthesis until coverage is sufficient.
+#flashcards/domain-1
+
+Question
+You resumed a session to keep working on a codebase, but the files were modified since the last session and Claude gives stale, inconsistent answers. What are your two options and how do you choose?
+?
+Either resume and explicitly tell the agent which files changed so it re-analyses just those spots, or — if the prior tool results are broadly stale — start a fresh session seeded with a structured summary, which is more reliable than resuming on top of stale data.
+#flashcards/domain-1
+
+Question
+You want to compare two refactoring strategies that both start from the same analysis you have already completed, without the branches interfering. What mechanism fits?
+?
+`fork_session`: it creates an independent branch from a shared baseline so you can explore divergent approaches in parallel from one common starting point.
+#flashcards/domain-1
+
+Question
+When should you build an agent (goal plus tools, Claude figures out the steps) rather than a workflow (a predetermined series of calls)?
+?
+Use a workflow when you can picture the exact steps or your UX constrains users to fixed tasks; use an agent only when you cannot predict the task or its parameters. Default to workflows for reliability and reach for agents only when the flexibility is truly required.
+#flashcards/domain-1
+
+Question
+Why must an agent be able to inspect its environment, and what file-editing habit follows from it?
+?
+Claude acts blind and cannot tell whether an action succeeded without observing the result — this is why computer use returns a screenshot after each action. The habit is *read before write*: read a file's current contents before editing it.
+#flashcards/domain-1
+
+## Traps & distractors
+
+These are the wrong-but-plausible answers this domain engineers. Each is a
+mistake a real engineer might actually make, so eliminate them by reasoning about
+the mechanism.
+
+- **Parsing natural-language signals to end the loop.** Watching Claude's prose
+  for "done" or "complete" is unreliable — wording varies. The loop must be
+  driven by the structured `stop_reason` field (`tool_use` to continue,
+  `end_turn` to stop).
+
+- **Checking assistant text content as a completion indicator.** Same family as
+  above: the presence or content of a text block does not tell you the agent is
+  finished. Only `stop_reason` does.
+
+- **Using an arbitrary iteration cap as the *primary* stopping mechanism.** A
+  hard "stop after N loops" is a legitimate *backstop* against runaway loops, but
+  it is the wrong primary stop condition. The primary mechanism is still
+  `stop_reason == end_turn`. An answer that presents a max-iteration counter as
+  *the* way to terminate is a distractor.
+
+- **Relying on a prompt instruction where deterministic compliance is
+  required.** "Always verify identity before refunding" in the system prompt is
+  probabilistic and carries a non-zero failure rate. When the rule must hold
+  every time, the correct answer is a programmatic gate or a hook, not better
+  prompt wording.
+
+- **Assuming subagents inherit the coordinator's context.** They do not. Any
+  answer that expects a subagent to "just know" prior findings without them being
+  placed in its prompt is wrong — context must be passed explicitly.
+
+- **Decomposing a broad topic too narrowly.** Splitting into tiny pieces feels
+  thorough but can leave gaps between them, so a broad research task ends up with
+  incomplete coverage. The mitigation is an iterative refinement loop, not finer
+  slicing.
