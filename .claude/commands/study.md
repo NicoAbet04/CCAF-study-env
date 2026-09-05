@@ -23,6 +23,12 @@ Read the course manifest (`courses/<id>/course.yaml`) and the vault's
 - **(d) Mock-exam pointer** — link the external timed mocks from the manifest's
   practice tier (CyberSkill, CosX) for exam-day pacing; offer to debrief pasted
   results afterward.
+- **(e) Hands-on lab** — pick one of the manifest's `prep_exercises` (the four
+  exercises the OFFICIAL exam guide §8 recommends) filtered to the chosen
+  domain, and coach the user through building it for real. The guide's own §7
+  advice is to prepare with hands-on work, and domains 1 and 2 test judgment
+  that reading cannot supply. Log what the user struggled to implement to
+  `Weak Areas.md` the same way a missed question is logged.
 
 After any round, append misses to `Weak Areas.md` as
 `- [date] [[note#section]] — what was confused with what`, and suggest the next

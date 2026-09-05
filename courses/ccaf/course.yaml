@@ -15,7 +15,7 @@ vault: vaults/ccaf                       # §9.1 — inside the repo (path relat
 sources:                                 # PRIMARY tier: inventoried + coverage-gated + condensed into notes
   - path: ~/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main
   - path: ~/Projects/PyCharmProjects/CCAF
-  - path: courses/ccaf/sources-cache/exam-guide.pdf   # official Exam Guide (§0.4) — cached copy (added Phase 0)
+  - path: courses/ccaf/sources-cache/exam-guide.pdf   # official Exam Guide — COMPLETE 39-page edition
   - path: courses/ccaf/notes/exam-intel.md            # doc-verified exam intel from passers (§0.5) — created Phase 0.5
   - path: courses/ccaf/notes/module-05-mcp.md         # synthesized Intro-to-MCP notes (§9.10) — created Phase 0.5
 
@@ -33,6 +33,7 @@ crosscheck:                             # compared post-generation, NEVER ingest
 
 practice:                               # quarantined from notes/flashcards; feed Weak Areas.md only
   - name: cert-exam skill (77Q)         # local, adopted into .claude/skills/cert-exam.md
+  - name: exam guide §9 sample questions  # official worked examples — QUARANTINED like any mock
   - name: CyberSkill timed mock
     url: https://ccaf.cyberskill.world/exam
   - name: CosX AI mocks (3x60Q)
@@ -40,6 +41,18 @@ practice:                               # quarantined from notes/flashcards; fee
   - name: ccaf-exam-tutorial labs
     url: https://github.com/jamesbuckett/ccaf-exam-tutorial
   - name: claudecertificationguide.com  # trap boxes endorsed by a passer (§0.5.3)
+
+# Official "Preparation Exercises" (exam guide §8) — hands-on, not note material.
+# Surfaced by /study as lab options; they are the guide's own recommended practice.
+prep_exercises:
+  - name: "Build a Multi-Tool Agent with Escalation Logic"
+    domains: [1, 2, 5]
+  - name: "Configure Claude Code for a Team Development Workflow"
+    domains: [3, 2]
+  - name: "Build a Structured Data Extraction Pipeline"
+    domains: [4, 5]
+  - name: "Design and Debug a Multi-Agent Research Pipeline"
+    domains: [1, 2, 5]
 
 exclude:                                # gitignore syntax, applied at ANY depth (§0.1)
   - "**/.git/**"
@@ -57,15 +70,19 @@ content_extensions: [md, ipynb]         # swept during inventory
 read_referenced_images: true            # §9.8 — an image is read iff an assigned md/ipynb references it
                                         #   (both docs/ figures AND the ~120 notebook screenshots)
 
-blueprint:                              # canonical domain ordering = exam repo's (§0.1, confirmed by official guide §0.4)
-# TASK PROVENANCE — the task list IS the completeness definition the evaluator
-# checks against, so each task records where it came from:
-#   source: official   → verbatim task statement from the official Exam Guide
-#                        (its "Knowledge of" / "Skills in" bullets, condensed)
-#   source: community  → the community exam repo's domain-task index, used where
-#                        the public Exam Guide PDF truncates (after task 1.6)
-# If a complete Exam Guide turns up behind the registration portal (§9.13),
-# re-derive the `community` entries from it and flip their source.
+# ============================================================================
+# BLUEPRINT — the completeness definition the evaluator checks each note against.
+#
+# PROVENANCE: every task below is `source: official` — transcribed from the
+# COMPLETE 39-page Exam Guide (courses/ccaf/sources-cache/exam-guide.pdf),
+# condensed from its "Knowledge of" / "Skills in" bullets. Domain ordering and
+# weights are the guide's own. Nothing here is community-derived any more.
+#
+# Bullets prefixed "ANTI-PATTERN" are the guide's explicitly-named wrong answers
+# — the raw material for each note's "Traps & distractors" section, and the
+# shape most exam distractors take.
+# ============================================================================
+blueprint:
   - id: 1
     name: "Agentic Architecture & Orchestration"
     weight: 27
@@ -75,124 +92,421 @@ blueprint:                              # canonical domain ordering = exam repo'
         name: "Design and implement agentic loops for autonomous task execution"
         source: official
         knowledge:
-          - "Agentic loop lifecycle: send request, inspect stop_reason ('tool_use' vs 'end_turn'), execute tools, return results for the next iteration"
+          - "Agentic loop lifecycle: send request, inspect stop_reason ('tool_use' vs 'end_turn'), execute requested tools, return results for the next iteration"
           - "Tool results are appended to conversation history so the model can reason about the next action"
-          - "Model-driven decision-making vs pre-configured decision trees or fixed tool sequences"
+          - "Model-driven decision-making (Claude reasons about which tool to call next) vs pre-configured decision trees or fixed tool sequences"
         skills:
-          - "Loop control flow that continues on stop_reason 'tool_use' and terminates on 'end_turn'"
-          - "Adding tool results to context between iterations"
-          - "ANTI-PATTERNS: parsing natural-language signals to decide termination; arbitrary iteration caps as the PRIMARY stopping mechanism; checking assistant text content as a completion indicator"
+          - "Loop control flow that continues while stop_reason is 'tool_use' and terminates on 'end_turn'"
+          - "Adding tool results to context between iterations so new information enters the model's reasoning"
+          - "ANTI-PATTERN: parsing natural-language signals to decide loop termination"
+          - "ANTI-PATTERN: arbitrary iteration caps as the PRIMARY stopping mechanism (fine only as a backstop)"
+          - "ANTI-PATTERN: checking assistant text content as a completion indicator"
       - id: "1.2"
         name: "Orchestrate multi-agent systems with coordinator-subagent patterns"
         source: official
         knowledge:
-          - "Hub-and-spoke architecture: the coordinator manages all inter-subagent communication, error handling, and routing"
-          - "Subagents run with isolated context — they do NOT inherit the coordinator's conversation history"
-          - "Coordinator role: task decomposition, delegation, result aggregation, deciding which subagents to invoke by query complexity"
-          - "Risk of overly narrow decomposition: incomplete coverage of broad topics"
+          - "Hub-and-spoke architecture: the coordinator manages all inter-subagent communication, error handling, and information routing"
+          - "Subagents operate with isolated context — they do NOT automatically inherit the coordinator's conversation history"
+          - "Coordinator role: task decomposition, delegation, result aggregation, and deciding which subagents to invoke based on query complexity"
+          - "Risk of overly narrow task decomposition: incomplete coverage of broad research topics"
         skills:
-          - "Coordinators that dynamically select subagents rather than always routing through the full pipeline"
-          - "Partitioning scope across subagents to minimize duplication (distinct subtopics or source types)"
-          - "Iterative refinement loops: evaluate synthesis for gaps, re-delegate with targeted queries, re-invoke until coverage suffices"
-          - "Routing all subagent communication through the coordinator for observability and controlled information flow"
+          - "Coordinators that analyze query requirements and dynamically select subagents rather than always routing through the full pipeline"
+          - "Partitioning scope across subagents to minimize duplication (distinct subtopics or source types per agent)"
+          - "Iterative refinement loops: evaluate synthesis output for gaps, re-delegate targeted queries, re-invoke synthesis until coverage is sufficient"
+          - "Routing all subagent communication through the coordinator for observability, consistent error handling, and controlled information flow"
       - id: "1.3"
         name: "Configure subagent invocation, context passing, and spawning"
         source: official
         knowledge:
-          - "The Task tool spawns subagents; allowedTools must include 'Task' for a coordinator to invoke them"
-          - "Subagent context must be provided explicitly in the prompt — no automatic inheritance or shared memory between invocations"
-          - "AgentDefinition configuration: descriptions, system prompts, per-type tool restrictions"
-          - "Fork-based session management for exploring divergent approaches from a shared baseline"
+          - "The Task tool is the mechanism for spawning subagents; allowedTools must include 'Task' for a coordinator to invoke them"
+          - "Subagent context must be provided EXPLICITLY in the prompt — no automatic parent-context inheritance, no shared memory between invocations"
+          - "AgentDefinition configuration: descriptions, system prompts, and tool restrictions per subagent type"
+          - "Fork-based session management for exploring divergent approaches from a shared analysis baseline"
         skills:
-          - "Including complete prior-agent findings directly in the subagent's prompt"
-          - "Structured data formats that separate content from metadata (source URLs, document names, page numbers) to preserve attribution"
-          - "Spawning parallel subagents by emitting multiple Task calls in a SINGLE response, not across turns"
-          - "Coordinator prompts that specify goals and quality criteria rather than step-by-step procedure"
+          - "Including complete findings from prior agents directly in the subagent's prompt (e.g. passing search results and document analysis to the synthesis subagent)"
+          - "Structured data formats that separate content from metadata (source URLs, document names, page numbers) to preserve attribution across agents"
+          - "Spawning parallel subagents by emitting multiple Task calls in a SINGLE coordinator response, not across separate turns"
+          - "Coordinator prompts that specify research goals and quality criteria rather than step-by-step procedure, enabling subagent adaptability"
       - id: "1.4"
         name: "Implement multi-step workflows with enforcement and handoff patterns"
         source: official
         knowledge:
           - "Programmatic enforcement (hooks, prerequisite gates) vs prompt-based guidance for workflow ordering"
-          - "When deterministic compliance is required (e.g. identity verification before financial operations), prompt instructions alone have a non-zero failure rate"
-          - "Structured handoff protocols for mid-process escalation: customer details, root cause, recommended actions"
+          - "When deterministic compliance is required (e.g. identity verification before financial operations), prompt instructions alone carry a non-zero failure rate"
+          - "Structured handoff protocols for mid-process escalation: customer details, root cause analysis, recommended actions"
         skills:
           - "Programmatic prerequisites that block downstream tool calls until prior steps complete (e.g. block process_refund until get_customer returned a verified ID)"
-          - "Decomposing multi-concern requests, investigating each in parallel with shared context, then synthesizing one resolution"
-          - "Compiling structured handoff summaries for human agents who lack the transcript"
+          - "Decomposing multi-concern requests into distinct items, investigating each in parallel with shared context, then synthesizing one unified resolution"
+          - "Compiling structured handoff summaries (customer ID, root cause, refund amount, recommended action) for human agents who lack the transcript"
       - id: "1.5"
         name: "Apply Agent SDK hooks for tool call interception and data normalization"
         source: official
         knowledge:
-          - "Hook patterns (e.g. PostToolUse) that intercept tool results for transformation before the model sees them"
+          - "Hook patterns (e.g. PostToolUse) that intercept tool results for transformation before the model processes them"
           - "Hook patterns that intercept outgoing tool calls to enforce compliance rules (e.g. blocking refunds above a threshold)"
-          - "Hooks give deterministic guarantees; prompt instructions give probabilistic compliance"
+          - "Hooks give deterministic guarantees; prompt instructions give only probabilistic compliance"
         skills:
-          - "PostToolUse hooks normalizing heterogeneous formats (Unix timestamps, ISO 8601, numeric status codes) across MCP tools"
-          - "Interception hooks that block policy-violating actions and redirect to alternative workflows (e.g. human escalation)"
+          - "PostToolUse hooks that normalize heterogeneous formats (Unix timestamps, ISO 8601, numeric status codes) from different MCP tools before the agent sees them"
+          - "Tool-call interception hooks that block policy-violating actions and redirect to alternative workflows such as human escalation"
           - "Choosing hooks over prompt-based enforcement when business rules require guaranteed compliance"
       - id: "1.6"
         name: "Design task decomposition strategies for complex workflows"
         source: official
         knowledge:
           - "Fixed sequential pipelines (prompt chaining) vs dynamic adaptive decomposition based on intermediate findings"
-          - "Prompt chaining that breaks reviews into sequential steps (analyze each file, then a cross-file integration pass)"
+          - "Prompt chaining patterns that break reviews into sequential steps (analyze each file individually, then run a cross-file integration pass)"
           - "The value of adaptive investigation plans that generate subtasks from what each step discovers"
         skills:
           - "Selecting the decomposition pattern that fits the workflow: prompt chaining for predictable multi-aspect reviews, dynamic decomposition for open-ended investigation"
+          - "Splitting large code reviews into per-file local analysis passes plus a separate cross-file integration pass to avoid attention dilution"
+          - "Decomposing open-ended tasks by first mapping structure, identifying high-impact areas, then creating a prioritized plan that adapts as dependencies surface"
       - id: "1.7"
-        name: "Session state, resumption, and forking"
-        source: community          # public Exam Guide PDF truncates after 1.6 (§9.13)
-        knowledge: []
-        skills: []
+        name: "Manage session state, resumption, and forking"
+        source: official
+        knowledge:
+          - "Named session resumption using --resume <session-name> to continue a specific prior conversation"
+          - "fork_session for creating independent branches from a shared analysis baseline to explore divergent approaches"
+          - "The importance of informing the agent about changes to previously analyzed files when resuming after code modifications"
+          - "Why starting a new session with a structured summary is more reliable than resuming with stale tool results"
+        skills:
+          - "Using --resume with session names to continue named investigation sessions across work sessions"
+          - "Using fork_session for parallel exploration branches (e.g. comparing two testing or refactoring strategies from one shared analysis)"
+          - "Choosing between resumption (prior context mostly valid) and starting fresh with injected summaries (prior tool results stale)"
+          - "Informing a resumed session about specific file changes for targeted re-analysis rather than full re-exploration"
+
   - id: 2
     name: "Tool Design & MCP Integration"
     weight: 18
     flashcards_min: 12                  # other highest-failure domain
     tasks:
-      - {id: "2.1", name: "Tool interface design with clear descriptions", source: community}
-      - {id: "2.2", name: "Structured error responses for MCP tools", source: community}
-      - {id: "2.3", name: "Tool distribution across agents and tool_choice", source: community}
-      - {id: "2.4", name: "MCP server integration into Claude Code", source: community}
-      - {id: "2.5", name: "Built-in tools (Read, Write, Edit, Bash, Grep, Glob)", source: community}
+      - id: "2.1"
+        name: "Design effective tool interfaces with clear descriptions and boundaries"
+        source: official
+        knowledge:
+          - "Tool descriptions are the PRIMARY mechanism LLMs use for tool selection; minimal descriptions cause unreliable selection among similar tools"
+          - "Descriptions should include input formats, example queries, edge cases, and boundary explanations"
+          - "Ambiguous or overlapping descriptions cause misrouting (e.g. analyze_content vs analyze_document with near-identical descriptions)"
+          - "System prompt wording affects tool selection: keyword-sensitive instructions can create unintended tool associations"
+        skills:
+          - "Writing descriptions that differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives"
+          - "Renaming tools and updating descriptions to eliminate functional overlap (e.g. analyze_content → extract_web_results with a web-specific description)"
+          - "Splitting generic tools into purpose-specific ones with defined input/output contracts (analyze_document → extract_data_points, summarize_content, verify_claim_against_source)"
+          - "Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions"
+      - id: "2.2"
+        name: "Implement structured error responses for MCP tools"
+        source: official
+        knowledge:
+          - "The MCP isError flag pattern for communicating tool failures back to the agent"
+          - "Error taxonomy: transient (timeouts, service unavailable), validation (invalid input), business (policy violations), and permission errors"
+          - "ANTI-PATTERN: uniform generic error responses ('Operation failed') prevent the agent from making appropriate recovery decisions"
+          - "Retryable vs non-retryable errors, and how structured metadata prevents wasted retry attempts"
+        skills:
+          - "Returning structured error metadata: errorCategory (transient/validation/permission), isRetryable boolean, and human-readable descriptions"
+          - "Including retriable: false plus customer-friendly explanations for business-rule violations so the agent can communicate appropriately"
+          - "Implementing local error recovery inside subagents for transient failures, propagating to the coordinator only what cannot be resolved locally, with partial results and what was attempted"
+          - "Distinguishing access failures (needing retry decisions) from valid empty results (successful queries with no matches)"
+      - id: "2.3"
+        name: "Distribute tools appropriately across agents and configure tool choice"
+        source: official
+        knowledge:
+          - "Too many tools degrades selection reliability by increasing decision complexity (e.g. 18 tools instead of 4-5)"
+          - "Agents given tools outside their specialization tend to misuse them (e.g. a synthesis agent attempting web searches)"
+          - "Scoped tool access: give agents only role-relevant tools, with limited cross-role tools for specific high-frequency needs"
+          - "tool_choice options: 'auto', 'any', and forced selection ({'type': 'tool', 'name': '...'})"
+        skills:
+          - "Restricting each subagent's tool set to its role to prevent cross-specialization misuse"
+          - "Replacing generic tools with constrained alternatives (e.g. fetch_url → load_document that validates document URLs)"
+          - "Providing scoped cross-role tools for high-frequency needs (e.g. verify_fact for the synthesis agent) while routing complex cases through the coordinator"
+          - "Using forced tool_choice to ensure a specific tool runs first (e.g. extract_metadata before enrichment tools), then handling later steps in follow-up turns"
+          - "Setting tool_choice 'any' to guarantee the model calls a tool rather than returning conversational text"
+      - id: "2.4"
+        name: "Integrate MCP servers into Claude Code and agent workflows"
+        source: official
+        knowledge:
+          - "MCP server scoping: project-level (.mcp.json) for shared team tooling vs user-level (~/.claude.json) for personal/experimental servers"
+          - "Environment variable expansion in .mcp.json (e.g. ${GITHUB_TOKEN}) for credential management without committing secrets"
+          - "Tools from all configured MCP servers are discovered at connection time and available simultaneously to the agent"
+          - "MCP resources expose content catalogs (issue summaries, documentation hierarchies, database schemas) to reduce exploratory tool calls"
+        skills:
+          - "Configuring shared MCP servers in project-scoped .mcp.json with environment variable expansion for auth tokens"
+          - "Configuring personal/experimental MCP servers in user-scoped ~/.claude.json"
+          - "Enhancing MCP tool descriptions to detail capabilities and outputs, preventing the agent from preferring built-in tools (like Grep) over more capable MCP tools"
+          - "Choosing existing community MCP servers over custom implementations for standard integrations (e.g. Jira), reserving custom servers for team-specific workflows"
+          - "Exposing content catalogs as MCP resources so agents see available data without exploratory tool calls"
+      - id: "2.5"
+        name: "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively"
+        source: official
+        knowledge:
+          - "Grep for content search (file contents: function names, error messages, import statements)"
+          - "Glob for file path pattern matching (finding files by name or extension patterns)"
+          - "Read/Write for full file operations; Edit for targeted modifications using unique text matching"
+          - "When Edit fails on non-unique text matches, Read + Write is the reliable fallback"
+        skills:
+          - "Selecting Grep to search code content across a codebase (finding all callers of a function, locating error messages)"
+          - "Selecting Glob for files matching naming patterns (e.g. **/*.test.tsx)"
+          - "Using Read to load full contents followed by Write when Edit cannot find unique anchor text"
+          - "Building codebase understanding incrementally: Grep for entry points, then Read to follow imports and trace flows, rather than reading all files upfront"
+          - "Tracing function usage across wrapper modules by first identifying all exported names, then searching each name across the codebase"
+
   - id: 3
     name: "Claude Code Configuration & Workflows"
     weight: 20
     flashcards_min: 8
     tasks:
-      - {id: "3.1", name: "CLAUDE.md hierarchy, scoping, modular organization", source: community}
-      - {id: "3.2", name: "Custom slash commands and skills", source: community}
-      - {id: "3.3", name: "Path-specific rules for conditional convention loading", source: community}
-      - {id: "3.4", name: "Plan mode vs direct execution", source: community}
-      - {id: "3.5", name: "Iterative refinement techniques", source: community}
-      - id: "3.6"
-        name: "Claude Code in CI/CD pipelines"
-        source: community
+      - id: "3.1"
+        name: "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization"
+        source: official
         knowledge:
-          # Seeded from exam-intel (§0.5) — doc-verified, reported on the exam.
-          - "--append-system-prompt (temporary, stage-specific, KEEPS default behavior) vs --system-prompt (REPLACES it) vs CLAUDE.md (persistent shared context across CI runs and normal sessions)"
+          - "The CLAUDE.md hierarchy: user-level (~/.claude/CLAUDE.md), project-level (.claude/CLAUDE.md or root CLAUDE.md), and directory-level (subdirectory CLAUDE.md files)"
+          - "User-level settings apply only to that user — instructions in ~/.claude/CLAUDE.md are NOT shared with teammates via version control"
+          - "The @import syntax for referencing external files to keep CLAUDE.md modular"
+          - ".claude/rules/ directory for topic-specific rule files as an alternative to a monolithic CLAUDE.md"
+        skills:
+          - "Diagnosing configuration hierarchy issues (e.g. a new teammate not receiving instructions because they live in user-level rather than project-level config)"
+          - "Using @import to selectively include relevant standards files in each package's CLAUDE.md"
+          - "Splitting large CLAUDE.md files into focused topic files in .claude/rules/ (testing.md, api-conventions.md, deployment.md)"
+          - "Using /memory to verify which memory files are loaded and diagnose inconsistent behavior across sessions"
+      - id: "3.2"
+        name: "Create and configure custom slash commands and skills"
+        source: official
+        knowledge:
+          - "Project-scoped commands in .claude/commands/ (shared via version control) vs user-scoped in ~/.claude/commands/ (personal)"
+          - "Skills in .claude/skills/ with SKILL.md files supporting frontmatter: context: fork, allowed-tools, argument-hint"
+          - "The context: fork option runs skills in an isolated subagent context, preventing skill output from polluting the main conversation"
+          - "Personal skill customization: variants in ~/.claude/skills/ with different names to avoid affecting teammates"
+        skills:
+          - "Creating project-scoped slash commands in .claude/commands/ for team-wide availability via version control"
+          - "Using context: fork to isolate skills producing verbose output (codebase analysis) or exploratory context (brainstorming) from the main session"
+          - "Configuring allowed-tools in skill frontmatter to restrict tool access during execution (e.g. limiting file writes to prevent destructive actions)"
+          - "Using argument-hint frontmatter to prompt for required parameters when the skill is invoked without arguments"
+          - "Choosing between skills (on-demand, task-specific) and CLAUDE.md (always-loaded universal standards)"
+      - id: "3.3"
+        name: "Apply path-specific rules for conditional convention loading"
+        source: official
+        knowledge:
+          - ".claude/rules/ files with YAML frontmatter paths fields containing glob patterns for conditional rule activation"
+          - "Path-scoped rules load only when editing matching files, reducing irrelevant context and token usage"
+          - "Glob-pattern rules beat directory-level CLAUDE.md files for conventions spanning multiple directories (e.g. test files scattered across a codebase)"
+        skills:
+          - "Creating .claude/rules/ files with YAML frontmatter path scoping (e.g. paths: ['terraform/**/*']) so rules load only when editing matching files"
+          - "Using glob patterns to apply conventions by file type regardless of directory location (e.g. **/*.test.tsx for all test files)"
+          - "Choosing path-specific rules over subdirectory CLAUDE.md files when conventions must apply to files spread across the codebase"
+      - id: "3.4"
+        name: "Determine when to use plan mode vs direct execution"
+        source: official
+        knowledge:
+          - "Plan mode suits complex tasks: large-scale changes, multiple valid approaches, architectural decisions, multi-file modifications"
+          - "Direct execution suits simple, well-scoped changes (e.g. adding a single validation check to one function)"
+          - "Plan mode enables safe codebase exploration and design before committing to changes, preventing costly rework"
+          - "The Explore subagent isolates verbose discovery output and returns summaries, preserving main conversation context"
+        skills:
+          - "Selecting plan mode for architectural implications (microservice restructuring, library migrations affecting 45+ files, choosing between integration approaches)"
+          - "Selecting direct execution for well-understood changes with clear scope (single-file bug fix with a clear stack trace, adding a date validation conditional)"
+          - "Using the Explore subagent for verbose discovery phases to prevent context window exhaustion during multi-phase tasks"
+          - "Combining plan mode for investigation with direct execution for implementation"
+      - id: "3.5"
+        name: "Apply iterative refinement techniques for progressive improvement"
+        source: official
+        knowledge:
+          - "Concrete input/output examples are the most effective way to communicate expected transformations when prose descriptions are interpreted inconsistently"
+          - "Test-driven iteration: write test suites first, then iterate by sharing test failures to guide improvement"
+          - "The interview pattern: have Claude ask questions to surface considerations the developer had not anticipated before implementing"
+          - "When to provide all issues in a single message (interacting problems) versus fixing them sequentially (independent problems)"
+        skills:
+          - "Providing 2-3 concrete input/output examples to clarify transformation requirements when natural-language descriptions produce inconsistent results"
+          - "Writing test suites covering expected behavior, edge cases, and performance requirements before implementation, then iterating by sharing failures"
+          - "Using the interview pattern to surface design considerations (cache invalidation strategies, failure modes) before implementing in unfamiliar domains"
+          - "Providing specific test cases with example input and expected output to fix edge-case handling (e.g. null values in migration scripts)"
+          - "Addressing multiple interacting issues in one detailed message when fixes interact, versus sequential iteration for independent issues"
+      - id: "3.6"
+        name: "Integrate Claude Code into CI/CD pipelines"
+        source: official
+        knowledge:
+          - "The -p (or --print) flag runs Claude Code non-interactively in automated pipelines"
+          - "--output-format json and --json-schema CLI flags enforce structured output in CI contexts"
+          - "CLAUDE.md provides project context (testing standards, fixture conventions, review criteria) to CI-invoked Claude Code"
+          - "Session context isolation: the same session that generated code is less effective at reviewing its own changes than an independent review instance"
+          # Seeded from exam-intel (§0.5) — doc-verified, reported on the exam by a passer.
+          - "--append-system-prompt (temporary, stage-specific, KEEPS default behavior) vs --system-prompt (REPLACES default behavior) vs CLAUDE.md (persistent shared context across CI runs and normal sessions)"
           - "Managed GitHub Code Review reads CLAUDE.md for general project context AND a root-level REVIEW.md for review-specific instructions (what to flag, severity levels, exclusions, reporting preferences)"
+        skills:
+          - "Running Claude Code in CI with -p to prevent interactive input hangs"
+          - "Using --output-format json with --json-schema to produce machine-parseable findings for automated posting as inline PR comments"
+          - "Including prior review findings in context when re-running after new commits, instructing Claude to report only new or still-unaddressed issues to avoid duplicate comments"
+          - "Providing existing test files in context so test generation avoids duplicating scenarios already covered"
+          - "Documenting testing standards, valuable test criteria, and available fixtures in CLAUDE.md to improve test generation quality"
+
   - id: 4
     name: "Prompt Engineering & Structured Output"
     weight: 20
     flashcards_min: 8
     tasks:
-      - {id: "4.1", name: "Explicit criteria for precision and false-positive reduction", source: community}
-      - {id: "4.2", name: "Few-shot prompting for consistency and quality", source: community}
-      - {id: "4.3", name: "Structured output using tool use and JSON schemas", source: community}
-      - {id: "4.4", name: "Validation, retry, and feedback loops", source: community}
-      - {id: "4.5", name: "Batch processing strategies", source: community}
-      - {id: "4.6", name: "Multi-instance and multi-pass review architectures", source: community}
+      - id: "4.1"
+        name: "Design prompts with explicit criteria to improve precision and reduce false positives"
+        source: official
+        knowledge:
+          - "Explicit criteria beat vague instructions (e.g. 'flag comments only when claimed behavior contradicts actual code behavior' vs 'check that comments are accurate')"
+          - "ANTI-PATTERN: general instructions like 'be conservative' or 'only report high-confidence findings' fail to improve precision compared to specific categorical criteria"
+          - "False positive rates erode developer trust: high-false-positive categories undermine confidence in accurate ones"
+        skills:
+          - "Writing specific review criteria defining which issues to report (bugs, security) versus skip (minor style, local patterns), rather than confidence-based filtering"
+          - "Temporarily disabling high-false-positive categories to restore developer trust while improving those prompts"
+          - "Defining explicit severity criteria with concrete code examples per level for consistent classification"
+      - id: "4.2"
+        name: "Apply few-shot prompting to improve output consistency and quality"
+        source: official
+        knowledge:
+          - "Few-shot examples are the most effective technique for consistently formatted, actionable output when detailed instructions alone produce inconsistent results"
+          - "Few-shot examples demonstrate ambiguous-case handling (tool selection for ambiguous requests, branch-level test coverage gaps)"
+          - "Examples enable the model to generalize judgment to novel patterns rather than matching only pre-specified cases"
+          - "Few-shot examples reduce hallucination in extraction tasks (informal measurements, varied document structures)"
+        skills:
+          - "Creating 2-4 targeted examples for ambiguous scenarios showing the reasoning for why one action was chosen over plausible alternatives"
+          - "Including examples that demonstrate the desired output format (location, issue, severity, suggested fix)"
+          - "Providing examples distinguishing acceptable code patterns from genuine issues to cut false positives while enabling generalization"
+          - "Using examples to demonstrate handling of varied document structures (inline citations vs bibliographies, methodology sections vs embedded details)"
+          - "Adding examples showing correct extraction from varied formats to address empty/null extraction of required fields"
+      - id: "4.3"
+        name: "Enforce structured output using tool use and JSON schemas"
+        source: official
+        knowledge:
+          - "Tool use with JSON schemas is the most reliable approach for guaranteed schema-compliant output, eliminating JSON syntax errors"
+          - "tool_choice: 'auto' (model may return text instead of calling a tool), 'any' (must call a tool but chooses which), forced (must call a specific named tool)"
+          - "Strict JSON schemas eliminate SYNTAX errors but not SEMANTIC errors (line items that don't sum to the total, values in wrong fields)"
+          - "Schema design: required vs optional fields, enum fields with 'other' + detail string patterns for extensible categories"
+        skills:
+          - "Defining extraction tools with JSON schemas as input parameters and extracting structured data from the tool_use response"
+          - "Setting tool_choice 'any' to guarantee structured output when multiple extraction schemas exist and the document type is unknown"
+          - "Forcing a specific tool with tool_choice {'type': 'tool', 'name': 'extract_metadata'} to ensure a particular extraction runs before enrichment"
+          - "Designing schema fields as optional (nullable) when source documents may lack the information, preventing fabricated values to satisfy required fields"
+          - "Adding enum values like 'unclear' for ambiguous cases and 'other' + detail fields for extensible categorization"
+          - "Including format normalization rules in prompts alongside strict output schemas to handle inconsistent source formatting"
+      - id: "4.4"
+        name: "Implement validation, retry, and feedback loops for extraction quality"
+        source: official
+        knowledge:
+          - "Retry-with-error-feedback: append specific validation errors to the prompt on retry to guide the model toward correction"
+          - "The limits of retry: retries are ineffective when the required information is simply ABSENT from the source document (vs format or structural errors)"
+          - "Feedback loop design: tracking which code constructs trigger findings (detected_pattern field) to enable systematic analysis of dismissal patterns"
+          - "Semantic validation errors (values don't sum, wrong field placement) vs schema syntax errors (eliminated by tool use)"
+        skills:
+          - "Follow-up requests including the original document, the failed extraction, and specific validation errors for model self-correction"
+          - "Identifying when retries will be ineffective (information exists only in an external document not provided) versus when they will succeed (format mismatches, structural output errors)"
+          - "Adding detected_pattern fields to structured findings to enable false-positive analysis when developers dismiss findings"
+          - "Designing self-correction validation flows: extracting 'calculated_total' alongside 'stated_total' to flag discrepancies; adding 'conflict_detected' booleans for inconsistent source data"
+      - id: "4.5"
+        name: "Design efficient batch processing strategies"
+        source: official
+        knowledge:
+          - "The Message Batches API: 50% cost savings, up to a 24-hour processing window, no guaranteed latency SLA"
+          - "Batch processing suits non-blocking, latency-tolerant workloads (overnight reports, weekly audits, nightly test generation) and is inappropriate for blocking workflows (pre-merge checks)"
+          - "The batch API does NOT support multi-turn tool calling within a single request (cannot execute tools mid-request and return results)"
+          - "custom_id fields correlate batch request/response pairs"
+        skills:
+          - "Matching API approach to latency requirements: synchronous for blocking pre-merge checks, batch for overnight/weekly analysis"
+          - "Calculating batch submission frequency from SLA constraints (e.g. 4-hour windows to guarantee a 30-hour SLA with 24-hour batch processing)"
+          - "Handling batch failures by resubmitting only failed documents (identified by custom_id) with modifications (e.g. chunking documents that exceeded context limits)"
+          - "Using prompt refinement on a sample set before batch-processing large volumes to maximize first-pass success and reduce resubmission costs"
+      - id: "4.6"
+        name: "Design multi-instance and multi-pass review architectures"
+        source: official
+        knowledge:
+          - "Self-review limitations: a model retains reasoning context from generation, making it less likely to question its own decisions in the same session"
+          - "Independent review instances (without prior reasoning context) catch subtle issues better than self-review instructions or extended thinking"
+          - "Multi-pass review: split large reviews into per-file local analysis plus cross-file integration passes to avoid attention dilution and contradictory findings"
+        skills:
+          - "Using a second independent Claude instance to review generated code without the generator's reasoning context"
+          - "Splitting large multi-file reviews into focused per-file passes for local issues plus separate integration passes for cross-file data flow"
+          - "Running verification passes where the model self-reports confidence alongside each finding to enable calibrated review routing"
+
   - id: 5
     name: "Context Management & Reliability"
     weight: 15
     flashcards_min: 8
     tasks:
-      - {id: "5.1", name: "Conversation context preservation", source: community}
-      - {id: "5.2", name: "Escalation and ambiguity resolution", source: community}
-      - {id: "5.3", name: "Error propagation across multi-agent systems", source: community}
-      - {id: "5.4", name: "Context management in large codebase exploration", source: community}
-      - {id: "5.5", name: "Human review workflows and confidence calibration", source: community}
-      - {id: "5.6", name: "Information provenance and uncertainty", source: community}
+      - id: "5.1"
+        name: "Manage conversation context to preserve critical information across long interactions"
+        source: official
+        knowledge:
+          - "Progressive summarization risks: condensing numerical values, percentages, dates, and customer-stated expectations into vague summaries"
+          - "The 'lost in the middle' effect: models reliably process information at the beginning and end of long inputs but may omit findings from middle sections"
+          - "Tool results accumulate in context and consume tokens disproportionately to their relevance (e.g. 40+ fields per order lookup when only 5 are relevant)"
+          - "Complete conversation history must be passed in subsequent API requests to maintain conversational coherence"
+        skills:
+          - "Extracting transactional facts (amounts, dates, order numbers, statuses) into a persistent 'case facts' block included in each prompt, outside summarized history"
+          - "Extracting and persisting structured issue data (order IDs, amounts, statuses) into a separate context layer for multi-issue sessions"
+          - "Trimming verbose tool outputs to only relevant fields before they accumulate in context"
+          - "Placing key findings summaries at the beginning of aggregated inputs and organizing details with explicit section headers to mitigate position effects"
+          - "Requiring subagents to include metadata (dates, source locations, methodological context) in structured outputs to support accurate downstream synthesis"
+          - "Modifying upstream agents to return structured data (key facts, citations, relevance scores) instead of verbose content when downstream agents have limited context budgets"
+      - id: "5.2"
+        name: "Design effective escalation and ambiguity resolution patterns"
+        source: official
+        knowledge:
+          - "Appropriate escalation triggers: explicit customer requests for a human, policy exceptions/gaps (not merely complex cases), and inability to make meaningful progress"
+          - "Escalate immediately when a customer explicitly demands it, versus offering to resolve when the issue is straightforward"
+          - "ANTI-PATTERN: sentiment-based escalation and self-reported confidence scores are unreliable proxies for actual case complexity"
+          - "Multiple customer matches require clarification (requesting additional identifiers) rather than heuristic selection"
+        skills:
+          - "Adding explicit escalation criteria with few-shot examples to the system prompt demonstrating when to escalate versus resolve autonomously"
+          - "Honoring explicit customer requests for human agents immediately, without first attempting investigation"
+          - "Acknowledging frustration while offering resolution when the issue is within capability, escalating only if the customer reiterates the preference"
+          - "Escalating when policy is ambiguous or silent on the specific request (e.g. competitor price matching when policy addresses only own-site adjustments)"
+          - "Asking for additional identifiers when tool results return multiple matches, rather than selecting heuristically"
+      - id: "5.3"
+        name: "Implement error propagation strategies across multi-agent systems"
+        source: official
+        knowledge:
+          - "Structured error context (failure type, attempted query, partial results, alternative approaches) enables intelligent coordinator recovery decisions"
+          - "Access failures (timeouts needing retry decisions) vs valid empty results (successful queries with no matches)"
+          - "ANTI-PATTERN: generic error statuses ('search unavailable') hide valuable context from the coordinator"
+          - "ANTI-PATTERN: silently suppressing errors (returning empty results as success) and terminating entire workflows on single failures"
+        skills:
+          - "Returning structured error context including failure type, what was attempted, partial results, and potential alternatives"
+          - "Distinguishing access failures from valid empty results in error reporting so the coordinator can decide appropriately"
+          - "Having subagents implement local recovery for transient failures and propagate only unresolvable errors, including what was attempted and partial results"
+          - "Structuring synthesis output with coverage annotations indicating which findings are well-supported versus which topics have gaps from unavailable sources"
+      - id: "5.4"
+        name: "Manage context effectively in large codebase exploration"
+        source: official
+        knowledge:
+          - "Context degradation in extended sessions: models start giving inconsistent answers and referencing 'typical patterns' rather than specific classes discovered earlier"
+          - "Scratchpad files persist key findings across context boundaries"
+          - "Subagent delegation isolates verbose exploration output while the main agent coordinates high-level understanding"
+          - "Structured state persistence for crash recovery: each agent exports state to a known location and the coordinator loads a manifest on resume"
+        skills:
+          - "Spawning subagents to investigate specific questions ('find all test files', 'trace refund flow dependencies') while the main agent preserves high-level coordination"
+          - "Having agents maintain scratchpad files recording key findings, referencing them for later questions to counteract context degradation"
+          - "Summarizing key findings from one exploration phase before spawning subagents for the next, injecting summaries into initial context"
+          - "Designing crash recovery using structured agent state exports (manifests) the coordinator loads on resume and injects into agent prompts"
+          - "Using /compact to reduce context usage during extended exploration when context fills with verbose discovery output"
+      - id: "5.5"
+        name: "Design human review workflows and confidence calibration"
+        source: official
+        knowledge:
+          - "Aggregate accuracy metrics (e.g. 97% overall) can mask poor performance on specific document types or fields"
+          - "Stratified random sampling measures error rates in high-confidence extractions and detects novel error patterns"
+          - "Field-level confidence scores calibrated using labeled validation sets route review attention"
+          - "Validate accuracy by document type and field segment before automating high-confidence extractions"
+        skills:
+          - "Implementing stratified random sampling of high-confidence extractions for ongoing error-rate measurement and novel pattern detection"
+          - "Analyzing accuracy by document type and field to verify consistent performance across all segments before reducing human review"
+          - "Having models output field-level confidence scores, then calibrating review thresholds using labeled validation sets"
+          - "Routing extractions with low model confidence or ambiguous/contradictory source documents to human review, prioritizing limited reviewer capacity"
+      - id: "5.6"
+        name: "Preserve information provenance and handle uncertainty in multi-source synthesis"
+        source: official
+        knowledge:
+          - "Source attribution is lost during summarization when findings are compressed without preserving claim-source mappings"
+          - "Structured claim-source mappings must be preserved and merged by the synthesis agent when combining findings"
+          - "Conflicting statistics from credible sources should be annotated with source attribution rather than arbitrarily selecting one value"
+          - "Temporal data: require publication/collection dates in structured outputs to prevent temporal differences being misread as contradictions"
+        skills:
+          - "Requiring subagents to output structured claim-source mappings (source URLs, document names, relevant excerpts) that downstream agents preserve through synthesis"
+          - "Structuring reports with explicit sections distinguishing well-established findings from contested ones, preserving original source characterizations and methodological context"
+          - "Completing document analysis with conflicting values included and explicitly annotated, letting the coordinator decide how to reconcile before synthesis"
+          - "Requiring publication or data collection dates in structured outputs to enable correct temporal interpretation"
+          - "Rendering different content types appropriately in synthesis outputs — financial data as tables, news as prose, technical findings as structured lists — rather than converting everything to a uniform format"
 
 conventions: a4                         # formatting profile (A.4 baked into CLAUDE.md / builder prompt)
 max_gap_fill_cycles: 3                  # safety valve (§4.5 / §9.6)
