@@ -1,4 +1,4 @@
-# Source Inventory (generated 2026-09-06T17:17:34.827879+00:00)
+# Source Inventory (generated 2026-09-06T17:49:37.552837+00:00)
 
 _Authoritative data: `.claude/state/<course>/inventory.json`._
 

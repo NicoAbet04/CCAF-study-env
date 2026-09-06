@@ -14,7 +14,10 @@
     },
     {
       "item": "Timestamp refreshed after a content-neutral edit: Glossary links rewritten to #heading anchors so they jump to the exact term. Diff verified to touch only [[Glossary#...]] links; no prose/flashcard/trap changes."
+    },
+    {
+      "item": "Re-approved after filling a real gap in Task 4.4's eval-workflow content: the note said grading came in 'two flavours' (model/code) but the primary source's own Graders diagram (001_prompt_evals.ipynb) shows three, including Human-based grading, which was missing entirely. Added the human-grader description, made the prompt-rewrite step explicit with the course's own solution_criteria worked example, added a flashcard, and added Eval workflow / Grader Glossary entries. Two review rounds caught and fixed: a bolded wikilink alias and a wikilink split across a line break (both render as literal text in Obsidian instead of links), plus a mild internal contradiction ('solution criteria' used before the note itself introduces that field). 13 flashcards, one graph TD, trap per task 4.1-4.6, all anchors resolve."
     }
   ],
-  "timestamp": "2026-09-05T15:45:31Z"
+  "timestamp": "2026-09-06T17:49:06Z"
 }

@@ -157,6 +157,16 @@ A list of numbers representing the meaning of a piece of text, so
 that semantically similar texts sit close together in vector space. The individual
 dimensions are not human-interpretable. See [[5 - Context Management & Reliability]].
 
+### Eval workflow
+
+The disciplined alternative to testing a prompt once (or a
+few times) and calling it done: write an initial prompt, build a dataset of
+representative inputs, feed each one through Claude, score the outputs with
+a [[Glossary#Grader|grader]], then rewrite the prompt and repeat. Running a
+prompt through this loop before production catches the unexpected inputs
+that one-off testing misses. See
+[[4 - Prompt Engineering & Structured Output#4.4 — Validation, retry, and feedback loops|4 - Prompt Engineering & Structured Output]].
+
 ### Evaluator-optimizer
 
 An agentic pattern where one step produces output and
@@ -205,6 +215,26 @@ tags:
 ```
 
 See [[3 - Claude Code Configuration & Workflows]].
+
+## G
+
+### Grader
+
+The component that scores a prompt's output during an
+[[Glossary#Eval workflow|eval workflow]], distinguished by *who or what*
+assigns the score:
+
+- **Code-based** — a deterministic check (valid JSON/Python/regex, output
+  length, presence of certain words). Best for objective, mechanical
+  properties.
+- **Model-based** — a second Claude call scores the output against a
+  rubric, typically 1–10. Best for quality and instruction-following that
+  code cannot easily check.
+- **Human-based** — a person scores the output or compares two versions.
+  Best for the qualities hardest to automate: overall quality,
+  comprehensiveness, depth, conciseness, relevance.
+
+See [[4 - Prompt Engineering & Structured Output#4.4 — Validation, retry, and feedback loops|4 - Prompt Engineering & Structured Output]].
 
 ## H
 

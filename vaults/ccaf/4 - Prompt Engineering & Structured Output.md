@@ -173,17 +173,37 @@ which code construct triggered it — when developers dismiss findings, that fie
 lets you analyze which patterns are causing false positives so you can fix the
 prompt systematically.
 
-The course's **prompt evaluation** workflow is the disciplined version of this
-loop. Rather than testing a prompt once (which breaks on unexpected inputs) or a
-few times, you run it through an evaluation pipeline: draft a prompt, build a
-dataset of representative inputs, feed each through Claude, grade the outputs, and
-iterate. Grading comes in two flavours. **Model-based grading** uses a second
-Claude call to score an answer against solution criteria on a 1–10 scale — good
-for judging quality and correctness that code cannot easily check. **Code-based
-grading** runs deterministic checks, such as parsing the output to confirm it is
-valid JSON, Python, or a regex, scoring 10 or 0. The course combines both by
-averaging a model score with a syntax score. Model-based grading judges meaning;
-code-based grading judges structure.
+**[[Glossary#Eval workflow|Prompt evaluation]]** is the disciplined version
+of this loop, and it is worth knowing by its five steps: write an initial
+**prompt**; build an **eval dataset** of representative inputs; feed each
+one through Claude; **grade** the outputs; then **rewrite the prompt** and
+run the whole cycle again. The course's own example dataset has just three
+AWS-related coding tasks — production datasets run to thousands. Testing a
+prompt once, or tweaking it for a corner case or two, both leave you exposed
+to inputs you never considered; running it through this loop first is what
+gives you confidence before production.
+
+A [[Glossary#Grader|grader]] scores each output, and grading comes in three
+flavours, distinguished by *who or what* assigns the score:
+
+- **Code-based grading** runs a deterministic check — parsing the output to
+  confirm it is valid JSON, Python, or a regex, scoring 10 or 0. Best for
+  objective, mechanical properties: output length, whether certain words
+  appear, syntax validity, readability scores.
+- **Model-based grading** uses a second Claude call to score an output
+  against a rubric (typically 1–10). Best for response quality,
+  instruction-following, and completeness — qualities a program cannot
+  easily check but a good rubric can.
+- **Human-based grading** asks a person to score the output, or compare two
+  versions. Best for the qualities hardest to automate at all: general
+  response quality, comprehensiveness, depth, conciseness, relevance.
+
+The course combines code- and model-based grading by averaging a syntax
+score with a model score. It demonstrates the rewrite step concretely too:
+after an initial pass, it adds a `solution_criteria` field to each dataset
+record, then updates the model grader's own prompt to score against those
+criteria specifically — tightening the grader itself, not just the prompt
+being tested.
 
 ## 4.5 — Batch processing strategies
 
@@ -415,12 +435,29 @@ the real category was so you can extend the list later.
 #flashcards/domain-4
 
 Question
-What is the difference between model-based grading and code-based grading in a
-prompt-evaluation pipeline, and when do you use each?
+A prompt-evaluation pipeline can grade outputs three ways — by code, by a
+second model call, or by a human. What is each best suited for, and which
+two does the course combine into one averaged score?
 ?
-Model-based grading uses a second Claude call to score an output against solution
-criteria (e.g. 1–10) — best for judging meaning, quality, and correctness that
-code cannot easily check. Code-based grading runs deterministic checks such as
-parsing the output as valid JSON/Python/regex — best for judging structure. They
-are often combined by averaging the two scores.
+Code-based grading runs a deterministic check (e.g. parsing output as valid
+JSON/Python/regex) — best for objective, mechanical properties like syntax
+validity or output length. Model-based grading uses a second Claude call
+against a rubric — best for quality and instruction-following that code
+cannot easily check. Human-based grading asks a person to score or
+compare outputs — best for the hardest-to-automate qualities: general
+quality, comprehensiveness, depth, conciseness, relevance. The course
+averages code- and model-based scores into one combined score.
+#flashcards/domain-4
+
+Question
+You're evaluating a customer-support prompt and want to know whether Claude's
+tone actually feels warm and appropriately concise to a real reader — not just
+whether the response is well-formed. Which grader type fits, and why would
+code-based grading fall short here?
+?
+Human-based grading — qualities like overall response quality, tone, and
+conciseness are exactly what a person is best positioned to judge, and the
+hardest to automate reliably. Code-based grading can only check mechanical
+properties (valid syntax, output length, presence of certain words); it has
+no way to assess how a response *feels* to read.
 #flashcards/domain-4
