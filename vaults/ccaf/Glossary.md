@@ -183,6 +183,29 @@ Creating an independent branch from a shared analysis baseline so
 you can explore divergent approaches without disturbing the original session. See
 [[1 - Agentic Architecture & Orchestration]].
 
+### Frontmatter
+
+A block of structured metadata placed at the very top of a text or
+Markdown file, enclosed by two lines of three dashes (`---`). Claude Code
+reads it to configure how the file behaves — the `context`, `allowed-tools`,
+and `argument-hint` fields on a [[Glossary#SKILL.md|SKILL.md]], or the
+`paths` glob on a rule in
+[`.claude/rules/`](<Claude Commands.md#.claude/rules/>). A typical block
+looks like:
+
+```yaml
+---
+title: "My Blog Post"
+date: 2026-09-06
+author: "Jane Doe"
+tags:
+  - markdown
+  - yaml
+---
+```
+
+See [[3 - Claude Code Configuration & Workflows]].
+
 ## H
 
 ### Hook
@@ -274,6 +297,15 @@ a request rather than running several at once. See
 The field a `PreToolUse` hook returns to control a tool
 call: `allow`, `deny`, or `ask` (hand the decision to the user). See
 [[1 - Agentic Architecture & Orchestration]].
+
+### Plugin
+
+A versioned, installable bundle of Claude Code configuration —
+skills, subagents, hooks, and MCP server configs together — installed by
+name (`/plugin install org-name@plugin-name`) or through a shared
+marketplace, rather than assembled by hand. Because a plugin runs with your
+privileges and its hooks fire on every matching tool call, read what it does
+before installing it. See [[3 - Claude Code Configuration & Workflows]].
 
 ### PostToolUse
 
@@ -373,8 +405,9 @@ preferences. `CLAUDE.md` supplies general project context to the same review;
 
 ### SKILL.md
 
-The file defining a skill in `.claude/skills/`, with frontmatter
-options including `context: fork` (run the skill in an isolated subagent context
+The file defining a skill in `.claude/skills/`, with
+[[Glossary#Frontmatter|frontmatter]] options including `context: fork` (run
+the skill in an isolated subagent context
 so its output doesn't clutter the main conversation), `allowed-tools`, and
 `argument-hint`. See [[3 - Claude Code Configuration & Workflows]].
 
@@ -453,6 +486,22 @@ so echo back the fields you aren't changing. See
 
 A store that indexes embeddings and returns the nearest ones to
 a query vector, enabling fast semantic retrieval. See [[5 - Context Management & Reliability]].
+
+## W
+
+### Worktree
+
+A git worktree checked out to its own branch in its own directory,
+independent of the repository's main working copy. Two Claude Code sessions
+can each get their own worktree so they edit separate directories instead of
+colliding on the same files. The course's
+[`/create_worktree`](<Claude Commands.md#/create_worktree>) command creates
+one under `.trees/`; the companion
+[`/merge_worktree`](<Claude Commands.md#/merge_worktree>) command merges the
+branch back into main and helps resolve conflicts. A `.worktreeinclude` file
+at the repo root lists git-ignored files (like a local env file) to copy into
+every new worktree. See
+[[3 - Claude Code Configuration & Workflows#Custom commands in practice: parallel work with worktrees|3 - Claude Code Configuration & Workflows]].
 
 ## X
 

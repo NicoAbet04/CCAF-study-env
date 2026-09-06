@@ -46,9 +46,10 @@ See [[1 - Agentic Architecture & Orchestration]],
 ### /create_worktree
 
 A custom command shipped with the course, not a Claude Code built-in. It
-takes a feature name as `$ARGUMENTS`, checks that the worktree doesn't
-already exist, creates it under `.trees/`, and wires up the environment —
-paired with `/merge_worktree` for parallelizing work across sessions. See
+takes a feature name as `$ARGUMENTS`, checks that the
+[[Glossary#Worktree|worktree]] doesn't already exist, creates it under
+`.trees/`, and wires up the environment — paired with `/merge_worktree` for
+parallelizing work across sessions. See
 [[3 - Claude Code Configuration & Workflows]].
 
 ### /init
@@ -182,8 +183,9 @@ with the whole team through version control. The personal counterpart is
 
 Holds topic-specific rule files as an alternative to one monolithic
 [[Glossary#CLAUDE.md|CLAUDE.md]]. A rule file can carry a `paths` field in its
-YAML frontmatter — a glob pattern — so the rule loads only when Claude edits a
-matching file, rather than at every launch. This is the fix for a convention
+YAML [[Glossary#Frontmatter|frontmatter]] — a glob pattern — so the rule
+loads only when Claude edits a matching file, rather than at every launch.
+This is the fix for a convention
 that applies to a file *type* scattered across many directories (all test
 files, say), where a per-directory `CLAUDE.md` would have to be duplicated
 everywhere. See

@@ -124,8 +124,9 @@ into `CLAUDE.md` (which is for context, not command definitions).
 A **skill** is a reusable, task-specific capability that Claude invokes on its
 own when a task matches the skill's description. Skills live in
 [`.claude/skills/`](<Claude Commands.md#.claude/skills/>) as folders, each
-with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its frontmatter supports
-three options worth memorizing:
+with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its
+[[Glossary#Frontmatter|frontmatter]] supports three options worth
+memorizing:
 
 - **`context: fork`** runs the skill in an isolated subagent context so its
   output never pollutes the main conversation. Reach for this when a skill
@@ -157,21 +158,22 @@ weakened just to pass, and reports pass or fail with evidence — all without yo
 remembering to ask.
 
 To share a whole bundle of this configuration at once — skills, subagents,
-hooks, and MCP server configs — you can package it as a **plugin**, one
-versioned, installable unit added through a marketplace. Because a plugin runs
-code with your privileges and its hooks fire on every matching tool call, the
-rule is to read what a plugin does before installing it. See
-[[2 - Tool Design & MCP Integration]] for how MCP servers are scoped and shared.
+hooks, and MCP server configs — you can package it as a
+**[[Glossary#Plugin|plugin]]**, one versioned, installable unit added through
+a marketplace. Because a plugin runs code with your privileges and its hooks
+fire on every matching tool call, the rule is to read what a plugin does
+before installing it. See [[2 - Tool Design & MCP Integration]] for how MCP
+servers are scoped and shared.
 
 ### Custom commands in practice: parallel work with worktrees
 
 A concrete use of custom slash commands is parallelizing Claude Code. Two
-sessions editing the same files collide, so each gets its own **git worktree** —
-an independent working tree checked out to its own branch in its own directory.
-Because the trees are separate, the sessions cannot clobber each other; when a
-session exits, a clean worktree is removed automatically. A `.worktreeinclude`
-file at the repo root lists git-ignored files (like a local env file) to copy
-into every worktree.
+sessions editing the same files collide, so each gets its own
+[[Glossary#Worktree|git worktree]] — an independent working tree checked out
+to its own branch in its own directory. Because the trees are separate, the
+sessions cannot clobber each other; when a session exits, a clean worktree
+is removed automatically. A `.worktreeinclude` file at the repo root lists
+git-ignored files (like a local env file) to copy into every worktree.
 
 The course ships this as two custom commands. A `create_worktree` command takes
 a feature name as `$ARGUMENTS`, checks the worktree doesn't already exist,
