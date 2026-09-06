@@ -106,9 +106,28 @@ being picked up.
 A **custom slash command** is a saved prompt you invoke by name. You create one
 by dropping a Markdown file into a commands directory; the file's contents become
 the prompt that runs. The command can reference `$ARGUMENTS`, which is replaced
-by whatever you pass on invocation — so
-[`/create_worktree feature_a`](<Claude Commands.md#/create_worktree>) runs
-the command's prompt with `feature_a` substituted in.
+by whatever you pass on invocation, everywhere it appears in the file.
+
+The course's own `create_worktree.md` shows the pattern (its first two of
+four steps, trimmed here for length — the remaining two symlink `.venv` into
+the worktree and launch an editor there):
+
+```text
+Your task is to create a new worktree named '$ARGUMENTS' in the .trees/$ARGUMENTS folder.
+
+Follow these steps:
+
+1. Check if an existing folder in the .trees folder with the name '$ARGUMENTS'
+   already exists. If it does, stop here and tell the user the worktree
+   already exists.
+2. Create a new git worktree in the .trees folder with the name '$ARGUMENTS'.
+```
+
+Running [`/create_worktree feature_a`](<Claude Commands.md#/create_worktree>)
+substitutes `feature_a` for every `$ARGUMENTS` in that file before Claude
+sees it, so Claude actually reads an instruction to create a worktree named
+`feature_a` in `.trees/feature_a`, check for that exact folder, and create a
+git worktree with that exact name.
 
 Location decides the audience, and this is the exam's favourite distinction:
 

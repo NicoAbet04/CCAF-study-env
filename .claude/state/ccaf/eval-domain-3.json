@@ -20,7 +20,10 @@
     },
     {
       "item": "Re-approved after linking this note's first mentions of SKILL.md's frontmatter, plugin, and git worktree to three new Glossary entries (Frontmatter, Plugin, Worktree). Evaluator confirmed all three entries trace cleanly to primary sources and the exam guide, with two non-blocking wording suggestions (Plugin's install path, minor line-wrap tidiness) applied afterward as content-neutral polish. 12 flashcards, one graph TD, trap per task 3.1-3.6, all anchors resolve."
+    },
+    {
+      "item": "Re-approved after adding a verbatim $ARGUMENTS worked example to Task 3.2 (quoting the course's real create_worktree.md, disclosed as 2 of its 4 steps) and rewriting the Glossary's Worktree entry to be more generic/human-readable per user request. First pass flagged the simplified wording as imprecise (read like a full repo clone rather than a second working folder of the same project; 'main copy' should be 'main branch' to match the source and rest of the vault); both fixed and re-verified with zero remaining findings. 12 flashcards, one graph TD, trap per task 3.1-3.6, all links resolve."
     }
   ],
-  "timestamp": "2026-09-06T17:06:49Z"
+  "timestamp": "2026-09-06T17:17:12Z"
 }

@@ -491,16 +491,17 @@ a query vector, enabling fast semantic retrieval. See [[5 - Context Management &
 
 ### Worktree
 
-A git worktree checked out to its own branch in its own directory,
-independent of the repository's main working copy. Two Claude Code sessions
-can each get their own worktree so they edit separate directories instead of
-colliding on the same files. The course's
+A second working folder for the same project — a complete set of its files
+checked out to a different branch, in a different directory — that you can
+work in without touching your main one. Two Claude Code sessions can each
+get their own so they work in separate directories instead of fighting over
+the same files. The course's
 [`/create_worktree`](<Claude Commands.md#/create_worktree>) command creates
 one under `.trees/`; the companion
-[`/merge_worktree`](<Claude Commands.md#/merge_worktree>) command merges the
-branch back into main and helps resolve conflicts. A `.worktreeinclude` file
-at the repo root lists git-ignored files (like a local env file) to copy into
-every new worktree. See
+[`/merge_worktree`](<Claude Commands.md#/merge_worktree>) command folds that
+branch back into the main branch and helps resolve conflicts. A
+`.worktreeinclude` file at the repo root lists git-ignored files (like a
+local env file) to copy into every new one. See
 [[3 - Claude Code Configuration & Workflows#Custom commands in practice: parallel work with worktrees|3 - Claude Code Configuration & Workflows]].
 
 ## X
