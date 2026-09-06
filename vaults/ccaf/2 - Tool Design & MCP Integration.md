@@ -24,10 +24,7 @@ to the model so it can act on the outside world, described to the model by a
 [[Glossary#JSON Schema|JSON Schema]] for its inputs. The **Model Context Protocol**
 ([[Glossary#MCP (Model Context Protocol)|MCP]]) is a standard way to package tools, data, and prompt
 templates in a reusable server that any MCP-aware client — Claude Code, the
-desktop app, or your own script — can connect to. This domain leans on the
-[[1 - Agentic Architecture & Orchestration|agentic loop]] from Domain 1 and
-feeds the reliability patterns in
-[[5 - Context Management & Reliability|Domain 5]].
+desktop app, or your own script — can connect to. This domain leans on the [[Glossary#Agentic loop|agentic loop]] from [[1 - Agentic Architecture & Orchestration|1 - Agentic Architecture & Orchestration]] and feeds the reliability patterns in [[5 - Context Management & Reliability|5 - Context Management & Reliability]].
 
 ```mermaid
 graph TD
@@ -52,16 +49,26 @@ graph TD
 
 ## How tool use actually works (the shared mechanism)
 
-Every task in this domain sits on top of one loop, so it helps to have it clear
-first. You send Claude a request with a list of tool schemas. Claude replies
-with a message made of [[Glossary#Content block|content blocks]]: a text block
+Every request needs three fields regardless of tools: **`model`**,
+**`messages`** (a list where each entry has a `role` of `user` or `assistant`
+plus content), and **`max_tokens`**, a required cap on how much Claude may
+generate in that one reply. `max_tokens` is easy to confuse with
+[[Glossary#Context window|context-window]] capacity, but it only bounds this
+response's length — it says nothing about how much history or tool output the
+request can carry. See [[Glossary#max_tokens|max_tokens]] and
+[[5 - Context Management & Reliability|5 - Context Management & Reliability]].
+
+This entire area is built around a single core loop, so let's start by
+understanding that loop. On top of those three fields, you send Claude a
+request with a list of tool schemas. Claude replies with a message made of
+[[Glossary#Content block|content blocks]]: a text block
 explaining its thinking, and one or more **tool_use** blocks naming a tool and
 the input it wants. You detect this by reading the response's
 [[Glossary#stop_reason|stop_reason]]: when it equals `"tool_use"`, Claude is asking you to run
 something. You execute the tool, then send the result back inside a user message
 as a **tool_result** block whose `tool_use_id` matches the request. The loop
 repeats until `stop_reason` is `"end_turn"`. This is the same loop that
-[[1 - Agentic Architecture & Orchestration|Domain 1]] uses for autonomy.
+[[1 - Agentic Architecture & Orchestration|1 - Agentic Architecture & Orchestration]] uses for autonomy.
 
 Two mechanical details the exam expects you to know. Claude does not store the
 conversation for you, so you must append every block — including the full
@@ -72,7 +79,7 @@ response, each with its own `id`; you match every result to its request by
 
 A tool result block carries an **`is_error`** flag. Setting it tells Claude the
 tool failed rather than returned data — this is the API-level seed of the
-structured-error idea that task 2.2 develops for MCP.
+structured-error idea that [[#Task 2.2 — Structured error responses for MCP tools|Task 2.2]] develops for MCP.
 
 ---
 
@@ -169,11 +176,11 @@ timeout as an empty result, both lead the agent to the wrong next step.
 
 In a multi-agent system, errors should be handled at the lowest level that can
 resolve them. A subagent should recover locally from transient failures and
-propagate to the coordinator only what it genuinely cannot resolve — and when it
+propagate to the [[Glossary#Coordinator|coordinator]] only what it genuinely cannot resolve — and when it
 does propagate, it should include what it attempted and any partial results, so
 the coordinator can decide intelligently. This is the tool-side view of the
 error-propagation patterns in
-[[5 - Context Management & Reliability|Domain 5]].
+[[5 - Context Management & Reliability|5 - Context Management & Reliability]].
 
 ---
 
@@ -190,7 +197,7 @@ its actual job. The fix is scoped access: give each agent only the tools its rol
 needs, plus a small number of cross-role tools for genuine high-frequency needs.
 For example, give a synthesis agent a narrow `verify_fact` tool for quick checks
 while routing anything more complex back through the
-[[1 - Agentic Architecture & Orchestration|coordinator]].
+[[Glossary#Coordinator|coordinator]].
 
 You can also constrain tools by replacing a generic one with a safer, specific
 alternative. Swap a wide-open `fetch_url` for a `load_document` tool that
@@ -210,7 +217,7 @@ controls whether and how the model must call a tool:
   follow-up turns.
 
 This overlaps with structured output in
-[[4 - Prompt Engineering & Structured Output|Domain 4]], where `tool_choice` is
+[[4 - Prompt Engineering & Structured Output|4 - Prompt Engineering & Structured Output]], where `tool_choice` is
 the mechanism for guaranteeing schema-compliant JSON.
 
 ---
@@ -231,7 +238,7 @@ A common exam-shaped scenario: a teammate is not getting an MCP server that
 everyone else has. If it was configured in someone's `~/.claude.json`, it was
 never shared — it needs to move to the project's `.mcp.json`. (This mirrors the
 CLAUDE.md scoping trap in
-[[3 - Claude Code Configuration & Workflows|Domain 3]].)
+[[3 - Claude Code Configuration & Workflows|3 - Claude Code Configuration & Workflows]].)
 
 Credentials never get committed. `.mcp.json` supports **environment variable
 expansion**, so you write `${GITHUB_TOKEN}` and the value resolves at load time,
@@ -240,8 +247,19 @@ keeping secrets out of version control.
 Once servers are connected, **tools from all configured servers are discovered
 at connection time and are available to the agent simultaneously.** Connecting
 five servers means the model chooses among the union of their tools — which is
-exactly why the description quality (2.1) and tool count (2.3) discipline
+exactly why the description quality ([[#Task 2.1 — Design tool interfaces with clear descriptions and boundaries|2.1]]) and tool count ([[#Task 2.3 — Distribute tools across agents and configure tool choice|2.3]]) discipline
 matters here too.
+
+Mechanically, that discovery step is a specific message exchange: the client
+sends a [[Glossary#ListToolsRequest / ListToolsResult|ListToolsRequest]] and the
+server answers with a `ListToolsResult` listing what it offers, before your
+application ever hands anything to Claude. Running a discovered tool is the
+matching [[Glossary#CallToolRequest / CallToolResult|CallToolRequest/CallToolResult]]
+exchange — the client asks the server to run one tool with specific arguments
+and gets its output back. This exchange sits one layer outside the agentic
+loop: your application's MCP client talks to the MCP server this way, and it is
+your application — not Claude — that relays the discovered tools and their
+results into the `tool_use`/`tool_result` loop described above.
 
 A practical gotcha: **a thin MCP tool description loses to a built-in.** If your
 MCP tool's description is vague, the model may prefer a built-in like `Grep`
@@ -262,16 +280,17 @@ than forcing the agent to discover it through tool calls reduces exploratory too
 traffic. Publish a content catalog — issue summaries, a documentation hierarchy,
 a database schema — as a resource, and the agent sees what is available without
 probing for it. Resources are addressed by URI and come in two flavours: a
-**direct resource** (a fixed URI like `docs://documents`) and a **resource
-template** (a parameterized URI like `docs://documents/{doc_id}` that answers a
-family of queries and supports auto-completion).
+[[Glossary#Direct resource|direct resource]] (a fixed URI like `docs://documents`)
+and a [[Glossary#Resource template|resource template]] (a parameterized URI like
+`docs://documents/{doc_id}` that answers a family of queries and supports
+auto-completion).
 
 Finally, a build-versus-adopt judgment: **prefer an existing community MCP
 server** for standard integrations like Jira or GitHub, and reserve custom
 servers for genuinely team-specific workflows. You get maintained, tested tools
 for free.
 
-> [!note] Beyond the sources (unverified)
+> [!note] 
 > The course project uses the **stdio** transport, where the client launches the
 > server as a local subprocess and they talk over standard input/output — which
 > is why a Claude Code server entry is a *command plus arguments* rather than a
@@ -302,7 +321,7 @@ everything at once. Grep to find the entry points, then Read to follow the
 imports and trace the flow. To trace how a function is used across wrapper
 modules, first identify all the exported names, then search each name across the
 codebase. This keeps context focused, which ties directly into
-[[5 - Context Management & Reliability|Domain 5]].
+[[5 - Context Management & Reliability|5 - Context Management & Reliability]].
 
 ---
 
@@ -365,6 +384,7 @@ description). Tempting wrong fix: adding hints to the system prompt — the
 description is the model's primary selection signal, and thin or overlapping
 descriptions are the root cause.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 An MCP tool hits a downstream timeout. You could return `{isError: true,
@@ -376,6 +396,7 @@ retry, explain, or escalate. Return structured metadata: `errorCategory:
 transient`, `isRetryable: true`, and a human-readable description — so the agent
 knows a retry may succeed.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 A customer requests a refund that exceeds the policy limit. How should the MCP
@@ -386,6 +407,7 @@ customer-friendly description of the rule. `retriable: false` stops the agent
 from wasting retries, and the readable description lets it explain the limit to
 the customer.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 A synthesis subagent keeps running web searches it should not. What is the
@@ -396,6 +418,7 @@ such tools. Fix: scope its tool set to its role. If it occasionally needs a
 quick check, give it a narrow tool like `verify_fact` and route complex cases
 through the coordinator.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 You need to guarantee the model calls a tool rather than replying with
@@ -405,6 +428,7 @@ conversational text, but you do not care which tool. Which `tool_choice` setting
 would allow a plain-text reply; a forced `{"type":"tool","name":"..."}` would
 lock it to one specific tool.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 You must ensure `extract_metadata` runs before any enrichment tools. Which
@@ -415,6 +439,7 @@ Force the specific tool with `tool_choice: {"type": "tool", "name":
 (switching back to `auto` or `any`). Forcing guarantees the first step; you do
 not chain further forced calls in the same turn.
 #flashcards/domain-2
+<!--SR:!2026-09-07,1,230-->
 
 Question
 A new teammate is missing an MCP server that everyone else has. Where was it
@@ -424,6 +449,7 @@ It was likely configured in someone's user-scoped `~/.claude.json`, which is
 personal and never shared. Move it to the project root `.mcp.json`, which is
 committed and shared with the team.
 #flashcards/domain-2
+<!--SR:!2026-09-10,4,270-->
 
 Question
 How do you give an MCP server an auth token in `.mcp.json` without committing the
@@ -432,6 +458,7 @@ secret?
 Use environment variable expansion — write `${GITHUB_TOKEN}` in the config and
 let the value resolve at load time. The token stays out of version control.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 Claude Code keeps preferring the built-in `Grep` tool over a more capable MCP
@@ -441,6 +468,7 @@ Improve the MCP tool's description so it clearly details its capabilities and
 outputs. A thin description loses to built-ins; the fix is a better description,
 not a system-prompt workaround.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 An agent wastes tool calls exploring what data is available before it can answer.
@@ -451,6 +479,7 @@ database schema). Resources are application-controlled context the agent can see
 without probing, cutting exploratory tool calls. Tools are for actions;
 resources are for context.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 `Edit` fails on a file because the anchor text you targeted appears more than
@@ -459,6 +488,7 @@ once. What is the reliable fallback?
 Read the full file, then Write it back with your change. Edit needs a unique text
 match; when it cannot find one, Read + Write is the dependable path.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 You need to find every place a function is called across a codebase, then follow
@@ -469,9 +499,10 @@ Use Grep to search file contents for the function name and find all callers, the
 Read those files to follow imports and trace the flow. Reading everything upfront
 floods the context; incremental Grep-then-Read keeps context focused.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
-In the tool-use loop, how do you know Claude is asking to run a tool, and how do
+In the agentic loop, how do you know Claude is asking to run a tool, and how do
 you return the result correctly when Claude requested several tools at once?
 ?
 Check `stop_reason == "tool_use"`. For each `tool_use` block, run the tool and
@@ -479,6 +510,7 @@ return a `tool_result` block whose `tool_use_id` matches that request. Order nee
 not be preserved — the IDs do the matching — and you must append the assistant's
 `tool_use` blocks to history yourself.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 When should you choose an existing community MCP server versus building a custom
@@ -488,6 +520,7 @@ Use a community server for standard integrations (Jira, GitHub) — they are
 maintained and tested. Reserve custom servers for genuinely team-specific
 workflows that no existing server covers.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 You have one `analyze_document` tool, and the model uses it inconsistently —
@@ -500,6 +533,7 @@ and `verify_claim_against_source`. A single vague tool forces the model to guess
 which job you mean; giving each job its own tool with one clear purpose is what
 makes selection reliable, not padding one description.
 #flashcards/domain-2
+<!--SR:!2026-09-07,1,230-->
 
 Question
 You need to locate every test file matching `**/*.test.tsx` across a large repo,
@@ -510,15 +544,29 @@ searches file *contents*, so it is the wrong tool for finding files by name.
 Reach for `Grep` only when you need text inside files, such as a function name,
 an error string, or an import statement.
 #flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
 
 Question
 You want an MCP resource that can serve any document by its id, not just one
-fixed dataset. Which resource form do you use, and how does it differ from a
-direct resource?
+fixed dataset. Which resource form do you use, and how does it differ from other resource types?
 ?
 Use a resource *template* — a parameterized URI like `docs://documents/{doc_id}`
 that answers a whole family of queries and supports auto-completion. A direct
 resource is a fixed URI (like `docs://documents`) pointing at one specific piece
 of data. Both are application-controlled context addressed by URI; the template
 just lets one definition cover many items.
+#flashcards/domain-2
+<!--SR:!2026-09-09,3,250-->
+
+Question
+Before Claude ever sees a newly connected MCP server's tools, what protocol
+exchange has to happen first, and what is the separate exchange for actually
+running one of those tools?
+?
+The client sends a `ListToolsRequest` and the server replies with a
+`ListToolsResult` enumerating its tools — that discovery happens at connection
+time, before anything is handed to Claude. Running a tool is a different
+exchange: `CallToolRequest` (tool name plus arguments) answered by a
+`CallToolResult` (the output). Discovery and execution are separate message
+pairs.
 #flashcards/domain-2

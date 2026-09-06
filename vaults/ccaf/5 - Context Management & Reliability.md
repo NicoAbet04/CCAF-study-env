@@ -398,6 +398,13 @@ never in any mock question.
   first-in-first-out. Long API conversations need an explicit compaction or
   context-editing strategy.
 
+- **Raising `max_tokens` to fix a context problem.** `max_tokens` caps how much
+  Claude may generate in *this one reply*; it has no effect on how much
+  conversation history, tool output, or prior context fits in the request. A
+  session losing earlier details or running out of room needs the techniques in
+  this domain — a persistent facts block, trimmed tool outputs, a steered
+  `/compact` — not a bigger `max_tokens`. See [[Glossary#max_tokens|max_tokens]].
+
 ---
 
 ## Flashcards
@@ -533,4 +540,16 @@ relevance scores — rather than verbose prose and reasoning. When the downstrea
 agent has a limited context budget, verbose upstream output crowds out room for
 its own work, so passing only the distilled, structured facts (with attribution
 preserved) keeps the synthesis agent both informed and within budget.
+#flashcards/domain-5
+
+Question
+A long-running session keeps losing track of details from earlier in the
+conversation, so a teammate suggests raising `max_tokens` to give Claude "more
+room." Will that fix it?
+?
+No. `max_tokens` only caps how much Claude can generate in its *next* reply —
+it has no effect on how much conversation history or tool output the request
+carries. A session losing earlier details is a context-window problem, fixed
+with this domain's techniques (a persistent facts block, trimmed tool outputs,
+a steered `/compact`), not a bigger `max_tokens`.
 #flashcards/domain-5

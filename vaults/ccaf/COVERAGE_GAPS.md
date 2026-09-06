@@ -1,5 +1,5 @@
-# Coverage Gaps (generated 2026-09-05T15:45:31.359308+00:00)
+# Coverage Gaps (generated 2026-09-06T15:53:51.269498+00:00)
 
-**Gap count: 0**
+**Gap count: 1**
 
-_No gaps._
+- domain 1 verdict is stale (note edited after approval)

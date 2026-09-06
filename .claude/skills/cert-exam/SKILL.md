@@ -69,23 +69,40 @@ For each question in the queue:
 
 1. Output a progress line: `**Question [current] of [total] | Score: [correct]/[answered so far]**`
 
-2. Use AskUserQuestion with 1 question:
+2. Before building the question, shuffle the display order of the four options
+   for THIS question only (a fresh random shuffle per question, independent of
+   any other question). The source bank's correct-answer letter is not evenly
+   distributed across A/B/C/D, so echoing the source order lets the position
+   alone become a shortcut (e.g. several correct answers landing on "B" in a
+   row). Never change an option's wording and never change which option is
+   correct — only randomize which of the four texts is shown in each of the
+   four slots. Keep a mapping from the displayed slot back to the option's
+   original source letter so you can score it correctly afterward.
+
+   Use AskUserQuestion with 1 question:
    - `question`: Include the scenario context followed by the question stem. Format it as:
      "[Scenario context]. [Question stem]?"
      Keep it readable — trim to the most essential parts if very long.
    - `header`: "Q[number]" (e.g., "Q13")
    - `multiSelect`: false
-   - Options (4 options, A through D):
-     - label: "A", description: [full text of option A]
-     - label: "B", description: [full text of option B]
-     - label: "C", description: [full text of option C]
-     - label: "D", description: [full text of option D]
+   - Options (4 options, in the shuffled order from above, always labeled A-D
+     positionally):
+     - label: "A", description: [text of whichever original option landed in slot 1]
+     - label: "B", description: [text of whichever original option landed in slot 2]
+     - label: "C", description: [text of whichever original option landed in slot 3]
+     - label: "D", description: [text of whichever original option landed in slot 4]
 
-3. Record the user's answer. Compare to the correct answer letter.
+3. Record the user's answer. Map the displayed slot they picked back to its
+   original source letter using the mapping from step 2, then compare that
+   original letter to the correct answer letter from the source.
 
 4. If feedback mode is "After each question":
    - If correct: output `Correct.` then the explanation in brief (1-2 sentences).
-   - If incorrect: output `Incorrect. Correct answer: [X]` then the explanation (2-3 sentences max, focused on why the correct answer is right).
+   - If incorrect: output `Incorrect. Correct answer: [X]` then the explanation
+     (2-3 sentences max, focused on why the correct answer is right). `[X]` is
+     the DISPLAYED slot letter (A-D as shown to the user for this question),
+     found via the step-2 mapping — never the source file's original letter,
+     which the user never saw.
 
 5. If feedback mode is "Summary at the end only": just acknowledge and move on with no answer reveal.
 
@@ -127,6 +144,8 @@ Questions you missed:
   Q[n]: Correct answer was [X]. [1-sentence explanation]
   ...
 ```
+Here too, `[X]` is the displayed slot letter shown to the user for that
+question (via the step-2 mapping), not the source file's original letter.
 
 End with a short note pointing to the weakest domain if any scored below 60%.
 

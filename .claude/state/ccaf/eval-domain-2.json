@@ -10,11 +10,11 @@
   },
   "findings": [
     {
-      "item": "Re-approved post-repair: 17 cards (>=16), every task 2.1-2.5 has a trap, graph TD, correct glossary links, unverified callout absent from flashcards."
+      "item": "Re-approved after adding ListToolsRequest/ListToolsResult and CallToolRequest/CallToolResult (Task 2.4), one flashcard, and four Glossary entries. First eval pass rejected for a broken wikilink, a typo, a misleading analogy, and a pre-seeded SR stamp; all fixed and re-verified."
     },
     {
-      "item": "Timestamp refreshed after a content-neutral edit: Glossary links rewritten to #heading anchors so they jump to the exact term. Diff verified to touch only [[Glossary#...]] links; no prose/flashcard/trap changes."
+      "item": "Added the required Messages API request fields (model, messages/role, max_tokens) to 'How tool use actually works', sourced from Claude_API.md L41-45 and exam-guide.pdf p.37 Appendix (which names max_tokens as an in-scope Claude API concept). New Glossary entries: max_tokens, Context window. Evaluator approved (5/5) with two non-blocking notes: a topic-sentence ordering nit (fixed post-review by moving the loop topic sentence to precede the loop description) and a suggestion to add a Context window Glossary entry (done)."
     }
   ],
-  "timestamp": "2026-09-05T15:45:31Z"
+  "timestamp": "2026-09-06T15:52:12Z"
 }

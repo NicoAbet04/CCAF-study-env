@@ -10,11 +10,11 @@
   },
   "findings": [
     {
-      "item": "Re-approved post-repair: 12 cards (>=12), every task 5.1-5.6 has a trap. Non-blocking Traps-header provenance wording FIXED by orchestrator (matches D4). Callouts intact."
+      "item": "Re-approved after adding a new trap ('Raising max_tokens to fix a context problem') and one new flashcard (13 total, >=12), grounded in exam-guide.pdf p.37 Appendix (max_tokens named as in-scope) plus Domain 5's own context-management task content, not the quarantined mock bank. Evaluator noted the same distractor also appears in the practice bank but confirmed the trap is independently derivable from primary/official sources, so it does not violate the mock-quarantine rule."
     },
     {
-      "item": "Timestamp refreshed after a content-neutral edit: Glossary links rewritten to #heading anchors so they jump to the exact term. Diff verified to touch only [[Glossary#...]] links; no prose/flashcard/trap changes."
+      "item": "Added a 'Context window' Glossary entry (sourced from AI_fluency.md, an already-covered Primary source) per evaluator suggestion, since the term was used across notes without a definition. No prose changes needed in this note beyond the new trap and flashcard."
     }
   ],
-  "timestamp": "2026-09-05T15:45:31Z"
+  "timestamp": "2026-09-06T15:52:12Z"
 }

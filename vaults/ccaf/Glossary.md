@@ -57,6 +57,14 @@ search. See [[5 - Context Management & Reliability]].
 
 ## C
 
+### CallToolRequest / CallToolResult
+
+The MCP message pair for running a tool: the client sends a
+`CallToolRequest` naming the tool and its arguments, and the server executes it
+and replies with a `CallToolResult` carrying the output. Follows a
+[[Glossary#ListToolsRequest / ListToolsResult|ListToolsRequest/ListToolsResult]]
+exchange in the connection flow. See [[2 - Tool Design & MCP Integration]].
+
 ### CLAUDE.md
 
 A Markdown file that gives Claude Code persistent project or user
@@ -70,6 +78,14 @@ reasoning or reply), a `tool_use` block (naming a tool and its input), or a
 `tool_result` block (a tool's output sent back). A single message can carry
 several blocks — for example, text followed by two `tool_use` blocks. See
 [[2 - Tool Design & MCP Integration]].
+
+### Context window
+
+The practical limit on how much information a model can
+consider at once — the conversation history, tool results, and instructions
+that fit in a single request. Distinct from [[Glossary#max_tokens|max_tokens]],
+which caps only the length of one reply and has no effect on how much prior
+content the request carries. See [[5 - Context Management & Reliability]].
 
 ### Context degradation
 
@@ -96,6 +112,16 @@ A field you attach to each request in a Message Batches API
 submission so you can match responses back to requests and, on partial failure,
 resubmit only the documents that failed rather than the whole batch. See
 [[4 - Prompt Engineering & Structured Output]].
+
+## D
+
+### Direct resource
+
+An MCP resource addressed by a fixed URI (for example
+`docs://documents`), returning one specific piece of data. Contrast with a
+[[Glossary#Resource template|resource template]], whose URI is parameterized to
+answer a whole family of queries. Both are application-controlled context,
+not tools the model calls. See [[2 - Tool Design & MCP Integration]].
 
 ## E
 
@@ -150,6 +176,17 @@ eliminate JSON syntax errors. See [[4 - Prompt Engineering & Structured Output]]
 
 ## L
 
+### ListToolsRequest / ListToolsResult
+
+The MCP message pair used to discover a
+server's tools: the client sends a `ListToolsRequest` and the server replies
+with a `ListToolsResult` listing what it offers. This is the mechanism behind
+"tools from a connected server are discovered at connection time" — the client
+runs this exchange during setup, before it can hand any of that server's tools
+to the model. Calling a discovered tool is the separate
+[[Glossary#CallToolRequest / CallToolResult|CallToolRequest/CallToolResult]]
+exchange. See [[2 - Tool Design & MCP Integration]].
+
 ### Lost in the middle
 
 The tendency of models to reliably use information at the
@@ -158,6 +195,16 @@ Mitigated by putting key findings first and using clear section headers. See
 [[5 - Context Management & Reliability]].
 
 ## M
+
+### max_tokens
+
+A required field on every Messages API request that caps how much
+Claude may generate in that one reply. It bounds output length only — it has no
+effect on how much conversation history or tool output the request can carry,
+which is a separate [[Glossary#Context window|context-window]] concern. Hitting
+the cap mid-generation is what produces the [[Glossary#stop_reason|stop_reason]]
+value `max_tokens`. See [[2 - Tool Design & MCP Integration]] and
+[[5 - Context Management & Reliability]].
 
 ### MCP (Model Context Protocol)
 
@@ -270,6 +317,14 @@ rather than flattened. See [[5 - Context Management & Reliability]].
 A method for merging several ranked result lists
 into one by summing `1/(k + rank)` across lists, used to combine lexical and
 semantic search. See [[5 - Context Management & Reliability]].
+
+### Resource template
+
+An MCP resource addressed by a parameterized URI (for
+example `docs://documents/{doc_id}`), so one definition answers a whole family
+of queries and can support auto-completion. Contrast with a
+[[Glossary#Direct resource|direct resource]], which is a fixed URI pointing at
+one specific piece of data. See [[2 - Tool Design & MCP Integration]].
 
 ### Retrieval Augmented Generation (RAG)
 
