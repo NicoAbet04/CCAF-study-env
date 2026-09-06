@@ -221,7 +221,7 @@ all — belong to [[5 - Context Management & Reliability]].
 ## 1.5 Apply Agent SDK hooks for tool call interception and data normalization
 
 A [[Glossary#Hook|hook]] is deterministic code that runs at a fixed point in the
-agentic loop. A CLAUDE.md instruction is a *request*; a hook is a *guarantee*.
+agentic loop. A [[Glossary#CLAUDE.md|CLAUDE.md]] instruction is a *request*; a hook is a *guarantee*.
 That contrast — hooks give deterministic guarantees, prompts give only
 probabilistic compliance — is the heart of this task and reappears across the
 domain.

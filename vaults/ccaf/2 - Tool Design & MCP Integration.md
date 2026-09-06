@@ -237,7 +237,7 @@ asks about:
 A common exam-shaped scenario: a teammate is not getting an MCP server that
 everyone else has. If it was configured in someone's `~/.claude.json`, it was
 never shared — it needs to move to the project's `.mcp.json`. (This mirrors the
-CLAUDE.md scoping trap in
+[[Glossary#CLAUDE.md|CLAUDE.md]] scoping trap in
 [[3 - Claude Code Configuration & Workflows|3 - Claude Code Configuration & Workflows]].)
 
 Credentials never get committed. `.mcp.json` supports **environment variable

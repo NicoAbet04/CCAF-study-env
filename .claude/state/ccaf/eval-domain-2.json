@@ -14,7 +14,10 @@
     },
     {
       "item": "Added the required Messages API request fields (model, messages/role, max_tokens) to 'How tool use actually works', sourced from Claude_API.md L41-45 and exam-guide.pdf p.37 Appendix (which names max_tokens as an in-scope Claude API concept). New Glossary entries: max_tokens, Context window. Evaluator approved (5/5) with two non-blocking notes: a topic-sentence ordering nit (fixed post-review by moving the loop topic sentence to precede the loop description) and a suggestion to add a Context window Glossary entry (done)."
+    },
+    {
+      "item": "Timestamp refreshed after a content-neutral edit: the bare 'CLAUDE.md' mention in the MCP-scoping-trap paragraph was wikilinked to [[Glossary#CLAUDE.md|CLAUDE.md]] (its only mention in this note, previously unlinked). Diff verified to touch only that one link; no prose/flashcard/trap changes."
     }
   ],
-  "timestamp": "2026-09-06T15:52:12Z"
+  "timestamp": "2026-09-06T16:16:31Z"
 }

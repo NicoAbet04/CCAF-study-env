@@ -65,11 +65,47 @@ and replies with a `CallToolResult` carrying the output. Follows a
 [[Glossary#ListToolsRequest / ListToolsResult|ListToolsRequest/ListToolsResult]]
 exchange in the connection flow. See [[2 - Tool Design & MCP Integration]].
 
+### CLAUDE.local.md
+
+A project-root file, distinct from `CLAUDE.md`, for private
+notes on one specific repository — sandbox URLs, personal setup quirks,
+architectural decisions you want Claude to hold in mind on your own branch.
+It loads alongside the project `CLAUDE.md` but is git-ignored, so it never
+reaches teammates. See [[Glossary#CLAUDE.md|CLAUDE.md]] and
+[[3 - Claude Code Configuration & Workflows]].
+
 ### CLAUDE.md
 
-A Markdown file that gives Claude Code persistent project or user
-context. It loads in a hierarchy (user, project, directory) and, unlike command-line
-system-prompt flags, persists across sessions and CI runs. See [[3 - Claude Code Configuration & Workflows]].
+A Markdown file that gives Claude Code persistent context, loaded
+automatically at the start of every session. Managed policy, user, and project
+copies all load together at launch and stack — nothing is dropped. A
+directory-level copy is the exception: it loads later, on demand, only when
+Claude reads a file under that directory. Scopes, broadest to most specific:
+
+- **Managed policy** — a fixed OS-specific path your organization's platform
+  team deploys via MDM, Group Policy, or similar (`/etc/claude-code/CLAUDE.md`
+  on Linux/WSL, `/Library/Application Support/ClaudeCode/CLAUDE.md` on macOS,
+  `C:\Program Files\ClaudeCode\CLAUDE.md` on Windows). It applies to every user
+  and every repository on the machine, takes precedence over every other
+  scope, and **cannot be excluded** by any user, project, or local setting —
+  the one scope an individual can't opt out of.
+- **User** (`~/.claude/CLAUDE.md`) — your personal preferences, applied across
+  every project on your machine, never shared through version control.
+- **Project** (`.claude/CLAUDE.md` or root `CLAUDE.md`) — the team-shared
+  file, checked into the repository.
+- **Directory** (a `CLAUDE.md` inside a subdirectory) — conventions scoped to
+  files under that directory.
+
+Unlike command-line system-prompt flags, `CLAUDE.md` persists across sessions
+and CI runs. It is guidance, not enforced configuration — see
+[[Glossary#Hook|Hook]] for the enforcement alternative. Contrast with
+[[Glossary#CLAUDE.local.md|CLAUDE.local.md]], a different file for private,
+git-ignored, project-specific notes. See
+[[3 - Claude Code Configuration & Workflows]].
+*Managed-policy paths, deployment mechanism, precedence, and the directory
+scope's on-demand loading verified against the
+[Claude Code memory docs](https://code.claude.com/docs/en/memory)
+(checked 2026-09-06); everything else is in the course's own primary sources.*
 
 ### Content block
 

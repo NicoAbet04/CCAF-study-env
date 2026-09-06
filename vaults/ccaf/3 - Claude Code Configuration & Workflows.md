@@ -54,14 +54,18 @@ new teammate is not getting a rule everyone else follows, the rule is almost
 certainly sitting in someone's user-level config instead of the project file.
 You diagnose this by moving the rule into the project-level `CLAUDE.md`.
 
-The course material adds a fuller picture of *where* these files load from. All
-memory files load together at launch and stack — nothing gets dropped. Beyond
-user and project, there is a **managed-policy** file that your organization's
-platform team controls and you cannot exclude, and a **local** file
-(`CLAUDE.local.md`) that git ignores so you can keep private notes for one
-specific repository. Local is the right home for something like architectural
-decisions you want Claude to hold in mind while refactoring your own branch —
-useful to you, but not something you want pushed onto the whole team.
+The course material adds a fuller picture of *where* these files load from.
+The managed-policy, user, project, and local files all load together at
+launch and stack — nothing gets dropped. A directory-level file is the
+exception: it loads later, on demand, only when Claude reads a file under
+that directory. Beyond user and project, there is a
+**[[Glossary#CLAUDE.md|managed-policy]]** file that your organization's
+platform team controls and you cannot exclude, and a
+**[[Glossary#CLAUDE.local.md|local]]** file (`CLAUDE.local.md`) that git
+ignores so you can keep private notes for one specific repository. Local is
+the right home for something like architectural decisions you want Claude to
+hold in mind while refactoring your own branch — useful to you, but not
+something you want pushed onto the whole team.
 
 A worked example of that local file shows the shape: a short context paragraph,
 the project's setup and test commands, a "gotchas" list of known rough edges,
@@ -83,9 +87,9 @@ When the project file gets long, you have two ways to keep it modular:
   only the standards relevant to it. Be clear-eyed about what this buys you:
   imports are expanded inline at launch, so **everything still loads up front**.
   Imports organize the file; they do not reduce how much context Claude reads.
-- The **`.claude/rules/` directory** holds topic-specific rule files
-  (`testing.md`, `api-conventions.md`, `deployment.md`) as an alternative to one
-  monolithic `CLAUDE.md`.
+- The **[[Glossary#Path-specific rules (`.claude/rules/`)|`.claude/rules/` directory]]**
+  holds topic-specific rule files (`testing.md`, `api-conventions.md`,
+  `deployment.md`) as an alternative to one monolithic `CLAUDE.md`.
 
 Two commands support this workflow. You bootstrap a project's `CLAUDE.md` with
 **`/init`**, which scans the codebase and writes a summary of structure,
@@ -115,9 +119,9 @@ anyone's home directory and not pasted into `CLAUDE.md` (which is for context,
 not command definitions).
 
 A **skill** is a reusable, task-specific capability that Claude invokes on its
-own when a task matches the skill's description. Skills live in `.claude/skills/`
-as folders, each with a `SKILL.md` file. The frontmatter of `SKILL.md` supports
-three options worth memorizing:
+own when a task matches the skill's description. Skills live in
+`.claude/skills/` as folders, each with a [[Glossary#SKILL.md|`SKILL.md`]]
+file. Its frontmatter supports three options worth memorizing:
 
 - **`context: fork`** runs the skill in an isolated subagent context so its
   output never pollutes the main conversation. Reach for this when a skill
@@ -350,11 +354,13 @@ branches.
 > [!tip] 📌 Reported on the exam
 > Managed GitHub Code Review reads **two** files, with a division of labour, and
 > the trap is assuming `CLAUDE.md` alone configures review behaviour:
-> - **`CLAUDE.md`** supplies general project context and standards.
-> - **`REVIEW.md`** at the repo root supplies review-specific instructions — what
->   to flag, severity calibration, exclusions (generated code, lockfiles,
->   vendored dependencies, machine-authored branches), and reporting
->   preferences such as capping nit-level comments.
+> - **[[Glossary#CLAUDE.md|`CLAUDE.md`]]** supplies general project context
+>   and standards.
+> - **[[Glossary#REVIEW.md|`REVIEW.md`]]** at the repo root supplies
+>   review-specific instructions — what to flag, severity calibration,
+>   exclusions (generated code, lockfiles, vendored dependencies,
+>   machine-authored branches), and reporting preferences such as capping
+>   nit-level comments.
 >
 > *Verified against the [Code review docs](https://code.claude.com/docs/en/code-review) (checked 2026-09-05).*
 
