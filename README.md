@@ -43,6 +43,7 @@ study-env/
 │       ├── 5 - Context Management & Reliability.md
 │       ├── CCAF MOC.md        # map of content — start here
 │       ├── Glossary.md        # terms of art, defined plainly
+│       ├── Claude Commands.md # CLI flags, slash commands, config paths
 │       ├── Weak Areas.md      # your running miss log (auto-appended by /study)
 │       ├── FLAGGED.md         # anything the build couldn't process (human review)
 │       ├── SOURCE_INVENTORY.md  # generated view of source coverage
@@ -51,7 +52,7 @@ study-env/
     ├── settings.json          # registers the hooks
     ├── agents/                # domain-builder (writes notes), study-evaluator (reviews)
     ├── commands/              # /course-build, /course-audit, /study
-    ├── skills/cert-exam.md    # interactive 77-question practice exam
+    ├── skills/cert-exam/      # interactive 89-question practice exam
     ├── hooks/                 # stop-gate.sh (the completeness gate) + audit.py + loggers
     └── state/ccaf/            # machine-authoritative build state (JSON)
 ```
@@ -104,7 +105,8 @@ the fix?"), not definitions.
 Run **`/study ccaf [domain]`** in Claude Code for an interactive session. It offers:
 
 - **(a) Flashcard drill** — pulled from the notes, weighted toward your weak areas;
-- **(b) Scenario quiz** — the bundled `cert-exam` skill (77 community questions),
+- **(b) Scenario quiz** — the bundled `cert-exam` skill (89 questions: 77
+  community-authored plus 12 transcribed from the official exam guide),
   which you can also launch directly with `/cert-exam`;
 - **(c) Generated scenario round** — 5 fresh exam-style questions grounded only in
   the vault notes, so the bank never goes stale from memorisation;

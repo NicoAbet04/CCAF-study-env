@@ -293,7 +293,8 @@ works, not about how clever the architecture is.
 
 Long-running work spans multiple sittings, so you need to manage session state.
 
-**Resuming** continues a specific prior conversation with **`--resume <session-name>`**
+**Resuming** continues a specific prior conversation with
+**[`--resume <session-name>`](<Claude Commands.md#--resume>)**
 (or by capturing a session id from earlier JSON output and passing it back). One
 script can start the work and another resume it later with full context — handy
 when a first pass produces a plan and a second pass carries it out.
@@ -312,7 +313,8 @@ data. And when you resume after files have changed, **tell the agent exactly
 which files changed** so it re-analyses those targeted spots instead of trusting
 its now-outdated picture (or re-exploring everything from scratch).
 
-Claude Code gives you related steering tools for the same problem. **`/compact`**
+Claude Code gives you related steering tools for the same problem.
+**[`/compact`](<Claude Commands.md#/compact>)**
 summarises the conversation, makes that summary the new context, and drops the
 old messages to free the context window — but add instructions after the command
 (`/compact Focus on the --version flag work`) so it keeps what matters, or it may

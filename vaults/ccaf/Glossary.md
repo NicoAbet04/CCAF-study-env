@@ -37,16 +37,6 @@ subagent may call. A coordinator needs `Task` in its `allowedTools` before it ca
 spawn subagents at all — the first thing to check when delegation silently fails.
 See [[1 - Agentic Architecture & Orchestration]].
 
-### `--append-system-prompt` vs `--system-prompt`
-
-Two CLI flags that look
-interchangeable and are not. `--append-system-prompt` adds text to the end of
-Claude Code's default system prompt, keeping default behaviour — the right choice
-for temporary, stage-specific CI instructions. `--system-prompt` replaces the
-default prompt entirely; use it only to override default behaviour outright.
-`CLAUDE.md` is the third option, for persistent context shared across CI runs and
-ordinary sessions. See [[3 - Claude Code Configuration & Workflows]].
-
 ## B
 
 ### BM25
@@ -278,14 +268,6 @@ aggregating the results, instead of one pass trying to juggle every criterion
 together. Contrast with [[Glossary#Routing|routing]], which picks one path for
 a request rather than running several at once. See
 [[1 - Agentic Architecture & Orchestration#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|1 - Agentic Architecture & Orchestration]].
-
-### Path-specific rules (`.claude/rules/`)
-
-Rule files with a YAML `paths:` glob
-in their frontmatter, so a convention loads only when you're editing a matching
-file (e.g. all `**/*.test.tsx` files) instead of always, or instead of needing a
-directory-level `CLAUDE.md` for conventions that span many directories. See
-[[3 - Claude Code Configuration & Workflows]].
 
 ### permissionDecision
 

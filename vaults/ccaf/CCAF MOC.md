@@ -26,16 +26,19 @@ Each note is organised around the official exam guide's task list and ends with 
 ## How to use this vault
 
 - Read a domain note end to end for the reasoning behind each task.
-- Run `/study ccaf [domain]` for flashcard drills, the 77-question `cert-exam`
+- Run `/study ccaf [domain]` for flashcard drills, the 89-question `cert-exam`
   scenario bank, freshly generated scenario rounds, or a hands-on lab.
 - Misses are logged to [[Weak Areas]], which then steers later sessions.
-- Every term of art is defined in [[Glossary]].
+- Every term of art is defined in [[Glossary]]; slash commands, CLI flags,
+  and the `.claude/` directories are in [[Claude Commands]].
 - Coverage and build health live in `SOURCE_INVENTORY.md`, `COVERAGE_GAPS.md`, and
   `FLAGGED.md` (all generated — don't hand-edit).
 
 ## Supporting pages
 
 - [[Glossary]] — terms of art, defined plainly.
+- [[Claude Commands]] — CLI flags, slash commands, and config paths, defined
+  plainly.
 - [[Weak Areas]] — your running miss log, appended by `/study`.
 
 > [!info] Provenance

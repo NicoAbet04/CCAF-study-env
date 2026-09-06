@@ -14,7 +14,10 @@
     },
     {
       "item": "Added a 'Context window' Glossary entry (sourced from AI_fluency.md, an already-covered Primary source) per evaluator suggestion, since the term was used across notes without a definition. No prose changes needed in this note beyond the new trap and flashcard."
+    },
+    {
+      "item": "Timestamp refreshed after linking this note's first mention of /compact to the new Claude Commands.md catalog. Verified as part of a vault-wide review: 13 cards unchanged, link reads cleanly in context, target resolves."
     }
   ],
-  "timestamp": "2026-09-06T15:52:12Z"
+  "timestamp": "2026-09-06T16:53:14Z"
 }

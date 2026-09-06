@@ -14,7 +14,10 @@
     },
     {
       "item": "First eval pass rejected for a load-timing self-contradiction (managed/user/project load at launch, directory loads on demand — Glossary and note now agree), an overclaimed citation footer, link-spam in Sec 3.1 (CLAUDE.md linked 4x to the same anchor), and line-wrap regressions. All fixed and re-verified: 12 flashcards, one graph TD, every task 3.1-3.6 has a trap, all wikilinks resolve."
+    },
+    {
+      "item": "Re-approved after linking every first-mention command/flag in this note to the new Claude Commands.md catalog (/init, /memory, /create_worktree, .claude/commands/, /review, merge_worktree, .claude/skills/, /compact, /clear, -p, --output-format, --json-schema, --bare, --resume, --append-system-prompt, --system-prompt, /code-review, --fix, /install-github-app, --max-turns), and adding a blank callout separator before the CLI-reference citation. Three review rounds caught and fixed: a broken wikilink-with-backtick-alias pattern (SKILL.md/CLAUDE.md/REVIEW.md/.claude/rules/), a factual error in the migrated /review entry (falsely claimed not a real built-in; corrected after live-doc verification), and a quarantine breach (the corrected /review entry initially cited and disclosed a specific quarantined practice-tier sample question; removed). 12 flashcards, one graph TD, trap per task 3.1-3.6, all 67+ vault-wide anchors resolve."
     }
   ],
-  "timestamp": "2026-09-06T16:15:57Z"
+  "timestamp": "2026-09-06T16:53:14Z"
 }

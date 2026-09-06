@@ -87,16 +87,17 @@ When the project file gets long, you have two ways to keep it modular:
   only the standards relevant to it. Be clear-eyed about what this buys you:
   imports are expanded inline at launch, so **everything still loads up front**.
   Imports organize the file; they do not reduce how much context Claude reads.
-- The **[[Glossary#Path-specific rules (`.claude/rules/`)|`.claude/rules/` directory]]**
+- The **[`.claude/rules/`](<Claude Commands.md#.claude/rules/>) directory**
   holds topic-specific rule files (`testing.md`, `api-conventions.md`,
   `deployment.md`) as an alternative to one monolithic `CLAUDE.md`.
 
 Two commands support this workflow. You bootstrap a project's `CLAUDE.md` with
-**`/init`**, which scans the codebase and writes a summary of structure,
-dependencies, and conventions. You verify what actually loaded with
-**`/memory`**, which lists the memory files currently in context — the tool you
-reach for when behaviour is inconsistent across sessions and you suspect a file
-is or isn't being picked up.
+**[`/init`](<Claude Commands.md#/init>)**, which scans the codebase and writes
+a summary of structure, dependencies, and conventions. You verify what
+actually loaded with **[`/memory`](<Claude Commands.md#/memory>)**, which
+lists the memory files currently in context — the tool you reach for when
+behaviour is inconsistent across sessions and you suspect a file is or isn't
+being picked up.
 
 ---
 
@@ -105,23 +106,26 @@ is or isn't being picked up.
 A **custom slash command** is a saved prompt you invoke by name. You create one
 by dropping a Markdown file into a commands directory; the file's contents become
 the prompt that runs. The command can reference `$ARGUMENTS`, which is replaced
-by whatever you pass on invocation — so `/create_worktree feature_a` runs the
-command's prompt with `feature_a` substituted in.
+by whatever you pass on invocation — so
+[`/create_worktree feature_a`](<Claude Commands.md#/create_worktree>) runs
+the command's prompt with `feature_a` substituted in.
 
 Location decides the audience, and this is the exam's favourite distinction:
 
-- **Project-scoped** commands live in `.claude/commands/` and are shared with
-  the whole team through version control.
+- **Project-scoped** commands live in
+  [`.claude/commands/`](<Claude Commands.md#.claude/commands/>) and are
+  shared with the whole team through version control.
 - **User-scoped** commands live in `~/.claude/commands/` and are personal to you.
 
-So a team's standard `/review` command belongs in `.claude/commands/`, not in
-anyone's home directory and not pasted into `CLAUDE.md` (which is for context,
-not command definitions).
+So a team's standard [`/review`](<Claude Commands.md#/review>) command
+belongs in `.claude/commands/`, not in anyone's home directory and not pasted
+into `CLAUDE.md` (which is for context, not command definitions).
 
 A **skill** is a reusable, task-specific capability that Claude invokes on its
 own when a task matches the skill's description. Skills live in
-`.claude/skills/` as folders, each with a [[Glossary#SKILL.md|`SKILL.md`]]
-file. Its frontmatter supports three options worth memorizing:
+[`.claude/skills/`](<Claude Commands.md#.claude/skills/>) as folders, each
+with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its frontmatter supports
+three options worth memorizing:
 
 - **`context: fork`** runs the skill in an isolated subagent context so its
   output never pollutes the main conversation. Reach for this when a skill
@@ -171,10 +175,11 @@ into every worktree.
 
 The course ships this as two custom commands. A `create_worktree` command takes
 a feature name as `$ARGUMENTS`, checks the worktree doesn't already exist,
-creates it under `.trees/`, and wires up the environment. A `merge_worktree`
-command later merges that branch back into main and walks through resolving any
-conflicts. These are ordinary Markdown files in `.claude/commands/`, which is
-exactly why they are shared with the team.
+creates it under `.trees/`, and wires up the environment. A
+[`merge_worktree`](<Claude Commands.md#/merge_worktree>) command later merges
+that branch back into main and walks through resolving any conflicts. These
+are ordinary Markdown files in `.claude/commands/`, which is exactly why they
+are shared with the team.
 
 ---
 
@@ -273,29 +278,35 @@ them one at a time; sequential iteration keeps each change clean.
 
 The broader workflow these sit inside is: feed Claude the relevant files as
 context, ask it to plan without writing code, then ask it to implement. You
-steer a long session with `/compact` (summarize and free context — always add an
-instruction telling it what to keep), rewind to a checkpoint when it goes off
-course, and `/clear` to reset history between unrelated tasks.
+steer a long session with [`/compact`](<Claude Commands.md#/compact>)
+(summarize and free context — always add an instruction telling it what to
+keep), rewind to a checkpoint when it goes off course, and
+[`/clear`](<Claude Commands.md#/clear>) to reset history between unrelated
+tasks.
 
 ---
 
 ## 3.6 — Integrating Claude Code into CI/CD pipelines
 
-Running Claude Code in a pipeline means running it **non-interactively**, because
-no human is there to answer prompts. The core flag is **`-p`** (or `--print`):
-it runs Claude Code as a one-shot command with no interactive UI, reading
-standard in and writing standard out so it pipes like any other shell tool. Note
-that `-p` also skips auto-discovery of hooks, skills, plugins, MCP servers, and
-`CLAUDE.md` — you get Claude plus the tools you allow explicitly and nothing the
-local environment happens to load, which also makes startup faster.
+Running Claude Code in a pipeline means running it **non-interactively**,
+because no human is there to answer prompts. The core flag is
+**[`-p`](<Claude Commands.md#-p>)** (or `--print`): it runs Claude Code as a
+one-shot command with no interactive UI, reading standard in and writing
+standard out so it pipes like any other shell tool. Note that `-p` also skips
+auto-discovery of hooks, skills, plugins, MCP servers, and `CLAUDE.md` — you
+get Claude plus the tools you allow explicitly and nothing the local
+environment happens to load, which also makes startup faster.
 
-For machine-readable results, pair **`--output-format json`** with
-**`--json-schema`**. Claude constrains its output to your schema and puts the
-matching object in the response's `structured_output` field, which you can pull
-out with `jq` and post as inline PR comments or feed to another script. When CI
-needs *repeatable* output run to run, add the **`--bare`** flag for deterministic
-mode. For multi-step automation, capture the `session_id` from the JSON output
-and continue later with `--resume`.
+For machine-readable results, pair
+**[`--output-format json`](<Claude Commands.md#--output-format>)** with
+**[`--json-schema`](<Claude Commands.md#--json-schema>)**. Claude constrains
+its output to your schema and puts the matching object in the response's
+`structured_output` field, which you can pull out with `jq` and post as
+inline PR comments or feed to another script. When CI needs *repeatable*
+output run to run, add the **[`--bare`](<Claude Commands.md#--bare>)** flag
+for deterministic mode. For multi-step automation, capture the `session_id`
+from the JSON output and continue later with
+[`--resume`](<Claude Commands.md#--resume>).
 
 `CLAUDE.md` still matters in CI: it is how you give the automated run project
 context — testing standards, fixture conventions, review criteria — so generated
@@ -315,18 +326,21 @@ review architectures in [[4 - Prompt Engineering & Structured Output]].
 > [!tip] 📌 Reported on the exam
 > Three mechanisms that look interchangeable are not, and the exam asks you to
 > pick the one whose *scope and persistence* match the requirement:
-> - **`--append-system-prompt`** appends your text to the default system prompt,
->   so Claude Code's default behaviour is **kept**. This is the right choice for
->   temporary, stage-specific instructions — different stages of a multi-step CI
->   workflow needing different roles or rules. (There is also
+> - **[`--append-system-prompt`](<Claude Commands.md#--append-system-prompt>)**
+>   appends your text to the default system prompt, so Claude Code's default
+>   behaviour is **kept**. This is the right choice for temporary,
+>   stage-specific instructions — different stages of a multi-step CI workflow
+>   needing different roles or rules. (There is also
 >   `--append-system-prompt-file` to read that text from a file.)
-> - **`--system-prompt`** **replaces** the system prompt entirely. Use it only
->   when you genuinely need to override the default behaviour.
+> - **[`--system-prompt`](<Claude Commands.md#--system-prompt>)** **replaces**
+>   the system prompt entirely. Use it only when you genuinely need to
+>   override the default behaviour.
 > - **`CLAUDE.md`** is persistent, shared project context that applies across
 >   both CI runs and ordinary interactive sessions.
 >
 > Temporary and additive → append. Total override → replace. Durable and shared
 > → `CLAUDE.md`.
+>
 > *Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-05).*
 
 ### Managed GitHub Code Review versus the GitHub Action
@@ -338,13 +352,17 @@ push, or only on a `@claude review` comment. It analyzes the diff against the
 *full* codebase, posts findings as inline comments tagged by severity with a
 summary table, and deduplicates and ranks them. Two boundaries matter: it never
 approves or blocks the PR (a human decides), and there is no managed autofix. To
-apply a finding you pull the change down and run `/code-review` locally, whose
-`--fix` flag applies findings to your working tree.
+apply a finding you pull the change down and run
+[`/code-review`](<Claude Commands.md#/code-review>) locally, whose
+[`--fix`](<Claude Commands.md#--fix>) flag applies findings to your working
+tree.
 
 When the job goes *beyond* review — implementing changes from a comment, running
 scheduled reports — you reach for the **GitHub Action**
-(`anthropics/claude-code-action@v1`), set up with `/install-github-app`. You tune
-an unattended run through `claude_args` (for example `--max-turns` to cap the
+(`anthropics/claude-code-action@v1`), set up with
+[`/install-github-app`](<Claude Commands.md#/install-github-app>). You tune
+an unattended run through `claude_args` (for example
+[`--max-turns`](<Claude Commands.md#--max-turns>) to cap the
 loop, a non-asking permission mode, and a minimal allowed-tools set). A cloud
 alternative for recurring prompts is a **routine**, which runs on Anthropic's
 infrastructure on a schedule (at most hourly) and, as a guardrail, starts from a
@@ -354,9 +372,9 @@ branches.
 > [!tip] 📌 Reported on the exam
 > Managed GitHub Code Review reads **two** files, with a division of labour, and
 > the trap is assuming `CLAUDE.md` alone configures review behaviour:
-> - **[[Glossary#CLAUDE.md|`CLAUDE.md`]]** supplies general project context
+> - **[`CLAUDE.md`](<Glossary.md#CLAUDE.md>)** supplies general project context
 >   and standards.
-> - **[[Glossary#REVIEW.md|`REVIEW.md`]]** at the repo root supplies
+> - **[`REVIEW.md`](<Glossary.md#REVIEW.md>)** at the repo root supplies
 >   review-specific instructions — what to flag, severity calibration,
 >   exclusions (generated code, lockfiles, vendored dependencies,
 >   machine-authored branches), and reporting preferences such as capping

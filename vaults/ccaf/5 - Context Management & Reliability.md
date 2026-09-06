@@ -260,7 +260,8 @@ The countermeasures, from most to least aggressive:
   discovery output stays in the subagent and the main agent keeps only the
   high-level coordination. Summarize the findings of one phase before spawning
   subagents for the next, and inject those summaries into the new context.
-- **`/compact`.** In [[3 - Claude Code Configuration & Workflows|Claude Code]],
+- **[`/compact`](<Claude Commands.md#/compact>).** In
+  [[3 - Claude Code Configuration & Workflows|Claude Code]],
   `/compact` summarizes the conversation, uses the summary as the new context,
   and drops the old messages. Always steer it — write instructions after the
   command (e.g. `/compact focus on the refund-flow classes`) so the summary
