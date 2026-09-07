@@ -140,8 +140,8 @@ So a team's standard [`/review`](<Claude Commands.md#/review>) command
 belongs in `.claude/commands/`, not in anyone's home directory and not pasted
 into `CLAUDE.md` (which is for context, not command definitions).
 
-A **skill** is a reusable, task-specific capability that Claude invokes on its
-own when a task matches the skill's description. Skills live in
+A [[Glossary#Skill|skill]] is a reusable, task-specific capability that Claude
+invokes on its own when a task matches the skill's description. Skills live in
 [`.claude/skills/`](<Claude Commands.md#.claude/skills/>) as folders, each
 with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its
 [[Glossary#Frontmatter|frontmatter]] supports three options worth
@@ -235,9 +235,7 @@ Match the mode to the complexity of the task:
 
 - Use **plan mode** for complex work — large-scale changes, tasks with multiple
   valid approaches, architectural decisions, and multi-file modifications.
-  Concrete triggers the guide gives include restructuring into microservices, a
-  library migration touching 45+ files, and choosing between integration
-  approaches with different infrastructure needs. Planning first lets you catch a
+  A few examples from the guide: breaking a monolith into microservices, migrating a library across 45+ files, or picking between integration approaches that need different infrastructure. Planning first lets you catch a
   bad approach on paper, which is far cheaper than letting Claude build the wrong
   thing and cleaning up afterward.
 - Use **direct execution** for simple, well-scoped changes — a single-file bug

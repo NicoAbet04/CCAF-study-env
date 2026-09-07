@@ -433,9 +433,17 @@ preferences. `CLAUDE.md` supplies general project context to the same review;
 
 ## S
 
+### Skill
+
+A reusable, task-specific capability that Claude invokes on its own when a
+task matches the skill's description — unlike a custom slash command, which
+you invoke by name. Skills live in `.claude/skills/` as folders, each with a
+[[Glossary#SKILL.md|SKILL.md]] file. See
+[[3 - Claude Code Configuration & Workflows]].
+
 ### SKILL.md
 
-The file defining a skill in `.claude/skills/`, with
+The file defining a [[Glossary#Skill|skill]] in `.claude/skills/`, with
 [[Glossary#Frontmatter|frontmatter]] options including `context: fork` (run
 the skill in an isolated subagent context
 so its output doesn't clutter the main conversation), `allowed-tools`, and
@@ -525,12 +533,9 @@ A second working folder for the same project — a complete set of its files
 checked out to a different branch, in a different directory — that you can
 work in without touching your main one. Two Claude Code sessions can each
 get their own so they work in separate directories instead of fighting over
-the same files. The course's
-[`/create_worktree`](<Claude Commands.md#/create_worktree>) command creates
-one under `.trees/`; the companion
-[`/merge_worktree`](<Claude Commands.md#/merge_worktree>) command folds that
-branch back into the main branch and helps resolve conflicts. A
-`.worktreeinclude` file at the repo root lists git-ignored files (like a
+the same files. 
+
+A `.worktreeinclude` file at the repo root lists git-ignored files (like a
 local env file) to copy into every new one. See
 [[3 - Claude Code Configuration & Workflows#Custom commands in practice: parallel work with worktrees|3 - Claude Code Configuration & Workflows]].
 
