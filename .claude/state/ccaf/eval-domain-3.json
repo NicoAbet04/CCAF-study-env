@@ -6,7 +6,7 @@
     "completeness": 5,
     "formatting": 5,
     "pedagogy": 5,
-    "clarity": 5
+    "clarity": 4
   },
   "findings": [
     {
@@ -23,7 +23,10 @@
     },
     {
       "item": "Re-approved after adding a verbatim $ARGUMENTS worked example to Task 3.2 (quoting the course's real create_worktree.md, disclosed as 2 of its 4 steps) and rewriting the Glossary's Worktree entry to be more generic/human-readable per user request. First pass flagged the simplified wording as imprecise (read like a full repo clone rather than a second working folder of the same project; 'main copy' should be 'main branch' to match the source and rest of the vault); both fixed and re-verified with zero remaining findings. 12 flashcards, one graph TD, trap per task 3.1-3.6, all links resolve."
+    },
+    {
+      "item": "Re-approved after a Skill Glossary entry, a jq Glossary entry, an Output style Glossary entry (with a new '--system-prompt persistence, and how output styles differ' subsection in 3.6), and a .claude/settings.local.json Glossary entry were added and cross-linked, and the vault's scattered .claude/ directory references (previously split between Glossary.md and Claude Commands.md's 'Config directories' section) were consolidated into a new Claude Main Files and Directories.md, with this note's inline links repointed to it. First pass rejected on a genuine load-timing/attribution contradiction in 3.1 (course-material framing applied to a docs-only fact), a -p-vs-CLAUDE.md contradiction in 3.6 left unreconciled, a missing 3.6 skill bullet (feeding the existing test suite into context), run-on sentences, and a missing Subagent wikilink; second pass caught that the 3.6 reconciliation had invented an unsourced claim that the GitHub Action auto-loads CLAUDE.md, and that an unrelated external edit had corrupted the REVIEW.md exam-intel bullet (misspelling, self-contradictory 'non-blocking' qualifier, unsourced example) — both fixed and traced back to source wording. Final pass approved (clarity 4/5) with two non-blocking suggestions (an earlier 'worktree' Glossary link in 3.2, splitting one double-'since' sentence in the output-styles subsection), both applied as content-neutral polish. 12 flashcards, one graph TD (all six tasks now have a diagram leaf), trap per task 3.1-3.6, all wikilinks/anchors resolve into Glossary.md, Claude Commands.md, and Claude Main Files and Directories.md."
     }
   ],
-  "timestamp": "2026-09-06T17:17:12Z"
+  "timestamp": "2026-09-07T20:00:00Z"
 }

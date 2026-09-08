@@ -7,10 +7,11 @@ tags: [ccaf, commands]
 Quick reference for the literal commands and CLI flags used across the domain
 notes — the things you actually type, as opposed to [[Glossary]], which
 covers concepts and terms of art. Each entry says what the command does and
-links back to the domain note that teaches it in context. The last section
-covers the `.claude/` directories where custom commands, skills, and rules
-live; the config *files* that go inside them (`CLAUDE.md`, `SKILL.md`,
-`.mcp.json`, ...) stay in [[Glossary]].
+links back to the domain note that teaches it in context. For every
+`.claude/` directory and project-root config file (`.claude/commands/`,
+`.claude/rules/`, `CLAUDE.md`, `SKILL.md`, `.mcp.json`, ...), see
+[[Claude Main Files and Directories]] instead — this file stays focused on
+commands and flags.
 
 Mentions of these commands elsewhere link here with a Markdown link wrapped
 around inline code (e.g. `` [`/compact`](<Claude Commands.md#/compact>) ``)
@@ -91,6 +92,14 @@ for the project-vs-user scope decision it teaches. In current Claude Code,
 product, separate from that scope lesson.
 *Verified against the [commands reference](https://code.claude.com/docs/en/commands) (checked 2026-09-06).*
 
+### /rewind
+
+Rewinds the session to an earlier checkpoint, undoing conversation and/or
+code changes made since then. Reach for it when a session has gone off
+course but you want to jump back to a specific prior point rather than
+discarding all history the way [`/clear`](<Claude Commands.md#/clear>) does.
+See [[3 - Claude Code Configuration & Workflows]].
+
 ## CLI flags
 
 ### --append-system-prompt
@@ -168,32 +177,9 @@ instead. See [[3 - Claude Code Configuration & Workflows]].
 
 ## Config directories
 
-Not commands you run, but the directories a command's definition file lives
-in — grouped here because "where do I put this" is exactly the judgment the
-exam tests.
-
-### .claude/commands/
-
-Project-scoped custom slash commands, checked into the repository and shared
-with the whole team through version control. The personal counterpart is
-`~/.claude/commands/`, which never reaches teammates. See
-[[3 - Claude Code Configuration & Workflows]].
-
-### .claude/rules/
-
-Holds topic-specific rule files as an alternative to one monolithic
-[[Glossary#CLAUDE.md|CLAUDE.md]]. A rule file can carry a `paths` field in its
-YAML [[Glossary#Frontmatter|frontmatter]] — a glob pattern — so the rule
-loads only when Claude edits a matching file, rather than at every launch.
-This is the fix for a convention
-that applies to a file *type* scattered across many directories (all test
-files, say), where a per-directory `CLAUDE.md` would have to be duplicated
-everywhere. See
-[[3 - Claude Code Configuration & Workflows#3.3 — Path-specific rules for conditional convention loading|3 - Claude Code Configuration & Workflows]].
-
-### .claude/skills/
-
-Project-scoped skills, each a folder with a [[Glossary#SKILL.md|SKILL.md]]
-file. The personal counterpart is `~/.claude/skills/`, used for a private
-variant of a shared skill so you don't affect teammates. See
-[[3 - Claude Code Configuration & Workflows]].
+Not commands you run — see [[Claude Main Files and Directories]] for every
+`.claude/` directory (`.claude/commands/`, `.claude/rules/`,
+`.claude/skills/`, `.claude/agents/`, `.claude/hooks/`,
+`.claude/settings.json`, ...) and its project-root companion files
+(`CLAUDE.md`, `.mcp.json`, `REVIEW.md`, ...) in one place, since "where do I
+put this" is exactly the judgment the exam tests.

@@ -15,7 +15,8 @@ distractors in this domain are a plausible-but-wrong scope choice.
 Reported exam intel from passers (unverified calibration, not from the exam
 guide) suggests this domain gets specific about [[Glossary#CLAUDE.md|CLAUDE.md]]
 structure. Either way, it pays to know each config file's exact location and
-audience, not just its name.
+audience, not just its name — [[Claude Main Files and Directories]] maps
+every `.claude/` directory and companion file in one place.
 
 ```mermaid
 graph TD
@@ -29,7 +30,9 @@ graph TD
     T1 --> H1[User-level config is private and never shared via git]
     T2 --> H2[context: fork isolates a skill's output from the main chat]
     T3 --> H3[Glob rules beat subdirectory CLAUDE.md for scattered files]
-    T6 --> H4[--append-system-prompt keeps defaults; --system-prompt replaces them]
+    T6 --> H4["--append-system-prompt keeps defaults; --system-prompt replaces them"]
+    T4 --> H5[Match plan vs execute to task complexity, not habit]
+    T5 --> H6[Show examples or a failing test, not vaguer instructions]
 ```
 
 ---
@@ -54,11 +57,8 @@ new teammate is not getting a rule everyone else follows, the rule is almost
 certainly sitting in someone's user-level config instead of the project file.
 You diagnose this by moving the rule into the project-level `CLAUDE.md`.
 
-The course material adds a fuller picture of *where* these files load from.
-The managed-policy, user, project, and local files all load together at
-launch and stack — nothing gets dropped. A directory-level file is the
-exception: it loads later, on demand, only when Claude reads a file under
-that directory. Beyond user and project, there is a
+Here's a fuller picture of *where* these files actually load from. Beyond
+the user and project scopes above, there is a
 **[[Glossary#CLAUDE.md|managed-policy]]** file that your organization's
 platform team controls and you cannot exclude, and a
 **[[Glossary#CLAUDE.local.md|local]]** file (`CLAUDE.local.md`) that git
@@ -66,6 +66,11 @@ ignores so you can keep private notes for one specific repository. Local is
 the right home for something like architectural decisions you want Claude to
 hold in mind while refactoring your own branch — useful to you, but not
 something you want pushed onto the whole team.
+
+All four scopes — managed-policy, user, project, and local — load together
+at launch and stack, so nothing gets dropped. A directory-level file is the
+exception: it loads later, on demand, only when Claude reads a file under
+that directory.
 
 A worked example of that local file shows the shape: a short context paragraph,
 the project's setup and test commands, a "gotchas" list of known rough edges,
@@ -87,7 +92,8 @@ When the project file gets long, you have two ways to keep it modular:
   only the standards relevant to it. Be clear-eyed about what this buys you:
   imports are expanded inline at launch, so **everything still loads up front**.
   Imports organize the file; they do not reduce how much context Claude reads.
-- The **[`.claude/rules/`](<Claude Commands.md#.claude/rules/>) directory**
+- The
+  **[[Claude Main Files and Directories#.claude/rules/|`.claude/rules/`]] directory**
   holds topic-specific rule files (`testing.md`, `api-conventions.md`,
   `deployment.md`) as an alternative to one monolithic `CLAUDE.md`.
 
@@ -110,7 +116,7 @@ by whatever you pass on invocation, everywhere it appears in the file.
 
 The course's own `create_worktree.md` shows the pattern (its first two of
 four steps, trimmed here for length — the remaining two symlink `.venv` into
-the worktree and launch an editor there):
+the [[Glossary#Worktree|worktree]] and launch an editor there):
 
 ```text
 Your task is to create a new worktree named '$ARGUMENTS' in the .trees/$ARGUMENTS folder.
@@ -132,8 +138,8 @@ git worktree with that exact name.
 Location decides the audience, and this is the exam's favourite distinction:
 
 - **Project-scoped** commands live in
-  [`.claude/commands/`](<Claude Commands.md#.claude/commands/>) and are
-  shared with the whole team through version control.
+  [[Claude Main Files and Directories#.claude/commands/|`.claude/commands/`]]
+  and are shared with the whole team through version control.
 - **User-scoped** commands live in `~/.claude/commands/` and are personal to you.
 
 So a team's standard [`/review`](<Claude Commands.md#/review>) command
@@ -142,13 +148,13 @@ into `CLAUDE.md` (which is for context, not command definitions).
 
 A [[Glossary#Skill|skill]] is a reusable, task-specific capability that Claude
 invokes on its own when a task matches the skill's description. Skills live in
-[`.claude/skills/`](<Claude Commands.md#.claude/skills/>) as folders, each
-with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its
+[[Claude Main Files and Directories#.claude/skills/|`.claude/skills/`]] as
+folders, each with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its
 [[Glossary#Frontmatter|frontmatter]] supports three options worth
 memorizing:
 
-- **`context: fork`** runs the skill in an isolated subagent context so its
-  output never pollutes the main conversation. Reach for this when a skill
+- **`context: fork`** runs the skill in an isolated [[Glossary#Subagent|subagent]]
+  context so its output never pollutes the main conversation. Reach for this when a skill
   produces a lot of noise — a full codebase analysis, or exploratory
   brainstorming — that you don't want cluttering the main session's context.
 - **`allowed-tools`** restricts which tools the skill may use while it runs. You
@@ -234,10 +240,12 @@ needs to change, and hands you a plan to review before it edits anything.
 Match the mode to the complexity of the task:
 
 - Use **plan mode** for complex work — large-scale changes, tasks with multiple
-  valid approaches, architectural decisions, and multi-file modifications.
-  A few examples from the guide: breaking a monolith into microservices, migrating a library across 45+ files, or picking between integration approaches that need different infrastructure. Planning first lets you catch a
-  bad approach on paper, which is far cheaper than letting Claude build the wrong
-  thing and cleaning up afterward.
+  valid approaches, architectural decisions, and multi-file modifications. A
+  few examples from the guide: breaking a monolith into microservices,
+  migrating a library across 45+ files, or picking between integration
+  approaches that need different infrastructure. Planning first lets you
+  catch a bad approach on paper, which is far cheaper than letting Claude
+  build the wrong thing and cleaning up afterward.
 - Use **direct execution** for simple, well-scoped changes — a single-file bug
   fix with a clear stack trace, or adding one validation conditional to one
   function.
@@ -258,10 +266,10 @@ decide once what Claude may run without asking each time. The everyday ones you
 cycle with shift-tab are Manual (reads only), Accept edits (edits and safe bash
 without asking), Plan (reads only, proposes changes), and Auto (runs on its own,
 with a separate classifier reviewing each action for danger before it executes).
-Two more exist for specific situations: **Don't ask**, which allows only
+Two more exist for specific situations. **Don't ask** allows only
 pre-approved tools and auto-denies the rest — the right choice for unattended
-runs where no human can approve prompts — and **Bypass permissions**, which
-skips all checks and belongs only inside an isolated container or VM. A subtle
+runs where no human can approve prompts. **Bypass permissions** skips all
+checks entirely and belongs only inside an isolated container or VM. A subtle
 point the course stresses: Auto's classifier guards *intent*, not
 *correctness* — it won't notice that refactored code is broken, only that an
 action is dangerous — so you pair Auto mode with a Stop hook that runs the tests.
@@ -299,9 +307,9 @@ The broader workflow these sit inside is: feed Claude the relevant files as
 context, ask it to plan without writing code, then ask it to implement. You
 steer a long session with [`/compact`](<Claude Commands.md#/compact>)
 (summarize and free context — always add an instruction telling it what to
-keep), rewind to a checkpoint when it goes off course, and
-[`/clear`](<Claude Commands.md#/clear>) to reset history between unrelated
-tasks.
+keep), [`/rewind`](<Claude Commands.md#/rewind>) to a checkpoint when it goes
+off course, and [`/clear`](<Claude Commands.md#/clear>) to reset history
+between unrelated tasks.
 
 ---
 
@@ -320,17 +328,28 @@ For machine-readable results, pair
 **[`--output-format json`](<Claude Commands.md#--output-format>)** with
 **[`--json-schema`](<Claude Commands.md#--json-schema>)**. Claude constrains
 its output to your schema and puts the matching object in the response's
-`structured_output` field, which you can pull out with `jq` and post as
+`structured_output` field, which you can pull out with [[Glossary#jq|jq]] and post as
 inline PR comments or feed to another script. When CI needs *repeatable*
 output run to run, add the **[`--bare`](<Claude Commands.md#--bare>)** flag
 for deterministic mode. For multi-step automation, capture the `session_id`
 from the JSON output and continue later with
 [`--resume`](<Claude Commands.md#--resume>).
 
-`CLAUDE.md` still matters in CI: it is how you give the automated run project
-context — testing standards, fixture conventions, review criteria — so generated
-tests and reviews match your project. Documenting available fixtures and what
-makes a test valuable reduces low-value output.
+`CLAUDE.md` still matters in CI, but a bare [`-p`](<Claude Commands.md#-p>)
+call does not load it automatically — the auto-discovery skip described
+above includes `CLAUDE.md` itself. If a `-p` script needs that project
+context, you supply it deliberately: pipe the file's content into the
+prompt, or load it with `--append-system-prompt-file` (see the system-prompt
+mechanisms just below). Managed Code Review, covered later in this section,
+is not a bare `-p` call either — it reads `CLAUDE.md` on its own, alongside
+`REVIEW.md`.
+
+Where it does apply, `CLAUDE.md` is how you give an automated run project
+context: testing standards, fixture conventions, and review criteria, so
+generated tests and reviews match your project. Feed the existing test suite
+into context as well, so test generation doesn't suggest scenarios the suite
+already covers — between the two, you cut the low-value output that comes
+from Claude guessing at conventions and duplicating existing tests.
 
 One reliability principle to remember: **a session should not review its own
 work.** The same session that generated code carries its reasoning context and
@@ -361,6 +380,51 @@ review architectures in [[4 - Prompt Engineering & Structured Output]].
 > → `CLAUDE.md`.
 >
 > *Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-05).*
+
+### `--system-prompt` persistence, and how **output styles** differ
+
+A CLI flag like `--system-prompt` or `--append-system-prompt` only affects the
+single invocation it is passed to. Nothing about that choice is saved
+anywhere: start a new session, or the next scheduled CI run, without the
+flag, and Claude Code is back to its default system prompt. If you want the
+same customization every time, you have to keep passing the flag.
+
+An **[[Glossary#Output style|output style]]** is the persistent version of
+the same idea. You pick a style once — with `/config`, or by setting the
+`outputStyle` field in a settings file — and Claude Code saves that choice to
+[[Glossary#.claude/settings.local.json|`.claude/settings.local.json`]] at the
+project level. Every future session in
+that project, interactive or not, starts with that style already active
+until you change it. Like `--append-system-prompt`, a style adds instructions
+to the system prompt rather than replacing Claude Code's default outright. A
+`keep-coding-instructions` frontmatter field decides how much of the default
+survives alongside it. Set it to `true` to keep Claude Code's built-in
+software engineering instructions, for when you're only changing tone or
+format while still coding. Leave it at `false`, the default, to drop them —
+the right choice for a role that isn't software engineering at all, like a
+writing assistant.
+
+A custom output style is a Markdown file — frontmatter, then the instructions
+to add — saved under one of these directories, the same user/project/managed
+split as `CLAUDE.md` (a plugin can also ship its own `output-styles/`
+folder):
+
+- **User** — `~/.claude/output-styles`
+- **Project** — `.claude/output-styles`
+- **Managed policy** — an `output-styles/` folder inside the managed settings
+  directory
+
+Claude Code ships four built-in styles beyond Default: **Proactive**
+(executes immediately with minimal pausing), **Concise** (short, result-first
+answers), **Explanatory** (adds educational "Insights" alongside the work),
+and **Learning** (goes further than Explanatory by leaving `TODO(human)`
+markers in your code for you to fill in). A style change only takes effect
+after `/clear` or a new session, since the system prompt loads once at
+session start. It also shapes only the main conversation, because a
+[[Glossary#Subagent|subagent]] runs its own system prompt. A skill under
+`context: fork` is the exception, since a fork inherits the parent's full
+system prompt.
+*Verified against the [output styles docs](https://code.claude.com/docs/en/output-styles) (checked 2026-09-07).*
 
 ### Managed GitHub Code Review versus the GitHub Action
 
@@ -397,7 +461,7 @@ branches.
 >   review-specific instructions — what to flag, severity calibration,
 >   exclusions (generated code, lockfiles, vendored dependencies,
 >   machine-authored branches), and reporting preferences such as capping
->   nit-level comments.
+>   how many nit-level comments a single review may post.
 >
 > *Verified against the [Code review docs](https://code.claude.com/docs/en/code-review) (checked 2026-09-05).*
 

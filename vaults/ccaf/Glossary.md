@@ -7,7 +7,9 @@ tags: [ccaf, glossary]
 Short, plain definitions for the terms of art used across the CCAF domain notes.
 Each entry says what the term means and, where useful, which domain note develops
 it. Definitions are kept faithful to how the course sources and the official exam
-guide use each term.
+guide use each term. For the directory or file *location* a term lives in — every
+`.claude/` folder and its project-root companions — see
+[[Claude Main Files and Directories]] instead of hunting across entries here.
 
 ## A
 
@@ -91,7 +93,9 @@ and CI runs. It is guidance, not enforced configuration — see
 [[Glossary#Hook|Hook]] for the enforcement alternative. Contrast with
 [[Glossary#CLAUDE.local.md|CLAUDE.local.md]], a different file for private,
 git-ignored, project-specific notes. See
-[[3 - Claude Code Configuration & Workflows]].
+[[3 - Claude Code Configuration & Workflows]] and
+[[Claude Main Files and Directories]] for the `.claude/` directories that
+pair with it.
 *Managed-policy paths, deployment mechanism, precedence, and the directory
 scope's on-demand loading verified against the
 [Claude Code memory docs](https://code.claude.com/docs/en/memory)
@@ -200,7 +204,7 @@ Markdown file, enclosed by two lines of three dashes (`---`). Claude Code
 reads it to configure how the file behaves — the `context`, `allowed-tools`,
 and `argument-hint` fields on a [[Glossary#SKILL.md|SKILL.md]], or the
 `paths` glob on a rule in
-[`.claude/rules/`](<Claude Commands.md#.claude/rules/>). A typical block
+[[Claude Main Files and Directories#.claude/rules/|`.claude/rules/`]]. A typical block
 looks like:
 
 ```yaml
@@ -246,6 +250,15 @@ deterministic guarantees where prompt instructions give only probabilistic
 compliance. See [[1 - Agentic Architecture & Orchestration]] and [[3 - Claude Code Configuration & Workflows]].
 
 ## J
+
+### jq
+
+A command-line JSON processor, not a Claude Code feature itself, used
+downstream of a `-p` run's `--output-format json` output to pull a specific
+field — typically the `structured_output` object a `--json-schema` run
+produces — out of the response so it can be posted as inline PR comments or
+fed to another script. See
+[[3 - Claude Code Configuration & Workflows#3.6 — Integrating Claude Code into CI/CD pipelines|3 - Claude Code Configuration & Workflows]].
 
 ### JSON Schema
 
@@ -309,7 +322,29 @@ different reach. `.mcp.json` at the project root is committed and shared with th
 whole team; `~/.claude.json` is user-scoped and personal, for experimental servers
 nobody else needs. `.mcp.json` also supports environment-variable expansion (e.g.
 `${GITHUB_TOKEN}`) so credentials are never committed. See
-[[2 - Tool Design & MCP Integration]].
+[[2 - Tool Design & MCP Integration]] and
+[[Claude Main Files and Directories#.mcp.json and ~/.claude.json|Claude Main Files and Directories]].
+
+## O
+
+### Output style
+
+A named set of instructions layered onto Claude Code's system prompt to
+change how it responds — role, tone, and output format — set once and
+persisted per project (or user, or managed-policy) rather than passed as a
+one-off CLI flag. Selecting one, via `/config` or the `outputStyle` field, is
+saved to `.claude/settings.local.json`, so every future session in that
+project starts with it active until changed. A custom style is a Markdown
+file — frontmatter plus instructions — saved under `~/.claude/output-styles`
+(user), `.claude/output-styles` (project), or a managed-policy
+`output-styles/` folder; its `keep-coding-instructions` frontmatter field
+decides whether Claude Code's built-in software-engineering instructions
+survive alongside it. Contrast with
+[`--append-system-prompt`](<Claude Commands.md#--append-system-prompt>) and
+[`--system-prompt`](<Claude Commands.md#--system-prompt>), which apply only
+to a single invocation and are never saved. See
+[[3 - Claude Code Configuration & Workflows#--system-prompt persistence, and how output styles differ|3 - Claude Code Configuration & Workflows]].
+*Verified against the [output styles docs](https://code.claude.com/docs/en/output-styles) (checked 2026-09-07).*
 
 ## P
 
@@ -432,6 +467,32 @@ preferences. `CLAUDE.md` supplies general project context to the same review;
 `REVIEW.md` is the review-specific knob. See [[3 - Claude Code Configuration & Workflows]].
 
 ## S
+
+### .claude/settings.local.json
+
+A personal, project-scoped settings file that lives at the project root
+alongside `.claude/settings.json`. It holds overrides for you alone in that
+one project — a standing "yes, and don't ask again" permission approval, a
+personal model override, your chosen [[Glossary#Output style|output style]],
+or a few `/config` options such as Show tips. Claude Code often writes it for
+you automatically (the first time you approve a permission prompt with
+"don't ask again," or pick one of those `/config` settings) rather than you
+creating it by hand.
+
+In the settings precedence, project local sits above the shared
+`.claude/settings.json` but below the command line's `--settings` flag and
+any organization-managed settings, so it overrides a team default for you
+without touching what your teammates load. Claude Code also keeps it out of
+version control automatically: the first time it writes the file inside a
+git repository, it adds `**/.claude/settings.local.json` to your global git
+excludes, so it never shows up as a change to commit — you only need to
+gitignore it yourself if you created the file by hand before Claude Code
+touched it. This makes it the structured-settings counterpart to
+[[Glossary#CLAUDE.local.md|CLAUDE.local.md]]: the same personal,
+git-ignored-per-project idea, but for JSON settings rather than prose
+context. See
+[[3 - Claude Code Configuration & Workflows#--system-prompt persistence, and how output styles differ|3 - Claude Code Configuration & Workflows]].
+*Verified against the [settings docs](https://code.claude.com/docs/en/settings) (checked 2026-09-07).*
 
 ### Skill
 

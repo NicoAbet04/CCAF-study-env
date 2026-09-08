@@ -29,16 +29,18 @@ Each note is organised around the official exam guide's task list and ends with 
 - Run `/study ccaf [domain]` for flashcard drills, the 89-question `cert-exam`
   scenario bank, freshly generated scenario rounds, or a hands-on lab.
 - Misses are logged to [[Weak Areas]], which then steers later sessions.
-- Every term of art is defined in [[Glossary]]; slash commands, CLI flags,
-  and the `.claude/` directories are in [[Claude Commands]].
+- Every term of art is defined in [[Glossary]]; slash commands and CLI flags
+  are in [[Claude Commands]]; every `.claude/` directory and config file is
+  mapped in [[Claude Main Files and Directories]].
 - Coverage and build health live in `SOURCE_INVENTORY.md`, `COVERAGE_GAPS.md`, and
   `FLAGGED.md` (all generated — don't hand-edit).
 
 ## Supporting pages
 
 - [[Glossary]] — terms of art, defined plainly.
-- [[Claude Commands]] — CLI flags, slash commands, and config paths, defined
-  plainly.
+- [[Claude Commands]] — CLI flags and slash commands, defined plainly.
+- [[Claude Main Files and Directories]] — every `.claude/` directory and
+  project-root config file, mapped in one place.
 - [[Weak Areas]] — your running miss log, appended by `/study`.
 
 > [!info] Provenance
