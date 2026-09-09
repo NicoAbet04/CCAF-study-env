@@ -18,14 +18,15 @@ have stopped trusting, a nightly report that costs too much — and ask which
 technique actually fixes it. Study the *mechanism*, because the wrong answers are
 plausible-sounding fixes that do not address the real cause.
 
-The domain builds on the API foundations from module 02. Two of those
-foundations matter throughout. First, the Anthropic API keeps no memory of a
-conversation: to hold a multi-turn exchange you must resend the whole message
-list every request. Second, [[Glossary#Temperature|temperature]] controls how random Claude's
-token choices are — near 0 it is nearly deterministic and picks the highest-
-probability token every time, near 1 it spreads probability across many tokens
-for more varied output. Low temperature is what you reach for when you want the
-same structured result every run.
+Two facts about how the Anthropic API works underpin everything in this
+domain. First, the API is stateless: it keeps no memory of a conversation, so
+to hold a multi-turn exchange you must resend the whole message list with
+every request. Second, [[Glossary#Temperature|temperature]] controls how random
+Claude's token choices are — near 0 it is nearly deterministic and picks the
+highest-probability token every time, near 1 it spreads probability across
+many tokens for more varied output. Low temperature is what you reach for when
+you want the same structured result every run, which matters a lot once
+you're relying on that output being consistent and parseable.
 
 ```mermaid
 graph TD
@@ -72,9 +73,10 @@ example so the classification is repeatable.
 When detailed instructions alone still produce inconsistent output, **few-shot
 prompting is the most effective technique**. A [[Glossary#Few-shot prompt|few-shot prompt]] is one
 that includes a small number of worked examples — input paired with the ideal
-output — before the real task. The course frames the same idea as one-shot
-(a single example) versus multi-shot (several), and recommends wrapping examples
-in [[Glossary#XML tags|XML tags]] like `<example>` so their structure is unambiguous.
+output — before the real task. This is the same idea as one-shot (a single
+example) versus multi-shot (several); wrapping each example in
+[[Glossary#XML tags|XML tags]] like `<example>` keeps its structure
+unambiguous.
 
 Examples do more than fix formatting. They teach *judgment on ambiguous cases*.
 Two to four targeted examples that show the reasoning for why one action was
@@ -84,18 +86,19 @@ generalization is the point: you are demonstrating how to decide, not
 enumerating every input.
 
 Few-shot examples are also the antidote to two specific extraction failures.
-They cut hallucination when documents come in varied structures (inline
-citations versus a bibliography, a methodology section versus details buried in
-prose) by showing correct handling of each shape. And they fix empty or null
-extraction of required fields by including examples that pull the value correctly
-out of an awkward format. Good examples also nail down the output format itself —
-show a finding as `location, issue, severity, suggested fix` and the model
-follows that shape.
+Documents come in varied structures — inline citations versus a bibliography,
+a methodology section versus details buried in prose — and showing correct
+handling of each shape cuts hallucination on the shapes you demonstrated. And
+they fix empty or null extraction of required fields by including examples
+that pull the value correctly out of an awkward format. Good examples also
+nail down the output format itself — show a finding as `location, issue,
+severity, suggested fix` and the model follows that shape.
 
-The course's "be clear and direct" and "be specific" techniques support this
-task. Lead with a plain statement of the task, use action verbs ("Write",
-"Identify"), and either list the qualities the output should have or give the
-steps to follow. Examples plus clear direction plus XML structure is the reliable
+Two general prompting techniques support this task: being **clear and
+direct** — lead with a plain statement of what you want, using action verbs
+like "Write" or "Identify" — and being **specific**, either listing the
+qualities the output should have or spelling out the steps to follow.
+Examples, plus clear direction, plus XML structure, is the reliable
 combination.
 
 ## 4.3 — Enforce structured output with tool use and JSON schemas
@@ -103,9 +106,10 @@ combination.
 When you need output that is *guaranteed* to match a shape, the most reliable
 approach is **tool use with a JSON schema**. You define a tool whose
 `input_schema` describes the fields you want, and Claude fills that schema when
-it "calls" the tool. Because the SDK constrains the output to the schema, this
-eliminates JSON syntax errors entirely — no more missing commas or stray prose
-around a code block. You then read the structured data straight from the
+it "calls" the tool. Because tool use constrains the response to the schema you
+declared, JSON syntax errors are eliminated entirely — no more missing commas
+or stray prose around a code block. You then read the structured data straight
+from the
 `tool_use` block of the response. (See [[2 - Tool Design & MCP Integration]] for
 how the same tool machinery is used to give agents real capabilities.)
 
@@ -120,31 +124,51 @@ You control whether and which tool Claude uses through [[Glossary#tool_choice|to
   call that one named tool. Use it to make a specific extraction run first, for
   example pulling metadata before an enrichment step.
 
-The Vertex course notebook shows the pattern directly: an `article_summary` tool
-whose schema requires `title`, `author`, and a `key_insights` array, invoked with
-a forced `tool_choice` so the extraction is guaranteed to run and the result is
-read from `response.content[0].input`.
+Here's the pattern worked through concretely: define an `article_summary` tool
+whose schema requires `title`, `author`, and a `key_insights` array, then call
+it with a forced `tool_choice` so the extraction is guaranteed to run.
+Claude's response comes back with the extracted fields inside a `tool_use`
+block, which you read from `response.content[0].input`.
 
 The critical limit to remember: **strict schemas eliminate syntax errors but not
 semantic errors**. The JSON will always be well-formed, but the model can still
 put line items that do not sum to the stated total, or place a value in the wrong
 field. Schema validity is not correctness — semantic checks are task 4.4's job.
 
-Two schema-design habits come up repeatedly. Make a field **optional (nullable)
-whenever the source document might not contain it**. If you mark a field required
-when the information may be absent, you are forcing the model to fabricate a value
-to satisfy the schema. And for categories that will not fit a fixed list, add an
-enum value like `"other"` with a companion detail string, plus `"unclear"` for
-genuinely ambiguous cases — that gives the model an honest escape hatch instead
-of a wrong guess. Finally, put format-normalization rules in the prompt alongside
-the schema so inconsistent source formatting (dates, units) is cleaned up on the
-way in.
+Two schema-design habits come up repeatedly, and both matter for the same
+reason: a schema only guarantees the *shape* of the output, not that the
+model is being honest about what it actually knows.
 
-> A simpler, non-schema technique from module 02 is worth knowing for lightweight
-> cases: prefill the assistant message with an opening fence such as ` ```json `
-> and set a stop sequence of ` ``` `. Claude then emits only the content between
-> them, with no surrounding commentary. It strips wrapper text but gives none of
-> tool use's schema guarantees, so prefer tool use when the shape must be
+The first is making a field **optional (nullable) whenever the source
+document might not contain it**. Say you're extracting `contract_end_date`
+from a batch of scanned contracts. Some state the end date outright; others
+only say something like "renews annually," with no fixed end date at all. If
+`contract_end_date` is marked required, the model has no legal way to leave
+it blank on that second kind of contract — so it fabricates a plausible-
+looking date rather than violate the schema. Making the field nullable
+removes that pressure: the model can return `null`, and you know to route
+that document to a human instead of trusting a guess.
+
+The second is giving open-ended categories an honest way out. If a
+`document_type` field is a fixed enum — say `invoice`, `receipt`,
+`purchase_order` — anything that doesn't cleanly match one of those still
+gets forced into the nearest option. Add an `"other"` value with a companion
+detail string, plus an `"unclear"` value for cases that are genuinely
+ambiguous rather than merely uncommon. Now a shipping manifest that isn't any
+of your three known types comes back as `other` with detail `"shipping
+manifest"`, instead of being silently misfiled as an `invoice`.
+
+Alongside both habits, put format-normalization rules directly in the prompt
+— "dates as YYYY-MM-DD," "amounts as plain decimals with no currency
+symbol" — so inconsistent source formatting gets cleaned up as the model
+extracts, rather than becoming a separate pass you have to write afterward.
+
+> A simpler, non-schema technique is worth knowing for lightweight cases:
+> prefill the assistant's reply with an opening fence such as ` ```json ` and
+> set a stop sequence of ` ``` `. Claude then emits only the content between
+> them, with no surrounding commentary — a quick way to strip wrapper text
+> without defining a tool. It gives none of tool use's schema guarantees
+> though, so prefer tool use whenever the shape genuinely needs to be
 > enforced.
 
 ## 4.4 — Validation, retry, and feedback loops
@@ -165,23 +189,36 @@ no amount of retrying will conjure it; you need to supply the missing source, no
 loop. Recognizing "the data isn't here" versus "the data is here but formatted
 wrong" is the exam-tested distinction.
 
-Design your validation to catch the semantic errors that schemas cannot. Extract
-a `calculated_total` alongside the document's `stated_total` and flag any
-discrepancy. Add a `conflict_detected` boolean when the source itself is
-inconsistent. And add a `detected_pattern` field to each finding that records
-which code construct triggered it — when developers dismiss findings, that field
-lets you analyze which patterns are causing false positives so you can fix the
-prompt systematically.
+Design your validation to catch semantic errors — cases where the JSON is
+perfectly well-formed but the *values* in it are wrong. For an
+invoice-extraction pipeline, that means having the model check its own
+arithmetic: alongside the `stated_total` printed on the invoice, have it
+extract a separate `calculated_total` that it computes itself by summing the
+individual line items, then flag any case where the two disagree. A mismatch
+means either the model misread a line item or the invoice itself contains an
+error — either way, a case worth a human look rather than silent acceptance.
+Where the source document contradicts itself outright (say, two different
+totals printed on the same page), add a `conflict_detected` boolean so those
+cases surface instead of the model quietly picking one number.
+
+The same idea carries over to a code-review pipeline: have it record a
+`detected_pattern` field on each finding, naming the specific construct that
+triggered the flag (for example, "bare except clause" or "string-concatenated
+SQL query"). When developers start dismissing a reviewer's findings, that
+field lets you group the dismissals by pattern and see which one is
+generating the false positives, so you can fix that part of the prompt
+instead of guessing.
 
 **[[Glossary#Eval workflow|Prompt evaluation]]** is the disciplined version
 of this loop, and it is worth knowing by its five steps: write an initial
 **prompt**; build an **eval dataset** of representative inputs; feed each
 one through Claude; **grade** the outputs; then **rewrite the prompt** and
-run the whole cycle again. The course's own example dataset has just three
-AWS-related coding tasks — production datasets run to thousands. Testing a
-prompt once, or tweaking it for a corner case or two, both leave you exposed
-to inputs you never considered; running it through this loop first is what
-gives you confidence before production.
+run the whole cycle again. A worked example might start with just a handful
+of representative tasks to prove out the mechanics — a real production
+dataset runs to thousands of cases. Testing a prompt once, or tweaking it for
+a corner case or two, both leave you exposed to inputs you never considered;
+running it through this loop first is what gives you confidence before
+production.
 
 A [[Glossary#Grader|grader]] scores each output, and grading comes in three
 flavours, distinguished by *who or what* assigns the score:
@@ -198,18 +235,32 @@ flavours, distinguished by *who or what* assigns the score:
   versions. Best for the qualities hardest to automate at all: general
   response quality, comprehensiveness, depth, conciseness, relevance.
 
-The course combines code- and model-based grading by averaging a syntax
-score with a model score. It demonstrates the rewrite step concretely too:
-after an initial pass, it adds a `solution_criteria` field to each dataset
-record, then updates the model grader's own prompt to score against those
-criteria specifically — tightening the grader itself, not just the prompt
-being tested.
+In practice these often combine: average a code-based syntax score with a
+model-based quality score into one composite grade per output, so a response
+is penalized for both broken formatting and weak content. And the rewrite
+step in the eval loop isn't limited to the prompt under test — the grader
+itself can need tightening too. If a model grader keeps giving inconsistent
+scores to outputs a human would clearly rank differently, add a
+`solution_criteria` field to each eval-dataset record spelling out exactly
+what a correct answer must contain, then update the model grader's own prompt
+to score against those specific criteria. Sharpening the grader this way is
+often what makes the rest of the loop trustworthy.
 
 ## 4.5 — Batch processing strategies
 
-The **Message Batches API** trades latency for cost. It gives **50% cost savings**
-and processes within an **up to 24-hour window**, but comes with **no guaranteed
-latency SLA** — you cannot count on any particular result arriving quickly.
+Everything so far in this domain assumes you send one request and wait for
+one reply. The **Message Batches API** works differently: instead of calling
+the API once per document, you submit a whole set of requests as a single
+job — a hundred documents at once, say — and Claude works through them
+asynchronously in the background rather than one at a time in real time. You
+submit the job and poll it (or come back later) for the results, rather than
+getting an answer inline.
+
+That shift trades latency for cost. Batching gives **50% cost savings**
+compared with sending the same requests synchronously, and Claude processes
+the whole batch within an **up to 24-hour window** — but there is **no
+guaranteed latency SLA**, so you cannot count on any single result, or the
+batch as a whole, coming back quickly.
 
 That trade-off decides where it belongs. Batch is right for **non-blocking,
 latency-tolerant workloads**: overnight reports, weekly audits, nightly test
@@ -226,8 +277,9 @@ request. And **`custom_id` fields correlate each request with its response**;
 because results do not come back in order, the `custom_id` is how you match them
 up.
 
-The skills are practical arithmetic and hygiene. Match the API to the latency
-requirement — synchronous for pre-merge, batch for overnight. Calculate
+Putting batch into practice comes down to a few concrete habits. Match the API
+to the latency requirement — synchronous for pre-merge, batch for overnight.
+Calculate
 submission frequency from your SLA: with a 24-hour processing window, submitting
 on 4-hour intervals keeps you inside a 30-hour SLA. When a batch partially fails,
 resubmit **only** the failed documents, identified by `custom_id`, with
@@ -270,12 +322,13 @@ require.
 - **Fixing inconsistent output by writing ever-longer instructions.** When
   detailed written instructions have already produced inconsistent formatting or
   judgment, piling on more prose rarely helps — few-shot examples are the most
-  effective technique at that point (task 4.2). A companion trap is assuming
-  examples only correct formatting: they also teach judgment on ambiguous cases
-  and let the model generalize to novel patterns, so an option that adds a couple
-  of worked examples usually beats one that only lengthens the instructions, and
-  an option that says "just add one example per input type" misses that examples
-  generalize rather than match cases one-for-one.
+  effective technique at that point (task 4.2). So an option that adds a couple
+  of worked examples usually beats one that only lengthens the instructions.
+  A companion trap is assuming examples only correct formatting — they also
+  teach judgment on ambiguous cases and let the model generalize to novel
+  patterns. So an option that says "just add one example per input type" is
+  also wrong: it misses that good examples generalize rather than match cases
+  one-for-one.
 
 - **Marking a field required to "make sure it's always filled in."** When the
   source may not contain the information, a required field forces the model to
@@ -437,7 +490,7 @@ the real category was so you can extend the list later.
 Question
 A prompt-evaluation pipeline can grade outputs three ways — by code, by a
 second model call, or by a human. What is each best suited for, and which
-two does the course combine into one averaged score?
+two are commonly combined into one averaged score?
 ?
 Code-based grading runs a deterministic check (e.g. parsing output as valid
 JSON/Python/regex) — best for objective, mechanical properties like syntax
@@ -445,18 +498,18 @@ validity or output length. Model-based grading uses a second Claude call
 against a rubric — best for quality and instruction-following that code
 cannot easily check. Human-based grading asks a person to score or
 compare outputs — best for the hardest-to-automate qualities: general
-quality, comprehensiveness, depth, conciseness, relevance. The course
-averages code- and model-based scores into one combined score.
+quality, comprehensiveness, depth, conciseness, relevance. Code-based and
+model-based scores are the two commonly averaged into one combined score.
 #flashcards/domain-4
 
 Question
 You're evaluating a customer-support prompt and want to know whether Claude's
-tone actually feels warm and appropriately concise to a real reader — not just
-whether the response is well-formed. Which grader type fits, and why would
-code-based grading fall short here?
+replies actually feel high-quality and appropriately concise to a real
+reader — not just whether the response is well-formed. Which grader type
+fits, and why would code-based grading fall short here?
 ?
-Human-based grading — qualities like overall response quality, tone, and
-conciseness are exactly what a person is best positioned to judge, and the
+Human-based grading — qualities like general response quality, conciseness,
+and relevance are exactly what a person is best positioned to judge, and the
 hardest to automate reliably. Code-based grading can only check mechanical
 properties (valid syntax, output length, presence of certain words); it has
 no way to assess how a response *feels* to read.

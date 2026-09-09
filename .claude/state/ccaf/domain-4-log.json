@@ -68,7 +68,7 @@
   {
     "path": "/home/nico/Projects/PyCharmProjects/CCAF/src/02_building_with_claude_api/prompt_evaluation/001_prompt_evals.ipynb",
     "status": "used",
-    "contribution": "Primary source for the task 4.4 evaluation content: generate_dataset, model-based grading (grade_by_model with strengths/weaknesses/reasoning/score), code-based grading (validate_json/validate_python/validate_regex scoring 10/0), combining syntax + model scores, and adding solution_criteria to grading.",
+    "contribution": "Primary source for the task 4.4 evaluation content: generate_dataset, model-based grading (grade_by_model with strengths/weaknesses/reasoning/score), code-based grading (validate_json/validate_python/validate_regex scoring 10/0), combining syntax + model scores, and adding solution_criteria to grading. Also the source, via its referenced imgs/img.png and imgs/img_1.png ('Graders' slide), for the three-grader taxonomy (code-based, model-based, human-based) and each grader's best-suited qualities.",
     "sections_covered": "Generating test datasets; running the eval; model-based grading; code-based grading; eval exercise"
   },
   {
