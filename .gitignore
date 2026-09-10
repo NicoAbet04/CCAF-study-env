@@ -6,6 +6,26 @@ __pycache__/
 # Obsidian vault config is local-only: personal editor prefs (app.json),
 # per-session UI state (workspace.json), and large third-party plugin/theme
 # binaries (~2.4 MB — like node_modules). The study content itself (notes,
-# flashcards, Glossary, MOC, Weak Areas) is plain markdown and stays tracked.
+# flashcards, Glossary, MOC) is plain markdown and stays tracked.
 # On a fresh clone, re-enable the Spaced Repetition plugin in Obsidian.
 **/.obsidian/
+
+# NOTE: vaults/ccaf/Weak Areas.md ships with a template ("no misses logged
+# yet") that IS tracked. /study then appends a per-user "Miss log" locally —
+# personal study history, not shareable course content. Because .gitignore
+# can't hide further edits to an already-tracked file, that file is marked
+# `git update-index --skip-worktree` instead: git keeps the checked-in
+# template for other downloaders but never diffs or commits this machine's
+# local miss log. Run `git update-index --no-skip-worktree` on it first if
+# you ever need to actually commit a change to the template itself.
+
+# Build/session state: run.json, inventory.json, domain/eval logs, and the
+# hook-appended *.jsonl files. This is local machine state (absolute source
+# paths under the user's home directory, per-session transcript paths,
+# timestamps of individual work sessions) — not portable course content, and
+# not something to publish for other downloaders. SOURCE_INVENTORY.md and
+# COVERAGE_GAPS.md (generated from this state with paths rendered relative to
+# `~`) stay tracked as the shareable summary.
+.claude/state/*/*.json
+.claude/state/*/*.jsonl
+!.claude/state/*/.gitkeep

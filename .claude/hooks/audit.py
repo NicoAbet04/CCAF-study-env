@@ -28,6 +28,16 @@ def state_dir(course):
     return os.path.join(ROOT, ".claude", "state", course)
 
 
+def display_path(path):
+    """Render a source path relative to the home directory (~/...) so the
+    generated, tracked SOURCE_INVENTORY.md never leaks the machine's username
+    or absolute directory layout."""
+    home = os.path.expanduser("~")
+    if path.startswith(home + os.sep):
+        return "~" + path[len(home):]
+    return path
+
+
 def load_json(path, default=None):
     try:
         with open(path, encoding="utf-8") as f:
@@ -149,7 +159,7 @@ def regenerate_views(vault, inventory, gaps):
              "_Authoritative data: `.claude/state/<course>/inventory.json`._", ""]
     for e in inventory or []:
         claimed = ", ".join(str(c) for c in e.get("claimed_by", [])) or "—"
-        lines.append(f"- `{e['path']}` — **{e['status']}** (domains: {claimed})")
+        lines.append(f"- `{display_path(e['path'])}` — **{e['status']}** (domains: {claimed})")
     with open(os.path.join(vault, "SOURCE_INVENTORY.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 

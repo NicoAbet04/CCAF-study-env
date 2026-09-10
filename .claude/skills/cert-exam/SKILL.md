@@ -14,7 +14,7 @@ Run an interactive practice exam for the Claude Certified Architect – Foundati
 
 Read both exam files and concatenate their questions into one bank:
 
-1. `/home/nico/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md`
+1. `~/Projects/PyCharmProjects/Claude-Certified-Architect-Foundations-Certification-Exam-main/Claude Certification Exam.md`
    — Q1-Q77, community-authored practice bank (PRACTICE tier, unofficial —
    author and sourcing unstated; see `courses/ccaf/course.yaml`).
 2. `courses/ccaf/practice/exam-guide-sample-questions.md` — Q78-Q89, transcribed
