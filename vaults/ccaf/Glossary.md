@@ -57,6 +57,15 @@ and replies with a `CallToolResult` carrying the output. Follows a
 [[Glossary#ListToolsRequest / ListToolsResult|ListToolsRequest/ListToolsResult]]
 exchange in the connection flow. See [[2 - Tool Design & MCP Integration]].
 
+### Case facts block
+
+A small block of the hard, precise facts relevant to the task at hand —
+amounts, dates, names, statuses — kept as structured data outside any
+summarized narrative and repeated in full in every prompt. The point is that
+summarizing text tends to soften exact details into vague language, so
+anything that must stay exact goes in this block instead of in the part of
+the context that gets condensed. See [[5 - Context Management & Reliability]].
+
 ### CLAUDE.local.md
 
 A project-root file, distinct from `CLAUDE.md`, for private
@@ -443,9 +452,11 @@ one specific piece of data. See [[2 - Tool Design & MCP Integration]].
 
 ### Retrieval Augmented Generation (RAG)
 
-Answering with the help of retrieved
-source passages: chunk the corpus, embed and index it, retrieve the most relevant
-chunks for a query, and give them to the model as context. See [[5 - Context Management & Reliability]].
+A way to answer questions using a body of text too large to hand the model in
+one go: instead of pasting the whole thing into the prompt, you split it into
+pieces ahead of time, store those pieces so they can be searched, and then,
+for each question, look up and hand the model only the few pieces likely to
+be relevant. See [[5 - Context Management & Reliability]].
 
 ### Routing
 
@@ -524,9 +535,13 @@ boundaries and long sessions, and can be re-read later. See [[5 - Context Manage
 
 ### Stratified random sampling
 
-Sampling within segments (e.g. by document type)
-to measure error rates and catch novel failures that an aggregate accuracy number
-would hide. See [[5 - Context Management & Reliability]].
+A sampling method that first splits a population into subgroups ("strata")
+that share some characteristic — say, document type, region, or confidence
+level — and then draws a separate random sample from each subgroup, rather
+than one random sample from the population as a whole. This keeps a small or
+unusual subgroup from being drowned out by a large, easy majority, so you can
+track each subgroup's own error rate and catch problems that a single
+overall average would hide. See [[5 - Context Management & Reliability]].
 
 ### Subagent
 

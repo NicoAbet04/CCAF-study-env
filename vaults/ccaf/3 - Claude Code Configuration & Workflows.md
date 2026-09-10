@@ -538,69 +538,81 @@ A teammate just cloned the repo but Claude Code isn't following a coding rule ev
 ?
 It is almost certainly in someone's **user-level** config (`~/.claude/CLAUDE.md`), which is personal and never shared through version control. Move the rule into the **project-level** `CLAUDE.md` (`.claude/CLAUDE.md` or root `CLAUDE.md`) so it is checked in and every teammate loads it.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 Your CI workflow has several stages that each need Claude Code to take on a different role, but you want to keep its default behaviour intact. Which CLI mechanism fits, and why not the alternatives?
 ?
 Use **`--append-system-prompt`**: it adds stage-specific text while keeping the default system prompt, which suits temporary, per-stage instructions. `--system-prompt` would *replace* the default entirely (only for genuine overrides), and `CLAUDE.md` is for durable shared context, not temporary per-stage roles.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 You enabled managed GitHub Code Review and added your flagging rules and severity calibration to `CLAUDE.md`, but the review still uses default behaviour. What did you miss?
 ?
 Managed Code Review reads review-specific instructions from a **root-level `REVIEW.md`**, not `CLAUDE.md`. `CLAUDE.md` provides only general project context; what to flag, severity levels, exclusions, and reporting preferences belong in `REVIEW.md`.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 A convention must apply to every test file, but the test files are scattered across many directories. Do you use a subdirectory `CLAUDE.md` or a path-specific rule, and why?
 ?
 Use a **path-specific rule** in `.claude/rules/` with a glob in its `paths` frontmatter (for example `**/*.test.tsx`). A single glob captures files by type regardless of location, whereas a subdirectory `CLAUDE.md` only covers files under one directory and would have to be duplicated everywhere. The glob rule also loads only when a matching file is edited, saving context.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 A developer splits a long `CLAUDE.md` into several files pulled in with `@import`, hoping to cut token usage. Will it work?
 ?
 No. `@import` keeps the file organized, but imports are expanded inline at launch, so the full content still loads and the context cost is unchanged. To actually reduce context, use path-specific rules that load conditionally, or a skill with `context: fork`.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 A skill you wrote runs a full codebase analysis whose verbose output is flooding the main conversation. Which frontmatter option fixes this?
 ?
 Set **`context: fork`** in the skill's `SKILL.md` frontmatter. It runs the skill in an isolated subagent context so its output never pollutes the main conversation — the right tool for verbose or exploratory skills.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 You're deciding between plan mode and direct execution for (a) fixing one function's off-by-one bug with a clear stack trace and (b) migrating a library across 45+ files. Which goes where?
 ?
 Direct execution for (a) — it is simple and well-scoped. Plan mode for (b) — a large, multi-file, architecture-affecting change where reviewing the approach on paper first prevents costly rework. A good combined pattern is plan mode to design the migration, then direct execution to carry it out.
 #flashcards/domain-3
+<!--SR:!2026-09-12,4,270-->
 
 Question
 You need Claude Code inside a CI pipeline to emit machine-parseable findings and never hang waiting for input. Which flags do you reach for?
 ?
 Run it with **`-p`** (`--print`) for non-interactive one-shot execution so it can't hang on a prompt, and pair **`--output-format json`** with **`--json-schema`** so the result is schema-constrained and lands in the `structured_output` field for parsing (e.g. with `jq`). Add `--bare` if CI needs deterministic, repeatable output.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 Why is it a mistake to have the same Claude Code session that generated code also review it, and what's the fix?
 ?
 The generating session retains its own reasoning context, so it is less likely to question its own decisions and misses subtle issues. Use an **independent review instance** with no memory of how the code was built. (Auto mode's classifier is no substitute — it guards intent, not correctness.)
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 When giving Claude feedback on several problems at once, when do you batch them into one message versus fix them sequentially?
 ?
 Batch them into a single detailed message when the problems **interact** (fixing one affects another), so Claude can reason about them together. Fix them **sequentially** when the problems are **independent**, keeping each change isolated and clean.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 You built a handy `/review` slash command, but a teammate who pulled the repo says the command doesn't exist for them. Where did you put it, and where should it go?
 ?
 You almost certainly saved it under **`~/.claude/commands/`**, which is user-scoped and personal — it lives only on your machine and is never shared through version control. Move the Markdown file into the project's **`.claude/commands/`** so it is checked in and every teammate gets it. User scope is only for a personal variant you don't want to push onto the team.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->
 
 Question
 You need Claude Code to run unattended in a pipeline where no human is present to approve permission prompts, but you don't want it running with all safety checks off. Which permission mode fits, and which one would be a mistake?
 ?
 Use **Don't ask**: it allows only the tools you pre-approved and auto-denies everything else, so nothing hangs waiting for approval and nothing unapproved runs. **Bypass permissions** would be the mistake here — it skips all checks entirely and is only appropriate inside an isolated container or VM, not a general pipeline.
 #flashcards/domain-3
+<!--SR:!2026-09-11,3,250-->

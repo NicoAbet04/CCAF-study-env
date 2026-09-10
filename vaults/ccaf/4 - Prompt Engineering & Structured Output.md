@@ -133,7 +133,7 @@ block, which you read from `response.content[0].input`.
 The critical limit to remember: **strict schemas eliminate syntax errors but not
 semantic errors**. The JSON will always be well-formed, but the model can still
 put line items that do not sum to the stated total, or place a value in the wrong
-field. Schema validity is not correctness — semantic checks are task 4.4's job.
+field. Schema validity is not correctness — semantic checks are [[#4.4 — Validation, retry, and feedback loops|Task 4.4's]] job.
 
 Two schema-design habits come up repeatedly, and both matter for the same
 reason: a schema only guarantees the *shape* of the output, not that the
@@ -315,14 +315,14 @@ require.
 
 - **"Be conservative" or "only report high-confidence findings."** These vague
   instructions feel like precision controls but do not improve precision compared
-  with specific categorical criteria (task 4.1). If an option fixes false
+  with specific categorical criteria ([[#4.1 — Write explicit criteria, not vague warnings|Task 4.1]]). If an option fixes false
   positives by softening the tone rather than naming exactly what to flag, it is
   the distractor.
 
 - **Fixing inconsistent output by writing ever-longer instructions.** When
   detailed written instructions have already produced inconsistent formatting or
   judgment, piling on more prose rarely helps — few-shot examples are the most
-  effective technique at that point (task 4.2). So an option that adds a couple
+  effective technique at that point ([[#4.2 — Few-shot examples for consistency and judgment|Task 4.2]]). So an option that adds a couple
   of worked examples usually beats one that only lengthens the instructions.
   A companion trap is assuming examples only correct formatting — they also
   teach judgment on ambiguous cases and let the model generalize to novel
@@ -332,32 +332,32 @@ require.
 
 - **Marking a field required to "make sure it's always filled in."** When the
   source may not contain the information, a required field forces the model to
-  fabricate a value to satisfy the schema (task 4.3). The correct design makes
+  fabricate a value to satisfy the schema ([[#4.3 — Enforce structured output with tool use and JSON schemas|Task 4.3]]). The correct design makes
   such fields optional/nullable.
 
 - **Assuming a strict JSON schema guarantees a correct answer.** Schemas via tool
   use eliminate *syntax* errors, not *semantic* ones — totals that do not add up
-  and values in the wrong field still get through (task 4.3). An option that
+  and values in the wrong field still get through ([[#4.3 — Enforce structured output with tool use and JSON schemas|Task 4.3]]). An option that
   treats "schema-valid" as "correct" is wrong.
 
 - **Retrying when the information is absent.** Retry-with-error-feedback fixes
   format and structural errors, but retries are useless when the required data is
-  simply not in the provided source (task 4.4). Looping instead of supplying the
+  simply not in the provided source ([[#4.4 — Validation, retry, and feedback loops|Task 4.4]]). Looping instead of supplying the
   missing document is the trap.
 
 - **Switching a blocking workflow to the Batch API for the cost savings.** Batch
   is 50% cheaper but has up to a 24-hour window and no latency guarantee, so it is
-  wrong for pre-merge checks and other blocking work (task 4.5). Keep synchronous
+  wrong for pre-merge checks and other blocking work ([[#4.5 — Batch processing strategies|Task 4.5]]). Keep synchronous
   calls for anything someone is waiting on.
 
 - **Expecting the batch API to run tools mid-request.** It does not support
-  multi-turn tool calling within a single request (task 4.5), so any option that
+  multi-turn tool calling within a single request ([[#4.5 — Batch processing strategies|Task 4.5]]), so any option that
   assumes an agentic tool loop inside one batch request is wrong.
 
 - **Trusting a model to review its own work with a "now check yourself"
   instruction.** A model keeps its generation reasoning in the same session and
   under-questions its own decisions; a fresh independent instance is what catches
-  subtle issues (task 4.6). Self-review instructions and extended thinking are the
+  subtle issues ([[#4.6 — Multi-instance and multi-pass review architectures|Task 4.6]]). Self-review instructions and extended thinking are the
   plausible-but-weaker distractors.
 
 ---

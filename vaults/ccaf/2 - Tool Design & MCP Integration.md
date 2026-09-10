@@ -312,9 +312,7 @@ picking the right one for the job. The distinctions are small but exact:
   `**/*.test.tsx` to find every test file regardless of directory.
 - **Read** and **Write** handle whole files; **Edit** makes targeted changes by
   matching a unique piece of anchor text.
-- When **Edit fails because the anchor text is not unique**, the reliable
-  fallback is **Read the full file, then Write it back** with your change. This
-  is a frequently tested pairing.
+- When **Edit fails because the anchor text is not unique**, the right first fallback is to **Read** the file, find enough surrounding context to make the string to be replaced unique, and retry **Edit** with that larger context. **Read** + **Write** is a valid fallback, but only after a context-widened **Edit** retry has also failed. This is a frequently tested pairing.
 
 The deeper skill is exploring a codebase *incrementally* instead of reading
 everything at once. Grep to find the entry points, then Read to follow the

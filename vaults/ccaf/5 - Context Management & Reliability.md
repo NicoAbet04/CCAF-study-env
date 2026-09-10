@@ -26,8 +26,10 @@ domain is 15% of the exam and pairs naturally with
 The exam frames this domain as "making sound escalation and reliability
 decisions, including error handling and human-in-the-loop." Study it around the
 six tasks below, not around the RAG notebooks — the notebooks supply the
-mechanics for 5.1 and 5.4, but the exam tests judgment about escalation,
-error propagation, review, and provenance.
+mechanics for
+[[#5.1 Preserve critical information across long interactions|5.1]] and
+[[#5.4 Manage context in large codebase exploration|5.4]], but the exam tests
+judgment about escalation, error propagation, review, and provenance.
 
 ```mermaid
 graph TD
@@ -130,7 +132,7 @@ interpret. You embed every chunk, store the vectors in a
 [[Glossary#Vector database|vector database]], then embed the user's question and ask the
 database for the closest chunks. Closeness is measured by
 [[Glossary#Cosine similarity|cosine similarity]] — the cosine of the angle between two vectors,
-ranging from -1 (opposite) to 1 (nearly identical); cosine *distance* is simply
+ranging from **-1** (opposite) to **1** (nearly identical); cosine *distance* is simply
 `1 - similarity`.
 
 Semantic search alone misses exact strings. If a user searches for an incident
@@ -142,7 +144,7 @@ hybrid pipeline runs semantic and BM25 search in parallel and merges their
 rankings with [[Glossary#Reciprocal rank fusion (RRF)|reciprocal rank fusion]] (RRF), which combines each
 chunk's rank from both lists using `score = Σ 1 / (k + rank)`.
 
-Two further accuracy techniques from the source notebooks:
+Two further accuracy techniques from the courses:
 
 - **LLM-based re-ranking** passes the merged candidate chunks back to Claude and
   asks it to reorder them by relevance. Accuracy improves, but latency goes up.
@@ -221,7 +223,7 @@ Distinguish two things that look similar but mean opposite things:
 - An **access failure** — a timeout or an unavailable service — means the answer
   is unknown and the coordinator may need to retry or try another route.
 - A **valid empty result** — a successful query that simply found no matches —
-  means the answer is "there is nothing," and retrying is pointless.
+  means the answer is "there is nothing" and retrying is pointless.
 
 Collapsing these together is how systems waste retries or, worse, treat a
 genuine failure as "no data found."
@@ -234,8 +236,7 @@ results. And when a synthesis agent writes its output, it should include
 topics have gaps because a source was unavailable — so the gap is visible rather
 than silently absent.
 
-This task shares its vocabulary with
-[[2 - Tool Design & MCP Integration|MCP structured errors]] (the `isError`
+This task shares its vocabulary with [[2 - Tool Design & MCP Integration#Task 2.2 — Structured error responses for MCP tools|MCP structured errors]] (the `isError`
 flag, `errorCategory`, and `isRetryable`): the tool layer and the agent layer
 must both refuse to flatten distinct failures into one generic status.
 
@@ -260,13 +261,7 @@ The countermeasures, from most to least aggressive:
   discovery output stays in the subagent and the main agent keeps only the
   high-level coordination. Summarize the findings of one phase before spawning
   subagents for the next, and inject those summaries into the new context.
-- **[`/compact`](<Claude Commands.md#/compact>).** In
-  [[3 - Claude Code Configuration & Workflows|Claude Code]],
-  `/compact` summarizes the conversation, uses the summary as the new context,
-  and drops the old messages. Always steer it — write instructions after the
-  command (e.g. `/compact focus on the refund-flow classes`) so the summary
-  keeps what matters. Left unsteered, `/compact` may drop the one detail you
-  needed and let the agent drift.
+- **[`/compact`](<Claude Commands.md#/compact>).** In [[3 - Claude Code Configuration & Workflows|Claude Code]], `/compact` summarizes the conversation, uses the summary as the new context, and drops the old messages. Always steer it — write instructions after the command (e.g. `/compact focus on the refund-flow classes`) so the summary keeps what matters. Left unsteered, `/compact` may drop the one detail you needed and let the agent drift.
 - **Structured state for crash recovery.** For long multi-agent runs, have each
   agent export its state to a known location and have the coordinator load a
   manifest on resume and inject it back into agent prompts. That way a crash
@@ -276,12 +271,14 @@ The countermeasures, from most to least aggressive:
 
 ## 5.5 Human review workflows and confidence calibration
 
-The central warning: a good-looking **aggregate** number can hide a bad
-**segment**. A pipeline reporting 97% overall accuracy may be nearly perfect on
-common document types and quietly terrible on a rare one. Before you reduce
-human review, analyze accuracy *by document type and by field* to confirm
-performance is consistent across every segment — do not trust the headline
-number.
+The central warning: a good-looking overall accuracy number can hide a
+subgroup where the system is doing badly. A pipeline reporting 97% accuracy
+across all documents may be nearly perfect on common document types and
+quietly terrible on a rare one — the many easy cases mathematically outweigh
+the few bad ones, so the single headline number never reveals the problem.
+Before you reduce human review, break accuracy down *by document type and by
+field* and confirm performance holds up in each of those breakdowns
+individually — do not trust the headline number alone.
 
 To keep measuring once a system is live, use **stratified random sampling**:
 sample from the high-confidence extractions specifically, so you keep measuring
@@ -296,10 +293,12 @@ actually means. Send the low-confidence extractions, and any drawn from
 ambiguous or contradictory source documents, to human review, so limited
 reviewer capacity goes where it is most needed.
 
-This is the reliability counterpart to
+This task is the reliability counterpart to
 [[4 - Prompt Engineering & Structured Output|multi-instance and multi-pass review]]:
-Domain 4 designs the review architecture, Domain 5 decides what a human actually
-looks at.
+that earlier task is about designing the review pipeline itself — running
+several passes or instances to produce a well-checked output. This task picks
+up after that pipeline runs, deciding which of its outputs a human reviewer
+should actually spend time on.
 
 ---
 

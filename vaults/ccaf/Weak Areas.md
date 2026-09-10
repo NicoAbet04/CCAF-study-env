@@ -22,4 +22,6 @@ themselves — only from your own answers, keeping the signal honest.
 
 ## Miss log
 
-_No misses logged yet — run `/study ccaf` to begin._
+- [2026-09-08] [[2 - Tool Design & MCP Integration#Task 2.5 — Select and apply Claude Code's built-in tools]] — on `Edit` "match not unique" errors, chose full `Write`-overwrite fallback instead of widening `old_string` context and retrying `Edit` first.
+- [2026-09-08] [[2 - Tool Design & MCP Integration#Task 2.1 — Design tool interfaces with clear descriptions and boundaries]] — on free-text input format errors (date parsing), chose schema validation as the fix instead of adding format constraints/examples to the tool description itself.
+- [2026-09-08] [[2 - Tool Design & MCP Integration#Task 2.5 — Select and apply Claude Code's built-in tools]] — for codebase-wide content search, chose `Bash find`+`grep` instead of the built-in `Grep` tool.
