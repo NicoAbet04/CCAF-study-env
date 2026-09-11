@@ -283,8 +283,8 @@ individually — do not trust the headline number alone.
 To keep measuring once a system is live, use **stratified random sampling**:
 sample from the high-confidence extractions specifically, so you keep measuring
 their true error rate and can catch novel error patterns that emerge over time.
-[[Glossary#Stratified random sampling|Stratified random sampling]] deliberately samples within strata (here,
-the confidence bands) rather than uniformly.
+[[Glossary#Stratified random sampling|Stratified random sampling]] deliberately samples within subgroups
+(here, the confidence bands) rather than uniformly across the whole population.
 
 Route reviewer attention with **field-level confidence scores**. Have the model
 output a confidence score per field, then calibrate the review thresholds using a
@@ -293,8 +293,7 @@ actually means. Send the low-confidence extractions, and any drawn from
 ambiguous or contradictory source documents, to human review, so limited
 reviewer capacity goes where it is most needed.
 
-This task is the reliability counterpart to
-[[4 - Prompt Engineering & Structured Output|multi-instance and multi-pass review]]:
+This task is the reliability counterpart to [[4 - Prompt Engineering & Structured Output|multi-instance and multi-pass review]]:
 that earlier task is about designing the review pipeline itself — running
 several passes or instances to produce a well-checked output. This task picks
 up after that pipeline runs, deciding which of its outputs a human reviewer
@@ -331,15 +330,6 @@ difference, not a contradiction.
 Finally, render each content type in its natural form in the synthesis output —
 financial data as tables, news as prose, technical findings as structured lists
 — rather than forcing everything into one uniform format that obscures meaning.
-
-> [!note] Beyond the sources (unverified)
-> The `report.md` synthesis fixture used by the RAG notebooks is a good mental
-> model for this task: it is a single report woven from ten departments where the
-> same incident ID (`INC-2023-Q4-011`) is referenced across the software,
-> finance, and cybersecurity sections. That cross-referencing is exactly what
-> makes exact-match retrieval (BM25) and preserved provenance matter — but the
-> fixture itself is course test data, so treat it as an illustration, not as an
-> authoritative claim about the exam.
 
 ---
 
