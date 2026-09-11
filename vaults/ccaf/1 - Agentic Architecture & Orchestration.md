@@ -45,7 +45,7 @@ graph TD
 ## 1.1 Design and implement agentic loops for autonomous task execution
 
 An [[Glossary#Agentic loop|agentic loop]] is the engine underneath every agent. You give
-Claude a goal and some [[2 - Tool Design & MCP Integration|tools]], then repeat a
+Claude a goal and some [[Glossary#Tool|tools]], then repeat a
 cycle: send the request, look at what Claude asked for, run any tools it
 requested, hand the results back, and send again. Claude decides what to do next;
 you just execute and report.
@@ -68,13 +68,13 @@ needs to know which answer belongs to which request. Feeding results back in is
 what lets new information enter Claude's reasoning for the next step.
 
 The power of the loop is that decisions are **model-driven**, not scripted. You
-do not write a decision tree that says "first call get_time, then call
-add_duration." You give Claude abstract, combinable tools and let it chain them.
+do not write a decision tree that says "first call `get_time`, then call
+`add_duration`" You give Claude abstract, combinable tools and let it chain them.
 Asked "what's the time," Claude calls one tool; asked "what day is it in 11
 days," it chains a datetime lookup into a duration-adder; asked to set a reminder
 next week, it uses all three in sequence. Claude will even pause to ask you for
 missing information (like a purchase date it needs before computing a warranty
-expiry) rather than guessing. Abstract tools beat hyper-specialised ones for the
+expiry) rather than guessing. **Abstract tools** beat hyper-specialised ones for the
 same reason Claude Code ships `bash`, `read`, `edit`, and `grep` instead of a
 "refactor code" tool — the model composes primitives into behaviours you never
 explicitly programmed.
@@ -94,7 +94,7 @@ action worked?" and give it a way to see.
 
 When a task is too big for one agent, you split it across several. The standard
 shape is **hub-and-spoke**: one [[Glossary#Coordinator|coordinator]] agent at the hub and
-several [[Glossary#Subagent|subagent]]s on the spokes. The rule that defines the pattern
+several [[Glossary#Subagent|subagents]] on the spokes. The rule that defines the pattern
 is that **all communication flows through the coordinator**. Subagents do not
 talk to each other directly. The coordinator handles routing, error handling,
 and every handoff. You route everything through the hub on purpose — it gives you
@@ -140,10 +140,11 @@ parallel branch can have its own prompt and tools, so you get focused attention
 per branch, independent optimisation, and easy scaling. This differs from
 routing: routing *picks one* path for a request, parallelisation *fans out to
 several* paths for the same request and combines what comes back. See
-[[Glossary#Parallelisation|Parallelisation]]. Delegation — a
-core [[Glossary#AI fluency|AI fluency]] skill — is the mindset behind all of this: decide
-deliberately what you do yourself, what you do with AI, and what you hand to AI
-entirely, and distribute the work to each party's strengths.
+[[Glossary#Parallelisation|Parallelisation]]. 
+
+Delegation — a core [[Glossary#AI fluency|AI fluency]] skill — is the mindset behind all of 
+this: decide deliberately what you do yourself, what you do with AI, and what you 
+hand to AI entirely, and distribute the work to each party's strengths.
 
 ## 1.3 Configure subagent invocation, context passing, and spawning
 
@@ -162,8 +163,7 @@ synthesis agent invents an answer from nothing.
 Pass that context as **structured data that separates content from metadata** —
 keep source URLs, document names, and page numbers attached to each finding — so
 attribution survives the handoff between agents. Losing provenance during
-handoffs is a recurring reliability failure (see
-[[5 - Context Management & Reliability]]).
+handoffs is a recurring reliability failure (see [[5 - Context Management & Reliability]]).
 
 Each subagent type is described by an **[[Glossary#AgentDefinition|AgentDefinition]]**: a
 description, a system prompt, and a set of tool restrictions. Scope the tools to
@@ -190,7 +190,7 @@ So when deterministic compliance is genuinely required — identity verification
 before a financial operation is the canonical example — you do not rely on the
 prompt. You build a **prerequisite gate**: a piece of code, not a Claude
 decision, that checks whether an earlier step already ran and refuses to let a
-later one proceed if it did not. Concretely, a `PreToolUse` hook (§1.5) can look
+later one proceed if it did not. Concretely, a `PreToolUse` hook ([[#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]) can look
 at the conversation so far, and if `process_refund` is being called without a
 prior successful `get_customer` call recorded, it returns `deny` — the tool call
 never reaches your backend, no matter what Claude's reasoning was. The gate has
@@ -274,11 +274,11 @@ dependencies surface.
 The choice is the skill: prompt chaining for predictable multi-aspect work,
 dynamic decomposition for open-ended exploration. A related pattern is
 [[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|routing]]
-(§1.2 above): categorise an incoming request first, then send it down one
+([[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|1.2]] above): categorise an incoming request first, then send it down one
 specialised pipeline rather than a one-size-fits-all prompt. Chaining picks a
 fixed *sequence* of steps; routing picks a *branch* based on what the request
 is; [[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|parallelisation]]
-(also §1.2) runs several branches *at once* instead of choosing one.
+(also [[#1.2 Orchestrate multi-agent systems with coordinator-subagent patterns|1.2]]) runs several branches *at once* instead of choosing one.
 
 The broader framing from the course is **workflows versus agents**. A workflow is
 a predetermined series of Claude calls; an agent is a goal plus tools where
@@ -293,8 +293,7 @@ works, not about how clever the architecture is.
 
 Long-running work spans multiple sittings, so you need to manage session state.
 
-**Resuming** continues a specific prior conversation with
-**[`--resume <session-name>`](<Claude Commands.md#--resume>)**
+**Resuming** continues a specific prior conversation with **[`--resume <session-name>`](<Claude Commands.md#--resume>)**
 (or by capturing a session id from earlier JSON output and passing it back). One
 script can start the work and another resume it later with full context — handy
 when a first pass produces a plan and a second pass carries it out.
@@ -314,13 +313,75 @@ which files changed** so it re-analyses those targeted spots instead of trusting
 its now-outdated picture (or re-exploring everything from scratch).
 
 Claude Code gives you related steering tools for the same problem.
-**[`/compact`](<Claude Commands.md#/compact>)**
-summarises the conversation, makes that summary the new context, and drops the
-old messages to free the context window — but add instructions after the command
-(`/compact Focus on the --version flag work`) so it keeps what matters, or it may
-drift. **Rewind** (double-tap escape) rolls back to a checkpoint — code,
+**[`/compact`](<Claude Commands.md#/compact>)** summarises the conversation, makes that summary the new context, and drops the old messages to free the context window — but add instructions after the command (`/compact Focus on the --version flag work`) so it keeps what matters, or it may drift. **Rewind** (double-tap escape) rolls back to a checkpoint — code,
 conversation, or both — and can *summarise from* or *up to* a checkpoint to
 compress a side conversation or a long setup phase while keeping the rest.
+
+## Traps & distractors
+
+These are the wrong-but-plausible answers this domain engineers. Each is a
+mistake a real engineer might actually make, so eliminate them by reasoning about
+the mechanism.
+
+- **Parsing natural-language signals to end the loop.** Watching Claude's prose
+  for "done" or "complete" is unreliable — wording varies. The loop must be
+  driven by the structured `stop_reason` field (`tool_use` to continue,
+  `end_turn` to stop).
+
+- **Checking assistant text content as a completion indicator.** Same family as
+  above: the presence or content of a text block does not tell you the agent is
+  finished. Only `stop_reason` does.
+
+- **Using an arbitrary iteration cap as the *primary* stopping mechanism.** A
+  hard "stop after N loops" is a legitimate *backstop* against runaway loops, but
+  it is the wrong primary stop condition. The primary mechanism is still
+  `stop_reason == end_turn`. An answer that presents a max-iteration counter as
+  *the* way to terminate is a distractor.
+
+- **Relying on a prompt instruction where deterministic compliance is
+  required.** "Always verify identity before refunding" in the system prompt is
+  probabilistic and carries a non-zero failure rate. When the rule must hold
+  every time, the correct answer is a programmatic gate or a hook, not better
+  prompt wording.
+
+- **Assuming subagents inherit the coordinator's context.** They do not. Any
+  answer that expects a subagent to "just know" prior findings without them being
+  placed in its prompt is wrong — context must be passed explicitly.
+
+- **Decomposing a broad topic too narrowly.** Splitting into tiny pieces feels
+  thorough but can leave gaps between them, so a broad research task ends up with
+  incomplete coverage. The mitigation is an iterative refinement loop, not finer
+  slicing.
+
+- **Forgetting `Task` in `allowedTools`, or handing a subagent context it never
+  received ([[#1.3 Configure subagent invocation, context passing, and spawning|1.3]]).** A coordinator can only spawn subagents if its `allowedTools`
+  includes `Task`; if it is not delegating, check that first. And because
+  subagents start with isolated context, any answer that expects one to "just
+  know" prior findings — without those findings being placed in its prompt as
+  structured data with attribution intact — is wrong. There is no shared memory
+  and no automatic inheritance.
+
+- **Using PostToolUse to block a policy-violating action ([[#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]).** PostToolUse
+  fires *after* the tool has already run, so it is too late to stop anything — it
+  can only transform the result (data normalisation). The only event that can
+  stop an action before it happens is PreToolUse, which returns a
+  `permissionDecision` of `allow`, `deny`, or `ask`. Picking PostToolUse for
+  enforcement is a distractor that swaps the two events.
+
+- **Reaching for adaptive decomposition — or one giant prompt — when the steps
+  are already predictable ([[#1.6 Design task decomposition strategies for complex workflows|1.6]]).** When you can picture the exact steps, prompt
+  chaining (a fixed sequential pipeline) is the fit; adaptive decomposition is
+  for open-ended investigation you cannot plan up front. Cramming every
+  requirement into a single mega-prompt is also wrong, because attention dilution
+  makes Claude drop constraints — split the work into focused passes instead.
+
+- **Resuming on top of stale tool results instead of starting fresh ([[#1.7 Manage session state, resumption, and forking|1.7]]).** When
+  the prior tool results have gone stale, resuming the old session is *less*
+  reliable than starting a new session seeded with a structured summary. Resume
+  only when the prior context is mostly still valid, and when you do resume after
+  files changed, tell the agent exactly which files changed. Note too that
+  `fork_session` is for exploring divergent *what-ifs* from a shared baseline, not
+  for continuing one line of work — that is what `--resume` is for.
 
 ## Flashcards
 
@@ -441,69 +502,3 @@ An agent hits a case it cannot resolve and must escalate to a human who never sa
 ?
 Send a structured handoff summary — the customer id, the root-cause analysis, the amount in question, and the recommended action — so the human can act without redoing the investigation. Because the human never saw the transcript, an unstructured dump forces them to re-derive everything from scratch.
 #flashcards/domain-1
-
-## Traps & distractors
-
-These are the wrong-but-plausible answers this domain engineers. Each is a
-mistake a real engineer might actually make, so eliminate them by reasoning about
-the mechanism.
-
-- **Parsing natural-language signals to end the loop.** Watching Claude's prose
-  for "done" or "complete" is unreliable — wording varies. The loop must be
-  driven by the structured `stop_reason` field (`tool_use` to continue,
-  `end_turn` to stop).
-
-- **Checking assistant text content as a completion indicator.** Same family as
-  above: the presence or content of a text block does not tell you the agent is
-  finished. Only `stop_reason` does.
-
-- **Using an arbitrary iteration cap as the *primary* stopping mechanism.** A
-  hard "stop after N loops" is a legitimate *backstop* against runaway loops, but
-  it is the wrong primary stop condition. The primary mechanism is still
-  `stop_reason == end_turn`. An answer that presents a max-iteration counter as
-  *the* way to terminate is a distractor.
-
-- **Relying on a prompt instruction where deterministic compliance is
-  required.** "Always verify identity before refunding" in the system prompt is
-  probabilistic and carries a non-zero failure rate. When the rule must hold
-  every time, the correct answer is a programmatic gate or a hook, not better
-  prompt wording.
-
-- **Assuming subagents inherit the coordinator's context.** They do not. Any
-  answer that expects a subagent to "just know" prior findings without them being
-  placed in its prompt is wrong — context must be passed explicitly.
-
-- **Decomposing a broad topic too narrowly.** Splitting into tiny pieces feels
-  thorough but can leave gaps between them, so a broad research task ends up with
-  incomplete coverage. The mitigation is an iterative refinement loop, not finer
-  slicing.
-
-- **Forgetting `Task` in `allowedTools`, or handing a subagent context it never
-  received (1.3).** A coordinator can only spawn subagents if its `allowedTools`
-  includes `Task`; if it is not delegating, check that first. And because
-  subagents start with isolated context, any answer that expects one to "just
-  know" prior findings — without those findings being placed in its prompt as
-  structured data with attribution intact — is wrong. There is no shared memory
-  and no automatic inheritance.
-
-- **Using PostToolUse to block a policy-violating action (1.5).** PostToolUse
-  fires *after* the tool has already run, so it is too late to stop anything — it
-  can only transform the result (data normalisation). The only event that can
-  stop an action before it happens is PreToolUse, which returns a
-  `permissionDecision` of `allow`, `deny`, or `ask`. Picking PostToolUse for
-  enforcement is a distractor that swaps the two events.
-
-- **Reaching for adaptive decomposition — or one giant prompt — when the steps
-  are already predictable (1.6).** When you can picture the exact steps, prompt
-  chaining (a fixed sequential pipeline) is the fit; adaptive decomposition is
-  for open-ended investigation you cannot plan up front. Cramming every
-  requirement into a single mega-prompt is also wrong, because attention dilution
-  makes Claude drop constraints — split the work into focused passes instead.
-
-- **Resuming on top of stale tool results instead of starting fresh (1.7).** When
-  the prior tool results have gone stale, resuming the old session is *less*
-  reliable than starting a new session seeded with a structured summary. Resume
-  only when the prior context is mostly still valid, and when you do resume after
-  files changed, tell the agent exactly which files changed. Note too that
-  `fork_session` is for exploring divergent *what-ifs* from a shared baseline, not
-  for continuing one line of work — that is what `--resume` is for.

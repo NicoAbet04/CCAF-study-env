@@ -557,6 +557,17 @@ The mechanism a coordinator uses to spawn subagents; the coordinator
 must have `Task` in its allowed tools. Emitting several `Task` calls in one response
 runs subagents in parallel. See [[1 - Agentic Architecture & Orchestration]].
 
+### Tool
+
+A capability you make available to a model beyond generating text — a
+function it can call to look something up, take an action, or affect the
+outside world, such as running a search, reading a file, or placing an order.
+The model decides for itself, based on the conversation, whether to call a
+tool and with what input; you are the one who runs it and hands the result
+back. See [[Glossary#Tool schema|Tool schema]] for how a tool is described to
+the model, and [[2 - Tool Design & MCP Integration]] for how to design one
+well.
+
 ### Tool schema
 
 What you give the model to describe a tool: a name, a
