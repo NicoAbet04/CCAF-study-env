@@ -105,10 +105,8 @@ When the project file gets long, you have two ways to keep it modular:
   only the standards relevant to it. Be clear-eyed about what this buys you:
   imports are expanded inline at launch, so **everything still loads up front**.
   Imports organize the file; they do not reduce how much context Claude reads.
-- The
-  **[[Claude Main Files and Directories#.claude/rules/|`.claude/rules/`]] directory**
-  holds topic-specific rule files (`testing.md`, `api-conventions.md`,
-  `deployment.md`) as an alternative to one monolithic `CLAUDE.md`.
+- The [`.claude/rules/`](<Claude Main Files and Directories#.claude/rules/>) **directory** holds topic-specific rule files (`testing.md`, 
+  `api-conventions.md`, `deployment.md`) as an alternative to one monolithic `CLAUDE.md`.
 
 Two commands support this workflow. You bootstrap a project's `CLAUDE.md` with
 **[`/init`](<Claude Commands.md#/init>)**, which scans the codebase and writes
@@ -150,8 +148,7 @@ git worktree with that exact name.
 
 Location decides the audience, and this is the exam's favourite distinction:
 
-- **Project-scoped** commands live in
-  [[Claude Main Files and Directories#.claude/commands/|`.claude/commands/`]]
+- **Project-scoped** commands live in [`.claude/commands/`](<Claude Main Files and Directories#.claude/commands/>) 
   and are shared with the whole team through version control.
 - **User-scoped** commands live in `~/.claude/commands/` and are personal to you.
 
@@ -161,7 +158,7 @@ into `CLAUDE.md` (which is for context, not command definitions).
 
 A [[Glossary#Skill|skill]] is a reusable, task-specific capability that Claude
 invokes on its own when a task matches the skill's description. Skills live in
-[[Claude Main Files and Directories#.claude/skills/|`.claude/skills/`]] as
+[`.claude/skills/`](<Claude Main Files and Directories#.claude/skills/>) as
 folders, each with a [`SKILL.md`](<Glossary.md#SKILL.md>) file. Its
 [[Glossary#Frontmatter|frontmatter]] supports three options worth
 memorizing:
@@ -260,8 +257,8 @@ A `paths` pattern can also cover more than one extension in a single entry with
 brace expansion — `"src/**/*.{ts,tsx}"` matches both TypeScript and TSX files
 without listing two separate patterns. Quote any pattern that starts with `{`
 or `*`, since YAML treats those as reserved indicators otherwise.
-*Verified via Claude Code community documentation of the rules loader (checked
-2026-09-12); treat the exact trigger and brace-expansion behavior as
+*Verified via [Claude Code community documentation of the rules loader](https://www.claudecodeclub.ai/blog/claude-code-rules-directory)
+(checked 2026-09-12); treat the exact trigger and brace-expansion behavior as
 current-implementation detail rather than an exam-guide-sourced fact.*
 
 The decision the exam draws out is **path-specific rules versus a

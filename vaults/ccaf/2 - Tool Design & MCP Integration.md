@@ -420,7 +420,7 @@ description). Tempting wrong fix: adding hints to the system prompt — the
 description is the model's primary selection signal, and thin or overlapping
 descriptions are the root cause.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-20,8,250-->
 
 Question
 An MCP tool hits a downstream timeout. You could return `{isError: true,
@@ -432,7 +432,7 @@ retry, explain, or escalate. Return structured metadata: `errorCategory:
 transient`, `isRetryable: true`, and a human-readable description — so the agent
 knows a retry may succeed.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-19,7,250-->
 
 Question
 A customer requests a refund that exceeds the policy limit. How should the MCP
@@ -443,7 +443,7 @@ customer-friendly description of the rule. `retriable: false` stops the agent
 from wasting retries, and the readable description lets it explain the limit to
 the customer.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-19,7,250-->
 
 Question
 A synthesis subagent keeps running web searches it should not. What is the
@@ -454,7 +454,7 @@ such tools. Fix: scope its tool set to its role. If it occasionally needs a
 quick check, give it a narrow tool like `verify_fact` and route complex cases
 through the coordinator.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-21,9,250-->
 
 Question
 You need to guarantee the model calls a tool rather than replying with
@@ -464,7 +464,7 @@ conversational text, but you do not care which tool. Which `tool_choice` setting
 would allow a plain-text reply; a forced `{"type":"tool","name":"..."}` would
 lock it to one specific tool.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-19,7,250-->
 
 Question
 You must ensure `extract_metadata` runs before any enrichment tools. Which
@@ -475,7 +475,7 @@ Force the specific tool with `tool_choice: {"type": "tool", "name":
 (switching back to `auto` or `any`). Forcing guarantees the first step; you do
 not chain further forced calls in the same turn.
 #flashcards/domain-2
-<!--SR:!2026-09-07,1,230-->
+<!--SR:!2026-09-14,2,230-->
 
 Question
 A new teammate is missing an MCP server that everyone else has. Where was it
@@ -485,7 +485,7 @@ It was likely configured in someone's user-scoped `~/.claude.json`, which is
 personal and never shared. Move it to the project root `.mcp.json`, which is
 committed and shared with the team.
 #flashcards/domain-2
-<!--SR:!2026-09-10,4,270-->
+<!--SR:!2026-09-23,11,270-->
 
 Question
 How do you give an MCP server an auth token in `.mcp.json` without committing the
@@ -494,7 +494,7 @@ secret?
 Use environment variable expansion — write `${GITHUB_TOKEN}` in the config and
 let the value resolve at load time. The token stays out of version control.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-20,8,250-->
 
 Question
 Claude Code keeps preferring the built-in `Grep` tool over a more capable MCP
@@ -504,7 +504,7 @@ Improve the MCP tool's description so it clearly details its capabilities and
 outputs. A thin description loses to built-ins; the fix is a better description,
 not a system-prompt workaround.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-20,8,250-->
 
 Question
 An agent wastes tool calls exploring what data is available before it can answer.
@@ -515,7 +515,7 @@ database schema). Resources are application-controlled context the agent can see
 without probing, cutting exploratory tool calls. Tools are for actions;
 resources are for context.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-20,8,250-->
 
 Question
 `Edit` fails on a file because the anchor text you targeted appears more than
@@ -524,7 +524,7 @@ once. What is the reliable fallback?
 Read the full file, then Write it back with your change. Edit needs a unique text
 match; when it cannot find one, Read + Write is the dependable path.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-19,7,250-->
 
 Question
 You need to find every place a function is called across a codebase, then follow
@@ -535,7 +535,7 @@ Use Grep to search file contents for the function name and find all callers, the
 Read those files to follow imports and trace the flow. Reading everything upfront
 floods the context; incremental Grep-then-Read keeps context focused.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-21,9,250-->
 
 Question
 In the agentic loop, how do you know Claude is asking to run a tool, and how do
@@ -546,7 +546,7 @@ return a `tool_result` block whose `tool_use_id` matches that request. Order nee
 not be preserved — the IDs do the matching — and you must append the assistant's
 `tool_use` blocks to history yourself.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-21,9,250-->
 
 Question
 When should you choose an existing community MCP server versus building a custom
@@ -556,7 +556,7 @@ Use a community server for standard integrations (Jira, GitHub) — they are
 maintained and tested. Reserve custom servers for genuinely team-specific
 workflows that no existing server covers.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-21,9,250-->
 
 Question
 You have one `analyze_document` tool, and the model uses it inconsistently —
@@ -569,7 +569,7 @@ and `verify_claim_against_source`. A single vague tool forces the model to guess
 which job you mean; giving each job its own tool with one clear purpose is what
 makes selection reliable, not padding one description.
 #flashcards/domain-2
-<!--SR:!2026-09-07,1,230-->
+<!--SR:!2026-09-14,2,230-->
 
 Question
 You need to locate every test file matching `**/*.test.tsx` across a large repo,
@@ -580,7 +580,7 @@ searches file *contents*, so it is the wrong tool for finding files by name.
 Reach for `Grep` only when you need text inside files, such as a function name,
 an error string, or an import statement.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-19,7,250-->
 
 Question
 You want an MCP resource that can serve any document by its id, not just one
@@ -592,7 +592,7 @@ resource is a fixed URI (like `docs://documents`) pointing at one specific piece
 of data. Both are application-controlled context addressed by URI; the template
 just lets one definition cover many items.
 #flashcards/domain-2
-<!--SR:!2026-09-09,3,250-->
+<!--SR:!2026-09-20,8,250-->
 
 Question
 Before Claude ever sees a newly connected MCP server's tools, what protocol
@@ -606,9 +606,11 @@ exchange: `CallToolRequest` (tool name plus arguments) answered by a
 `CallToolResult` (the output). Discovery and execution are separate message
 pairs.
 #flashcards/domain-2
+<!--SR:!2026-09-15,3,250-->
 
 Question
 An agent needs to find every TypeScript file that imports a deprecated module across a codebase of thousands of files. Why is piping `find` and `grep` through `Bash` the wrong choice here, even though it would work?
 ?
 `Grep` does the same content search in one call, without the shell-escaping and regex-dialect risk of a piped `find`/`grep` command, and returns a structured result instead of raw text. `Bash` is for tasks that aren't themselves a file read, write, or search — tests, git, builds, installs — not a substitute for `Grep`, `Glob`, `Read`, `Write`, or `Edit` when one of those already fits.
 #flashcards/domain-2
+<!--SR:!2026-09-15,3,250-->
