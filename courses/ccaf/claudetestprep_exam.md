@@ -238,7 +238,7 @@ The -p (--print) flag is the documented switch that keeps CLAUDE.md configuratio
 **Why the others fail**
 - A) --bare skips all configuration and runs headless — a practitioner who conflates 'headless' with 'non-interactive' would reach for this. The adjacent correct use of --bare is when you explicitly want to bypass CLAUDE.md and project configuration, the opposite of what the scenario requires.
 - B) --permission-mode dontAsk to suppress all prompts is attractive because CI pipelines must never block on permission dialogs. It controls whether tool-use requires approval, but does not switch Claude Code into non-interactive mode or cause it to print and exit.
-- C) --no-session-persistence to prevent interactive state sounds plausible because CI environments are stateless by design. This flag does not exist in Claude Code's CLI; it is a category mistake that confuses session storage concerns with interactive/non-interactive execution mode.
+- C) --no-session-persistence to prevent interactive state sounds plausible because CI environments are stateless by design. *(Correction, checked 2026-09-12: this flag now exists in current Claude Code — it disables session persistence in print mode, so sessions are not saved to disk and cannot be resumed. It still isn't the answer here, since it addresses session storage, not interactive/non-interactive execution mode — that is what `-p` controls. Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference).)*
 
 ---
 
@@ -753,6 +753,8 @@ A productivity team creates a /analyze-codebase skill that uses Glob, Grep, and 
 - D) Set allowed-tools: [Glob, Grep, Read] to restrict the skill to only those three tools
 
 **Correct answer:** D
+
+*(Correction, checked 2026-09-12: current Claude Code documentation defines `allowed-tools` as a permission grant — it pre-approves the listed tools for that turn so Claude isn't prompted for them, and does not itself remove other tools from the available set. The field that actually restricts by removing tools from the pool is `disallowed-tools` (e.g. `disallowed-tools: [Bash]` here). The exam still frames `allowed-tools` as the restricting field, so answer D on the exam; in real Claude Code work, reach for `disallowed-tools` instead. Verified against the [skills reference](https://code.claude.com/docs/en/skills).)*
 
 **Why D is correct**
 The team needs the /analyze-codebase skill locked to Glob, Grep, and Read specifically because it currently invokes Bash for analysis scripts — allowed-tools is the enforcement mechanism that runtime-restricts an invoked skill's tool set, so declaring only those three names makes any Bash call fail regardless of what the skill's logic attempts. This guarantees the restriction holds even if the underlying scripts still reference Bash, unlike approaches that merely isolate context or advise against it.

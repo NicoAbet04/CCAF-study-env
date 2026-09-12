@@ -18,11 +18,9 @@ the wrong answers here describe tools that *work* in isolation but that the mode
 cannot reliably *choose*, *route to*, or *recover from*. Everything below is
 about making tool use predictable.
 
-A quick vocabulary anchor before the tasks. A **tool** is a function you expose
+A quick vocabulary anchor before the tasks. A [[Glossary#Tool|tool]] is a function you expose
 to the model so it can act on the outside world, described to the model by a
-[[Glossary#Tool schema|tool schema]] — a name, a description, and a
-[[Glossary#JSON Schema|JSON Schema]] for its inputs. The **Model Context Protocol**
-([[Glossary#MCP (Model Context Protocol)|MCP]]) is a standard way to package tools, data, and prompt
+[[Glossary#Tool schema|tool schema]] — a name, a description, and a [[Glossary#JSON Schema|JSON Schema]] for its inputs. The **Model Context Protocol** ([[Glossary#MCP (Model Context Protocol)|MCP]]) is a standard way to package tools, data, and prompt
 templates in a reusable server that any MCP-aware client — Claude Code, the
 desktop app, or your own script — can connect to. This domain leans on the [[Glossary#Agentic loop|agentic loop]] from [[1 - Agentic Architecture & Orchestration|1 - Agentic Architecture & Orchestration]] and feeds the reliability patterns in [[5 - Context Management & Reliability|5 - Context Management & Reliability]].
 
@@ -288,7 +286,14 @@ auto-completion).
 Finally, a build-versus-adopt judgment: **prefer an existing community MCP
 server** for standard integrations like Jira or GitHub, and reserve custom
 servers for genuinely team-specific workflows. You get maintained, tested tools
-for free.
+for free. "Team-specific" includes business logic that must be enforced
+*deterministically* — a topic-based subscriber filter before sending a
+notification, say. A community server can do the generic action (send the
+email), but the filtering rule itself belongs in code the server runs, not in
+a system-prompt instruction layered on top of a generic tool: the same
+prompts-are-probabilistic-code-is-deterministic reasoning from
+[[1 - Agentic Architecture & Orchestration#1.4 Implement multi-step workflows with enforcement and handoff patterns|1.4's prerequisite gates]]
+applies here to whether a rule lives in the MCP server or the prompt.
 
 > [!note] 
 > The course project uses the **stdio** transport, where the client launches the
@@ -311,8 +316,22 @@ picking the right one for the job. The distinctions are small but exact:
 - **Glob** matches file *paths* by name or extension pattern, such as
   `**/*.test.tsx` to find every test file regardless of directory.
 - **Read** and **Write** handle whole files; **Edit** makes targeted changes by
-  matching a unique piece of anchor text.
-- When **Edit fails because the anchor text is not unique**, the right first fallback is to **Read** the file, find enough surrounding context to make the string to be replaced unique, and retry **Edit** with that larger context. **Read** + **Write** is a valid fallback, but only after a context-widened **Edit** retry has also failed. This is a frequently tested pairing.
+  matching a unique piece of anchor text. When you already know every
+  occurrence of a string in a file should change — renaming a variable used a
+  dozen times, say — set **`replace_all: true`** on the first `Edit` call
+  instead of reaching for `Bash` with `sed` or calling `Edit` once per
+  occurrence; it is the purpose-built, single-call way to do a whole-file
+  rename.
+- When **Edit fails because the anchor text is not unique**, the right first fallback is to **Read** the file, find enough surrounding context to make the string to be replaced unique, and retry **Edit** with that larger context — or set `replace_all: true` if every occurrence should change. **Read** + **Write** is a valid last resort, but only after a context-widened **Edit** retry has also failed. This is a frequently tested pairing.
+
+> [!tip] 📌 Reported on the exam
+> Current Claude Code documentation names widen-the-context or `replace_all` as
+> the Edit tool's own recovery path for a non-unique match, and never mentions
+> Read + Write at all. The certification exam guide's own answer key still
+> names **Read + Write** as the correct fallback for this scenario — and
+> flags the divergence itself. Answer **Read + Write** on the exam; use
+> widen-context or `replace_all` in real Claude Code work.
+> *Verified against the [tools reference](https://code.claude.com/docs/en/tools-reference) (checked 2026-09-12).*
 
 The deeper skill is exploring a codebase *incrementally* instead of reading
 everything at once. Grep to find the entry points, then Read to follow the
@@ -358,10 +377,12 @@ obvious-wrongness will not save you — reason about the mechanism.
 - **Building a custom MCP server for a standard integration** like Jira when a
   maintained community server already exists. Reserve custom servers for
   team-specific workflows.
-- **Reaching for `Edit` when the anchor text is not unique.** `Edit` needs a
-  single unique match, so a repeated snippet either fails or risks changing the
-  wrong spot. The reliable move is to Read the whole file and Write it back with
-  your change — not to keep retrying `Edit`.
+- **Giving up on `Edit` at the first non-unique-match failure.** `Edit` needs a
+  single unique match, so a repeated snippet fails rather than risk changing the
+  wrong spot. In real Claude Code work, widen the anchor with more surrounding
+  context (or use `replace_all`) and retry `Edit` before falling back to Read +
+  Write. On the certification exam itself, though, the guide's answer key wants
+  Read + Write as the named fallback — see the callout in Task 2.5 above.
 - **Using `Grep` to find files by name (or `Glob` to search inside them).** Grep
   searches file *contents* and Glob matches file *paths*; swapping them sends you
   looking for a filename in the wrong place. Match the tool to whether you are

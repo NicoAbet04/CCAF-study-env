@@ -47,7 +47,16 @@ practice:                               # quarantined from notes/flashcards; fee
     url: https://www.cosx.ai/ccaf-guide
   - name: ccaf-exam-tutorial labs
     url: https://github.com/jamesbuckett/ccaf-exam-tutorial
-  - name: claudecertificationguide.com  # trap boxes endorsed by a passer (§0.5.3)
+  - name: claudecertificationguide.com mock review (60Q)  # local, courses/ccaf/claudecertificationguide.md
+                                        #   (materialized 2026-09-12). Verified correct-answer key, cites
+                                        #   doc-currency checks inline. MOST TRUSTED practice source —
+                                        #   the /study generated-scenario round should treat this as its
+                                        #   primary style/quality exemplar (§0.5.3).
+  - name: claudetestprep_exam mock review (60Q)  # local, courses/ccaf/claudetestprep_exam.md
+                                        #   (materialized 2026-09-12). Sourcing/site unstated, lower
+                                        #   confidence than the guide review above — useful for question
+                                        #   variety and structure, but corroborate any factual claim
+                                        #   against the guide review or the vault notes before reusing it.
 
 # Official "Preparation Exercises" (exam guide §8) — hands-on, not note material.
 # Surfaced by /study as lab options; they are the guide's own recommended practice.

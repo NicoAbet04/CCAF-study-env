@@ -180,6 +180,16 @@ containing the original document, the failed extraction, and the *specific*
 validation errors, so the model can correct itself. Vague "try again" does
 nothing; the named errors are what guide the fix.
 
+This is also where [[1 - Agentic Architecture & Orchestration#1.6 Design task decomposition strategies for complex workflows|prompt chaining]]
+earns its keep over a single mega-prompt. If a chained pipeline's classification
+step occasionally misroutes a document to the wrong type, and the extraction
+step then pulls the wrong fields as a result, the fix is not to fuse
+classification and extraction into one prompt — that only makes the failure
+harder to isolate. Keep the steps separate and add a **validation step between
+them** that checks the classification before extraction runs, so a
+misclassification is caught at the seam instead of cascading silently into the
+next step's output.
+
 The single most important judgment in this task is knowing **when a retry cannot
 help**. Retries succeed for format mismatches and structural output errors —
 things the model can fix by looking again at material it already has. Retries are
@@ -190,9 +200,13 @@ loop. Recognizing "the data isn't here" versus "the data is here but formatted
 wrong" is the exam-tested distinction.
 
 Design your validation to catch semantic errors — cases where the JSON is
-perfectly well-formed but the *values* in it are wrong. For an
-invoice-extraction pipeline, that means having the model check its own
-arithmetic: alongside the `stated_total` printed on the invoice, have it
+perfectly well-formed but the *values* in it are wrong. Cross-field rules like
+"line items must sum to the total" or "the due date must not precede the
+invoice date" live in validation code, not the schema itself: a Pydantic model
+whose validators encode those rules is what turns a relationship between two
+fields into a concrete, per-field error message the retry request can quote
+back to the model. For an invoice-extraction pipeline, that means having the
+model check its own arithmetic: alongside the `stated_total` printed on the invoice, have it
 extract a separate `calculated_total` that it computes itself by summing the
 individual line items, then flag any case where the two disagree. A mismatch
 means either the model misread a line item or the invoice itself contains an
@@ -298,6 +312,18 @@ instruction or even [[Glossary#Extended thinking|extended thinking]]. This conne
 independent-review idea in [[1 - Agentic Architecture & Orchestration]] and the
 confidence-calibration workflows in [[5 - Context Management & Reliability]].
 
+Confidence scores and schema validity are two different signals, and when they
+conflict, **schema validity wins**. A model's self-reported confidence field
+reflects its own — potentially miscalibrated — certainty about content; it says
+nothing about whether the output actually parses into valid, well-formed
+structure. So a "high confidence" extraction that fails schema validation is
+still a schema failure and must be routed to review regardless of the reported
+confidence, not weighed against it or averaged into a combined score. Confidence
+only becomes a trustworthy routing signal once it is calibrated against a
+labelled validation set (see [[5 - Context Management & Reliability#5.5 Human review workflows and confidence calibration|5.5]]);
+an enum field like `confidence: [high, medium, low]` guarantees the model
+picks one of those three labels, not that the label it picks is accurate.
+
 For large reviews, use a **multi-pass** structure. Split the work into per-file
 local analysis passes, each focused on issues within one file, plus a separate
 cross-file integration pass that examines data flow between files. Doing it all in
@@ -329,6 +355,16 @@ require.
   patterns. So an option that says "just add one example per input type" is
   also wrong: it misses that good examples generalize rather than match cases
   one-for-one.
+
+- **Reaching for more few-shot examples to fix a category-drift problem.** When
+  the real requirement is that a field can only ever take one of a fixed set of
+  exact values — stopping "hate speech," "Hate Speech," and "hate-speech" from
+  all landing in the same field as different strings — examples are still only
+  probabilistic. An **enum** in the schema is the deterministic fix, the same
+  way a hook beats a prompt instruction when compliance must be guaranteed
+  ([[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]). Reach for few-shot examples when the goal is
+  *judgment* on ambiguous cases, not when the goal is collapsing formatting
+  variants of the same fixed value down to one canonical string.
 
 - **Marking a field required to "make sure it's always filled in."** When the
   source may not contain the information, a required field forces the model to

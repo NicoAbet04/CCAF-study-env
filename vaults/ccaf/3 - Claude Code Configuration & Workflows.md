@@ -72,6 +72,19 @@ at launch and stack, so nothing gets dropped. A directory-level file is the
 exception: it loads later, on demand, only when Claude reads a file under
 that directory.
 
+Stacking is not the same as overriding, and this is the trap the exam sets:
+when two loaded files genuinely **contradict** each other — a user-level
+"use 2-space indentation" against a project-level "use 4-space" — there is no
+scope-precedence rule that resolves it. All the files are concatenated into
+context, and if two instructions conflict, **Claude may pick one
+arbitrarily**. "The more specific scope wins" is a popular guess, but it is
+not what Anthropic's own docs say. When a rule must hold every time regardless
+of what else is loaded, the fix is not to reshuffle which file the rule lives
+in — it is a [[Glossary#Hook|hook]], which enforces the outcome directly
+rather than competing for Claude's attention alongside every other loaded
+instruction.
+*Verified against [How Claude remembers your project](https://code.claude.com/docs/en/memory) (checked 2026-09-12).*
+
 A worked example of that local file shows the shape: a short context paragraph,
 the project's setup and test commands, a "gotchas" list of known rough edges,
 and a stated communication preference. It is a scratch pad for one person on one
@@ -157,11 +170,30 @@ memorizing:
   context so its output never pollutes the main conversation. Reach for this when a skill
   produces a lot of noise — a full codebase analysis, or exploratory
   brainstorming — that you don't want cluttering the main session's context.
-- **`allowed-tools`** restricts which tools the skill may use while it runs. You
-  narrow this to prevent destructive actions, for instance limiting a skill so
-  it cannot make sweeping file writes.
+  The forked subagent never sees your conversation history, so the skill's own
+  instructions must be self-contained. It also runs in the background by
+  default, letting you keep working while it completes; set `background:
+  false` in the frontmatter to wait for its result in the same turn instead.
+- **`allowed-tools`** and **`disallowed-tools`** control tool permission while the
+  skill runs, and the exam's framing of them has drifted from the current docs
+  (see the callout below).
 - **`argument-hint`** prompts the developer for required parameters when the
   skill is invoked without them.
+
+> [!tip] 📌 Reported on the exam
+> Current Claude Code documentation defines `allowed-tools` as a permission
+> *grant*, not a restriction: it pre-approves the listed tools so Claude can use
+> them during that turn without an approval prompt, and every other tool
+> remains callable through your normal permission settings — the grant just
+> clears on your next message. The field that actually **removes** tools from
+> the available pool for the duration of the skill is `disallowed-tools`. The
+> certification exam guide still frames `allowed-tools` as the restricting
+> field (e.g. "`allowed-tools: [Read, Grep, Glob]` restricts the skill to only
+> those three tools") and flags this itself as outdated. Answer with the
+> exam's restricting framing of `allowed-tools` on the exam; in real Claude
+> Code work, reach for `disallowed-tools` when you actually need to keep a
+> skill away from Write, Edit, or Bash.
+> *Verified against the [skills reference](https://code.claude.com/docs/en/skills) (checked 2026-09-12).*
 
 A skill folder can carry more than instructions. You can drop a `reference.md`
 beside the skill for depth that Claude reads only when it needs it, and you can
@@ -214,11 +246,23 @@ are shared with the team.
 
 Some conventions should apply only when you touch certain files. You express
 this with a file in `.claude/rules/` whose **YAML frontmatter has a `paths`
-field** listing glob patterns. The rule loads *only* when you edit a file
-matching one of those patterns — for example `paths: ["terraform/**/*"]` so the
-Terraform conventions appear only while editing Terraform, and `**/*.test.tsx`
-so test conventions appear only while editing test files. Loading rules
-conditionally keeps irrelevant context out of the window and saves tokens.
+field** listing glob patterns. The trigger is narrower than it sounds: the
+rule loads *only* when Claude **reads** a file matching one of those
+patterns — for example `paths: ["terraform/**/*"]` so the Terraform
+conventions appear only once Claude has actually read a Terraform file, and
+`**/*.test.tsx` so test conventions appear only once a matching test file has
+been read. Writing, editing, or searching a matching path does **not** trigger
+the rule on its own — only a Read of that file's contents does. Loading rules
+conditionally this way keeps irrelevant context out of the window and saves
+tokens for the many sessions that never touch the scoped files.
+
+A `paths` pattern can also cover more than one extension in a single entry with
+brace expansion — `"src/**/*.{ts,tsx}"` matches both TypeScript and TSX files
+without listing two separate patterns. Quote any pattern that starts with `{`
+or `*`, since YAML treats those as reserved indicators otherwise.
+*Verified via Claude Code community documentation of the rules loader (checked
+2026-09-12); treat the exact trigger and brace-expansion behavior as
+current-implementation detail rather than an exam-guide-sourced fact.*
 
 The decision the exam draws out is **path-specific rules versus a
 subdirectory `CLAUDE.md`.** A directory-level `CLAUDE.md` works when the relevant
@@ -319,30 +363,39 @@ Running Claude Code in a pipeline means running it **non-interactively**,
 because no human is there to answer prompts. The core flag is
 **[`-p`](<Claude Commands.md#-p>)** (or `--print`): it runs Claude Code as a
 one-shot command with no interactive UI, reading standard in and writing
-standard out so it pipes like any other shell tool. Note that `-p` also skips
-auto-discovery of hooks, skills, plugins, MCP servers, and `CLAUDE.md` — you
-get Claude plus the tools you allow explicitly and nothing the local
-environment happens to load, which also makes startup faster.
+standard out so it pipes like any other shell tool. On its own, `-p` still
+loads `CLAUDE.md`, hooks, skills, plugins, and MCP servers exactly like an
+interactive session — it only changes the interaction mode, not what gets
+auto-discovered.
+
+The flag that skips auto-discovery is a separate one:
+**[`--bare`](<Claude Commands.md#--bare>)** puts Claude Code in a minimal
+mode that skips hooks, skills, custom commands, subagents, plugins, MCP
+servers, auto memory, and `CLAUDE.md` entirely, so a scripted call starts
+faster and its behavior does not depend on whatever the local checkout
+happens to have configured. CI scripts commonly combine the two as `-p
+--bare` for a fast, environment-independent run — but note that combining
+them also means `CLAUDE.md` is *not* loaded, so any project context the
+script needs (testing standards, review criteria) must be supplied
+deliberately: pipe it into the prompt, or load it with
+`--append-system-prompt-file` (see the system-prompt mechanisms just below).
+A plain `-p` call without `--bare` needs no such workaround, since it reads
+`CLAUDE.md` on its own.
+*Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-12).*
 
 For machine-readable results, pair
 **[`--output-format json`](<Claude Commands.md#--output-format>)** with
 **[`--json-schema`](<Claude Commands.md#--json-schema>)**. Claude constrains
 its output to your schema and puts the matching object in the response's
 `structured_output` field, which you can pull out with [[Glossary#jq|jq]] and post as
-inline PR comments or feed to another script. When CI needs *repeatable*
-output run to run, add the **[`--bare`](<Claude Commands.md#--bare>)** flag
-for deterministic mode. For multi-step automation, capture the `session_id`
-from the JSON output and continue later with
-[`--resume`](<Claude Commands.md#--resume>).
+inline PR comments or feed to another script. For multi-step automation,
+capture the `session_id` from the JSON output and continue later with
+[`--resume`](<Claude Commands.md#--resume>). If a script needs a session that
+is never written to disk at all (so nothing can later be resumed), add
+`--no-session-persistence`.
 
-`CLAUDE.md` still matters in CI, but a bare [`-p`](<Claude Commands.md#-p>)
-call does not load it automatically — the auto-discovery skip described
-above includes `CLAUDE.md` itself. If a `-p` script needs that project
-context, you supply it deliberately: pipe the file's content into the
-prompt, or load it with `--append-system-prompt-file` (see the system-prompt
-mechanisms just below). Managed Code Review, covered later in this section,
-is not a bare `-p` call either — it reads `CLAUDE.md` on its own, alongside
-`REVIEW.md`.
+Managed Code Review, covered later in this section, is not a `-p` call
+either — it reads `CLAUDE.md` on its own, alongside `REVIEW.md`.
 
 Where it does apply, `CLAUDE.md` is how you give an automated run project
 context: testing standards, fixture conventions, and review criteria, so
@@ -585,7 +638,7 @@ Direct execution for (a) — it is simple and well-scoped. Plan mode for (b) —
 Question
 You need Claude Code inside a CI pipeline to emit machine-parseable findings and never hang waiting for input. Which flags do you reach for?
 ?
-Run it with **`-p`** (`--print`) for non-interactive one-shot execution so it can't hang on a prompt, and pair **`--output-format json`** with **`--json-schema`** so the result is schema-constrained and lands in the `structured_output` field for parsing (e.g. with `jq`). Add `--bare` if CI needs deterministic, repeatable output.
+Run it with **`-p`** (`--print`) for non-interactive one-shot execution so it can't hang on a prompt, and pair **`--output-format json`** with **`--json-schema`** so the result is schema-constrained and lands in the `structured_output` field for parsing (e.g. with `jq`). Add `--bare` if the run should skip all local auto-discovery (hooks, skills, MCP servers, `CLAUDE.md`) for a faster, environment-independent result — but remember that also means `CLAUDE.md` must be supplied manually if the run needs it.
 #flashcards/domain-3
 <!--SR:!2026-09-11,3,250-->
 

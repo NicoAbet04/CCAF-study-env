@@ -262,6 +262,22 @@ The countermeasures, from most to least aggressive:
   high-level coordination. Summarize the findings of one phase before spawning
   subagents for the next, and inject those summaries into the new context.
 - **[`/compact`](<Claude Commands.md#/compact>).** In [[3 - Claude Code Configuration & Workflows|Claude Code]], `/compact` summarizes the conversation, uses the summary as the new context, and drops the old messages. Always steer it — write instructions after the command (e.g. `/compact focus on the refund-flow classes`) so the summary keeps what matters. Left unsteered, `/compact` may drop the one detail you needed and let the agent drift.
+  A rule or invariant that lives *only* in the conversation — a validation rule
+  you stated mid-session, say, and never wrote to disk — does not survive
+  `/compact` at all: the summarizer produces prose from the transcript and
+  does not selectively preserve instructions. What *does* survive is whatever
+  reloads from disk afterward — project-root
+  [[Glossary#CLAUDE.md|CLAUDE.md]] is re-read and re-injected right after
+  compaction, and nested CLAUDE.md files or path-scoped `.claude/rules/`
+  reload as Claude next reads a matching file — so a rule that lives only in
+  the conversation is the one thing compaction has no way to bring back. If a
+  discovery made mid-session (a shared mutex some code depends on,
+  a validation rule a pipeline must keep enforcing) needs to survive
+  compaction — or simply needs to stop decaying in the "lost in the middle" of
+  a long transcript — promote it out of the conversation and into
+  [[3 - Claude Code Configuration & Workflows|CLAUDE.md]] (or the case-facts
+  block, for a non-Claude-Code agent), so it reloads at full strength on every
+  future turn instead of being re-derived from a fading summary.
 - **Structured state for crash recovery.** For long multi-agent runs, have each
   agent export its state to a known location and have the coordinator load a
   manifest on resume and inject it back into agent prompts. That way a crash
@@ -382,6 +398,12 @@ never in any mock question.
   everything to a uniform format.** Annotate conflicts with source attribution
   and dates rather than silently picking a winner, and render each content type
   in its natural form.
+
+- **Trusting a mid-session discovery or conversation-only rule to survive
+  `/compact` (or a long transcript) on its own.** Neither a fading summary nor
+  a "remember this" instruction that was never written to disk persists
+  reliably. A finding or rule that must hold for the rest of the session
+  belongs in CLAUDE.md or a persistent facts block, not the transcript.
 
 - **Assuming the API rolls off old turns for you.** On the API context
   accumulates and nothing is dropped automatically; only chat interfaces roll

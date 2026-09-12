@@ -250,6 +250,18 @@ business rule requires guaranteed compliance.** If "usually" is not good enough,
 it goes in a hook. (Hooks are also central to [[3 - Claude Code Configuration & Workflows]];
 here the focus is using them to intercept tool traffic.)
 
+That rule cuts both ways, and the second half is the one people miss: **not
+every guardrail needs a hook.** Converting a *recoverable* best practice into a
+hook adds implementation complexity for no real benefit. Match the enforcement
+mechanism to the severity of what happens when it fails — a rule guarding
+against irreversible harm (writing outside the project directory, a destructive
+migration with no rollback) belongs in a hook; a rule whose failure is
+inconvenient but recoverable (forgetting to back up a file that is already in
+version control) is fine left as a prompt instruction, even at a real but
+non-zero failure rate. An agent with two guardrails, one enforced by a hook and
+one only followed most of the time by the prompt, is not automatically
+under-engineered — it may already be calibrated correctly.
+
 ## 1.6 Design task decomposition strategies for complex workflows
 
 Breaking a big job into smaller ones comes in two flavours, and picking the wrong
@@ -360,6 +372,13 @@ the mechanism.
   know" prior findings — without those findings being placed in its prompt as
   structured data with attribution intact — is wrong. There is no shared memory
   and no automatic inheritance.
+
+- **Converting every guardrail to a hook "for consistency" ([[#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]).** Hooks
+  are for guardrails whose failure would be severe or irreversible. A guardrail
+  whose failure is recoverable (a missed backup on a file already in version
+  control) is fine as a prompt instruction even at a real, non-zero failure
+  rate. Treat "convert the recoverable one to a hook too" as the distractor,
+  not the safer-sounding choice.
 
 - **Using PostToolUse to block a policy-violating action ([[#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]).** PostToolUse
   fires *after* the tool has already run, so it is too late to stop anything — it
