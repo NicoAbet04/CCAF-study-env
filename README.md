@@ -33,7 +33,9 @@ study-env/
 │   └── ccaf/
 │       ├── course.yaml        # THE manifest — the only file a course must author
 │       ├── notes/             # curated pre-build notes (exam-intel, module-05-mcp)
-│       └── sources-cache/     # cached primary sources (e.g. the official exam guide PDF)
+│       ├── sources-cache/     # cached primary sources (e.g. the official exam guide PDF)
+│       ├── claudecertificationguide.md  # local mock exam review, MOST TRUSTED practice source
+│       └── claudetestprep_exam.md       # local mock exam review, lower-confidence practice source
 ├── vaults/
 │   └── ccaf/                  # ← the Obsidian vault you study from (open THIS folder)
 │       ├── 1 - Agentic Architecture & Orchestration.md
@@ -109,7 +111,11 @@ Run **`/study ccaf [domain]`** in Claude Code for an interactive session. It off
   community-authored plus 12 transcribed from the official exam guide),
   which you can also launch directly with `/cert-exam`;
 - **(c) Generated scenario round** — 5 fresh exam-style questions grounded only in
-  the vault notes, so the bank never goes stale from memorisation;
+  the vault notes, so the bank never goes stale from memorisation. Style — stem
+  shape, distractor construction, trap phrasing — is modelled on the two local
+  mock-exam reviews in `courses/ccaf/` (`claudecertificationguide.md` is the
+  trusted exemplar; `claudetestprep_exam.md` adds structural variety only), but
+  facts always come from the notes, never from the mocks;
 - **(d) Mock-exam pointer** — links to external timed mocks for exam-day pacing,
   with an offer to debrief your pasted results.
 
@@ -174,7 +180,10 @@ of practice material, the writing-style contract) and the complete state model.
 - **Cross-check** — compared against our output after generation, never ingested.
 - **Practice** — quizzes, mocks, and labs are **quarantined** from notes and
   flashcards; they only feed `Weak Areas.md`. Studying the answer key would inflate
-  your practice scores and destroy the weak-areas signal.
+  your practice scores and destroy the weak-areas signal. The two local mock-exam
+  reviews are the one exception to "never referenced elsewhere": `/study`'s
+  generated-scenario round borrows their *style* (never their facts) when writing
+  fresh questions.
 
 ---
 
