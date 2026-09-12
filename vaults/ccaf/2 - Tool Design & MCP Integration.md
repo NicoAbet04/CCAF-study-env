@@ -31,7 +31,7 @@ graph TD
     D2 --> I2[2.2 Structured errors: isError, errorCategory, isRetryable]
     D2 --> I3[2.3 Tool distribution: scope tools to each agent role]
     D2 --> I4[2.4 MCP integration: .mcp.json vs user config, secrets]
-    D2 --> I5[2.5 Built-in tools: Grep, Glob, Read, Write, Edit]
+    D2 --> I5[2.5 Built-in tools: Grep, Glob, Read, Write, Edit, Bash]
     I1 --> I1a[Split generic tools into specific ones]
     I1 --> I1b[System prompt keywords can override descriptions]
     I2 --> I2a[Access failure vs valid empty result]
@@ -41,6 +41,7 @@ graph TD
     I4 --> I4b[Resources cut exploratory tool calls]
     I5 --> I5a[Grep for content, Glob for paths]
     I5 --> I5b[Edit fails on non-unique match then Read plus Write]
+    I5 --> I5c[Bash for shell commands, not a Grep/Glob/Edit substitute]
 ```
 
 ---
@@ -323,6 +324,15 @@ picking the right one for the job. The distinctions are small but exact:
   instead of reaching for `Bash` with `sed` or calling `Edit` once per
   occurrence; it is the purpose-built, single-call way to do a whole-file
   rename.
+- **Bash** runs shell commands in the project environment — tests, git
+  operations, builds, installs, one-off scripts — anything that isn't itself a
+  file read, write, or search. It is not a substitute for the other five
+  tools: the exam consistently marks `find`/`grep` piped through `Bash`, or a
+  `sed` replacement, as the wrong choice whenever `Grep`, `Glob`, or `Edit`
+  can do the same job. The dedicated tools are safer (no shell-escaping or
+  regex-dialect surprises) and give Claude a structured result instead of raw
+  text to re-parse, which is why they win even when the `Bash` equivalent
+  would technically work.
 - When **Edit fails because the anchor text is not unique**, the right first fallback is to **Read** the file, find enough surrounding context to make the string to be replaced unique, and retry **Edit** with that larger context — or set `replace_all: true` if every occurrence should change. **Read** + **Write** is a valid last resort, but only after a context-widened **Edit** retry has also failed. This is a frequently tested pairing.
 
 > [!tip] 📌 Reported on the exam
@@ -388,6 +398,12 @@ obvious-wrongness will not save you — reason about the mechanism.
   searches file *contents* and Glob matches file *paths*; swapping them sends you
   looking for a filename in the wrong place. Match the tool to whether you are
   after text or a path.
+- **Reaching for `Bash` (`find`, `grep`, `sed`) when a dedicated tool already
+  does the job.** `Bash` piping `find`/`grep`, or a `sed` replacement, can
+  technically work, but the exam marks it wrong whenever `Grep`, `Glob`, or
+  `Edit` covers the same task — they are safer and give Claude structured
+  results instead of raw text. `Bash` is for the things that genuinely aren't
+  file reads, writes, or searches: running tests, git, builds, installs.
 
 ---
 
@@ -589,4 +605,10 @@ time, before anything is handed to Claude. Running a tool is a different
 exchange: `CallToolRequest` (tool name plus arguments) answered by a
 `CallToolResult` (the output). Discovery and execution are separate message
 pairs.
+#flashcards/domain-2
+
+Question
+An agent needs to find every TypeScript file that imports a deprecated module across a codebase of thousands of files. Why is piping `find` and `grep` through `Bash` the wrong choice here, even though it would work?
+?
+`Grep` does the same content search in one call, without the shell-escaping and regex-dialect risk of a piped `find`/`grep` command, and returns a structured result instead of raw text. `Bash` is for tasks that aren't themselves a file read, write, or search — tests, git, builds, installs — not a substitute for `Grep`, `Glob`, `Read`, `Write`, or `Edit` when one of those already fits.
 #flashcards/domain-2
