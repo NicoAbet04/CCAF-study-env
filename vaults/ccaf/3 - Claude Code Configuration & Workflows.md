@@ -607,7 +607,7 @@ Managed Code Review reads review-specific instructions from a **root-level `REVI
 Question
 A convention must apply to every test file, but the test files are scattered across many directories. Do you use a subdirectory `CLAUDE.md` or a path-specific rule, and why?
 ?
-Use a **path-specific rule** in `.claude/rules/` with a glob in its `paths` frontmatter (for example `**/*.test.tsx`). A single glob captures files by type regardless of location, whereas a subdirectory `CLAUDE.md` only covers files under one directory and would have to be duplicated everywhere. The glob rule also loads only when a matching file is edited, saving context.
+Use a **path-specific rule** in `.claude/rules/` with a glob in its `paths` frontmatter (for example `**/*.test.tsx`). A single glob captures files by type regardless of location, whereas a subdirectory `CLAUDE.md` only covers files under one directory and would have to be duplicated everywhere. The glob rule also loads only when a matching file is read, saving context.
 #flashcards/domain-3
 <!--SR:!2026-09-11,3,250-->
 

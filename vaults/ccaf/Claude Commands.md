@@ -44,6 +44,17 @@ See [[1 - Agentic Architecture & Orchestration]],
 [[3 - Claude Code Configuration & Workflows]], and
 [[5 - Context Management & Reliability]].
 
+### /config
+
+Opens the Settings interface to adjust theme, model,
+[[Glossary#Output style|output style]], and other preferences — for output
+style specifically, the interactive equivalent of setting the `outputStyle`
+field in a settings file by hand. Claude Code saves an output-style choice to
+[[Glossary#.claude/settings.local.json|`.claude/settings.local.json`]] at the
+project level, so every future session in that project starts with it
+already active. See [[3 - Claude Code Configuration & Workflows]].
+*Verified against the [commands reference](https://code.claude.com/docs/en/commands) (checked 2026-09-12).*
+
 ### /create_worktree
 
 A custom command shipped with the course, not a Claude Code built-in. It
@@ -62,24 +73,36 @@ summary of its structure, dependencies, and conventions. See
 
 ### /install-github-app
 
-Sets up the `anthropics/claude-code-action@v1` GitHub Action for unattended
-runs — reviewing PR comments, running scheduled reports — tuned through
+Installs the Claude GitHub App on a repository (github.com only), with an
+optional additional step to wire up the `anthropics/claude-code-action@v1`
+GitHub Action workflow and secrets — the path to unattended runs (implementing
+a change from a comment, running scheduled reports) tuned through
 `claude_args` (for example `--max-turns`). This is the step beyond the
-managed, hosted Code Review service. See
-[[3 - Claude Code Configuration & Workflows]].
+managed, hosted Code Review service, which the same GitHub App also powers.
+See [[3 - Claude Code Configuration & Workflows]].
+*Verified against the [commands reference](https://code.claude.com/docs/en/commands) (checked 2026-09-12).*
 
 ### /memory
 
-Lists the memory files currently loaded into context. This is the tool to
-reach for when Claude's behaviour is inconsistent across sessions and you
-suspect a [[Glossary#CLAUDE.md|CLAUDE.md]] file is or isn't being picked up.
-See [[3 - Claude Code Configuration & Workflows]].
+Opens [[Glossary#CLAUDE.md|CLAUDE.md]] files for editing, toggles auto memory
+on or off, and shows the auto memory entries currently stored — not just a
+read-only listing. This is the tool to reach for when Claude's behaviour is
+inconsistent across sessions and you suspect a `CLAUDE.md` file is or isn't
+being picked up. See [[3 - Claude Code Configuration & Workflows]].
+*Verified against the [commands reference](https://code.claude.com/docs/en/commands) (checked 2026-09-12).*
 
 ### /merge_worktree
 
 The companion custom command to `/create_worktree`: merges that worktree's
 branch back into main and walks through resolving any conflicts. Also not a
 Claude Code built-in. See [[3 - Claude Code Configuration & Workflows]].
+
+### /plugin
+
+Installs a [[Glossary#Plugin|plugin]] by name (`/plugin install
+org-name@plugin-name`) or through a shared marketplace, rather than
+assembling skills, subagents, hooks, and MCP configs by hand. See
+[[3 - Claude Code Configuration & Workflows]].
 
 ### /review
 
@@ -102,6 +125,16 @@ See [[3 - Claude Code Configuration & Workflows]].
 
 ## CLI flags
 
+### --agents
+
+Defines custom subagents inline as JSON for a single run, rather than
+loading them from files. When a subagent name collides across sources, this
+flag ranks just below managed-policy settings — above the project's own
+[[Claude Main Files and Directories#.claude/agents/|`.claude/agents/`]], the
+personal `~/.claude/agents/`, and a plugin's own `agents/` folder. See
+[[1 - Agentic Architecture & Orchestration]].
+*Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-12).*
+
 ### --append-system-prompt
 
 Appends text to the end of Claude Code's default system prompt, keeping the
@@ -116,9 +149,16 @@ shared context rather than a one-off flag. There is also
 
 ### --bare
 
-Deterministic mode for [`-p`](<Claude Commands.md#-p>) runs: the right choice
-when CI needs the same, repeatable output on every run rather than anything
-that varies. See [[3 - Claude Code Configuration & Workflows]].
+Puts Claude Code in a minimal mode that skips hooks, skills, custom commands,
+subagents, plugins, MCP servers, auto memory, and
+[[Glossary#CLAUDE.md|CLAUDE.md]] entirely — not just deterministic output,
+but no local auto-discovery at all. CI scripts commonly combine it with
+[`-p`](<Claude Commands.md#-p>) as `-p --bare` for a fast,
+environment-independent run; because `CLAUDE.md` is skipped too, any project
+context the run needs must be supplied manually — piped into the prompt, or
+loaded with `--append-system-prompt-file`. See
+[[3 - Claude Code Configuration & Workflows]].
+*Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-12).*
 
 ### --fix
 
@@ -135,9 +175,19 @@ response's `structured_output` field, ready to pull out with `jq`. See
 
 ### --max-turns
 
-A `claude_args` setting that caps how many turns an unattended GitHub Action
-run may take, bounding a loop that has no human watching it. See
+A [`-p`](<Claude Commands.md#-p>)-only flag that caps how many agentic turns a
+run may take, erroring out once the limit is reached instead of looping
+forever. In CI it is typically passed through the GitHub Action's
+`claude_args`, bounding an unattended run that has no human watching it. See
 [[3 - Claude Code Configuration & Workflows]].
+*Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-12).*
+
+### --no-session-persistence
+
+Runs the session without ever writing it to disk, so there is nothing later
+to pick up with [`--resume`](<Claude Commands.md#--resume>). Reach for it in
+a scripted [`-p`](<Claude Commands.md#-p>) call that never needs to be
+resumed. See [[3 - Claude Code Configuration & Workflows]].
 
 ### --output-format
 
@@ -152,10 +202,13 @@ foundation of posting inline PR comments or feeding another script. See
 Short for `--print`. Runs Claude Code as a one-shot, non-interactive command:
 it reads standard in and writes standard out, so it pipes like any other
 shell tool, and is the core mechanism for running Claude Code inside a CI
-pipeline where no human can answer a prompt. It also skips auto-discovery of
-hooks, skills, plugins, MCP servers, and [[Glossary#CLAUDE.md|CLAUDE.md]] —
-you get Claude plus only the tools you allow explicitly, which also makes
-startup faster. See [[3 - Claude Code Configuration & Workflows]].
+pipeline where no human can answer a prompt. On its own it still loads
+[[Glossary#CLAUDE.md|CLAUDE.md]], hooks, skills, plugins, and MCP servers
+exactly like an interactive session — it only changes the interaction mode,
+not what gets auto-discovered. Pair it with
+[`--bare`](<Claude Commands.md#--bare>) to skip that discovery too. See
+[[3 - Claude Code Configuration & Workflows]].
+*Verified against the [CLI reference](https://code.claude.com/docs/en/cli-reference) (checked 2026-09-12).*
 
 ### --resume
 
@@ -165,6 +218,13 @@ with [[Glossary#fork_session|fork_session]], which branches off into a new,
 independent session instead of continuing the same one. See
 [[1 - Agentic Architecture & Orchestration]] and
 [[3 - Claude Code Configuration & Workflows]].
+
+### --settings
+
+Points at a settings file for a single invocation. In the settings
+precedence it ranks second — after managed-policy settings, before the
+project's local, shared, and user-level settings files. See
+[[Claude Main Files and Directories#.claude/settings.json|`.claude/settings.json`]].
 
 ### --system-prompt
 

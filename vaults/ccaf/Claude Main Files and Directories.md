@@ -115,7 +115,7 @@ in the map.
 Holds topic-specific rule files as an alternative to one monolithic
 [[Glossary#CLAUDE.md|CLAUDE.md]]. A rule file's YAML
 [[Glossary#Frontmatter|frontmatter]] can carry a `paths` field — a glob
-pattern — so the rule loads only when Claude edits a matching file, rather
+pattern — so the rule loads only when Claude reads a matching file, rather
 than at every launch. This is the fix for a convention that applies to a
 file *type* scattered across many directories (all test files, say), where
 a per-directory `CLAUDE.md` would have to be duplicated everywhere. See
