@@ -290,10 +290,11 @@ for free. "Team-specific" includes business logic that must be enforced
 *deterministically* — a topic-based subscriber filter before sending a
 notification, say. A community server can do the generic action (send the
 email), but the filtering rule itself belongs in code the server runs, not in
-a system-prompt instruction layered on top of a generic tool: the same
-prompts-are-probabilistic-code-is-deterministic reasoning from
-[[1 - Agentic Architecture & Orchestration#1.4 Implement multi-step workflows with enforcement and handoff patterns|1.4's prerequisite gates]]
-applies here to whether a rule lives in the MCP server or the prompt.
+a system-prompt instruction layered on top of a generic tool. This is the
+same choice [[1 - Agentic Architecture & Orchestration#1.4 Implement multi-step workflows with enforcement and handoff patterns|1.4's prerequisite gates]]
+make: a prompt only gets the model to *usually* follow the rule, while code
+enforces it *every time* — so a rule that must always hold belongs in the
+server's code, not the prompt.
 
 > [!note] 
 > The course project uses the **stdio** transport, where the client launches the
