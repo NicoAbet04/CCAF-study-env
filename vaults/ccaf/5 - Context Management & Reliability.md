@@ -270,8 +270,13 @@ The countermeasures, from most to least aggressive:
   [[Glossary#CLAUDE.md|CLAUDE.md]] is re-read and re-injected right after
   compaction, and nested CLAUDE.md files or path-scoped `.claude/rules/`
   reload as Claude next reads a matching file — so a rule that lives only in
-  the conversation is the one thing compaction has no way to bring back. If a
-  discovery made mid-session (a shared mutex some code depends on,
+  the conversation is the one thing compaction has no way to bring back. A
+  [[Glossary#SessionStart|SessionStart]] hook with the `compact` matcher is
+  the scripted version of the same idea: it fires right after compaction and
+  can print a summary that goes straight back into context, which is how you
+  automate "pick up where you left off" instead of relying on CLAUDE.md alone
+  (see [[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]).
+  If a discovery made mid-session (a shared mutex some code depends on,
   a validation rule a pipeline must keep enforcing) needs to survive
   compaction — or simply needs to stop decaying in the "lost in the middle" of
   a long transcript — promote it out of the conversation and into

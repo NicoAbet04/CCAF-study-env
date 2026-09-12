@@ -258,6 +258,16 @@ A configured script that fires on a lifecycle event (e.g. `PreToolUse`,
 deterministic guarantees where prompt instructions give only probabilistic
 compliance. See [[1 - Agentic Architecture & Orchestration]] and [[3 - Claude Code Configuration & Workflows]].
 
+## I
+
+### InstructionsLoaded
+
+A hook that fires whenever a CLAUDE.md or `.claude/rules/` file loads into
+context — useful for auditing exactly what made it in, the scripted
+counterpart to running `/memory` interactively. See
+[[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]]
+and [[3 - Claude Code Configuration & Workflows]].
+
 ## J
 
 ### jq
@@ -381,11 +391,24 @@ marketplace, rather than assembled by hand. Because a plugin runs with your
 privileges and its hooks fire on every matching tool call, read what it does
 before installing it. See [[3 - Claude Code Configuration & Workflows]].
 
+### PostCompact
+
+A hook that fires after context compaction completes. Its output is **not**
+re-injected into the conversation — for restoring lost context after
+compaction, use a [[Glossary#SessionStart|SessionStart]] hook with the
+`compact` matcher instead. See [[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
+
 ### PostToolUse
 
 A hook that fires after a tool runs; useful for normalising or
 transforming a tool's result before the model sees it. It cannot stop the tool,
 which already ran. See [[1 - Agentic Architecture & Orchestration]].
+
+### PreCompact
+
+A hook that fires before context compaction runs. See
+[[Glossary#PostCompact|PostCompact]] for the matching after-event, and
+[[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
 
 ### PreToolUse
 
@@ -479,6 +502,15 @@ preferences. `CLAUDE.md` supplies general project context to the same review;
 
 ## S
 
+### SessionStart
+
+A hook that fires at session launch, and again later after `/clear` or a
+compaction. A `SessionStart` hook with the `compact` matcher is the way to
+re-inject context lost to compaction: unlike
+[[Glossary#PostCompact|PostCompact]], plain text it prints on success is added
+back into the conversation. See
+[[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
+
 ### .claude/settings.local.json
 
 A personal, project-scoped settings file that lives at the project root
@@ -521,6 +553,15 @@ the skill in an isolated subagent context
 so its output doesn't clutter the main conversation), `allowed-tools`, and
 `argument-hint`. See [[3 - Claude Code Configuration & Workflows]].
 
+### Stop
+
+A hook that fires when Claude wants to end its turn. It can refuse — telling
+Claude it is not done yet — which is how you pair a permissive execution mode
+with a guarantee that, say, the test suite actually passed before the turn
+ends. [[Glossary#SubagentStop|SubagentStop]] is the matching event for a
+finishing subagent. See
+[[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
+
 ### stop_reason
 
 The field on a Claude API response that drives the agentic
@@ -548,6 +589,12 @@ overall average would hide. See [[5 - Context Management & Reliability]].
 A separate agent invoked for a scoped task with its own isolated
 context; it does not inherit the caller's conversation history, so context must be
 passed explicitly. See [[1 - Agentic Architecture & Orchestration]].
+
+### SubagentStop
+
+The [[Glossary#Stop|Stop]] hook's counterpart for a finishing subagent instead
+of the main conversation. See
+[[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
 
 ## T
 

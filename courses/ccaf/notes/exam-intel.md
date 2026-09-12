@@ -95,6 +95,37 @@ out mid-generation stops with `stop_reason: "model_context_window_exceeded"`.
 Accuracy also degrades as the window fills ("context rot"), so curating what is
 in context matters as much as how much room remains.
 
+## 1.5 — Hook events beyond PreToolUse/PostToolUse (PreCompact reported on the exam)
+
+- **Reported by:** the user, from a mock exam they took (comment, 2026-09-12)
+- **Domain / task:** 1 — Agentic Architecture & Orchestration, task 1.5
+- **Verified against:** [Hooks reference](https://code.claude.com/docs/en/hooks) (checked 2026-09-12)
+
+The exam has been reported testing hook events beyond the two the course
+material emphasizes most (`PreToolUse`, `PostToolUse`). Current, confirmed
+events worth knowing at the exam's level of detail:
+
+- **`Stop`** — fires when Claude wants to end its turn; can refuse and force
+  another turn. **`SubagentStop`** is the matching event for a finishing
+  subagent.
+- **`PreCompact`** / **`PostCompact`** — fire before/after context compaction.
+  The trap: `PostCompact`'s output is **not** re-injected into the
+  conversation. To restore context after compaction, use a **`SessionStart`**
+  hook with the `compact` matcher instead — it fires right after compaction,
+  and plain text it prints on success *is* added back into context.
+- **`InstructionsLoaded`** — fires whenever a CLAUDE.md or `.claude/rules/`
+  file loads into context; useful for auditing what actually made it in.
+
+The course's own primary-source lesson material already names these events
+and the `PostCompact`-vs-`SessionStart` trap specifically (see
+`docs/04_claude_code_in_action/Claude_Code.md` in the CCAF source repo), so
+this is confirmed content, not a new claim — it just hadn't made it into the
+domain note prior to this entry. The current hooks reference lists a much
+larger event catalog (`UserPromptSubmit`, `SessionEnd`, `PreModelSwitch`,
+`FileChanged`, and more) that goes beyond what the course material or any
+reviewed exam question covers; treat those as reference-tier background, not
+exam-tested content, until an entry here says otherwise.
+
 ---
 
 ## Calibration notes (not a topic — how the exam behaves)

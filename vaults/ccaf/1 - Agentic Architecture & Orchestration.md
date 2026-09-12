@@ -245,6 +245,37 @@ Two hook events carry most of the weight:
   a PostToolUse hook rewrites them into one consistent format so the agent reasons
   over clean, uniform data.
 
+PreToolUse and PostToolUse are the two that matter most for tool interception,
+but the agentic loop has other fixed points a hook can hang on, and this
+domain's own exam questions have been reported testing them beyond the two
+above:
+
+> [!tip] 📌 Reported on the exam
+> - **[[Glossary#Stop|Stop]]** fires when Claude wants to end its turn — you can
+>   refuse and tell it "you're not done yet" if some condition isn't met (this
+>   is how you pair Auto mode's intent-only classifier with a hook that
+>   actually runs the tests before letting the turn end; see
+>   [[3 - Claude Code Configuration & Workflows#3.4 — Plan mode versus direct execution|3.4]]).
+>   **[[Glossary#SubagentStop|SubagentStop]]** is the matching event for when a
+>   subagent finishes.
+> - **[[Glossary#PreCompact|PreCompact]]** and **[[Glossary#PostCompact|PostCompact]]** fire
+>   before and after compaction (the [`/compact`](<Claude Commands.md#/compact>) command, or an
+>   automatic compaction when context fills up). The trap: `PostCompact`'s
+>   output does **not** get re-injected into the conversation, so it is the
+>   wrong tool for restoring lost context. Use a **[[Glossary#SessionStart|SessionStart]]**
+>   hook with the `compact` matcher instead — it fires right after compaction
+>   finishes, and unlike `PostCompact`, plain text it prints on success *is*
+>   added back into context. A worked pattern: have that hook print a short
+>   summary of the files you were working on, so Claude picks up where it left
+>   off instead of starting cold. This is the concrete mechanism behind the
+>   persistence principle in [[5 - Context Management & Reliability#5.1 Preserve critical information across long interactions|5.1]].
+> - **[[Glossary#InstructionsLoaded|InstructionsLoaded]]** fires whenever a CLAUDE.md or
+>   `.claude/rules/` file loads — useful for auditing what actually made it
+>   into context, which is the scripted version of what `/memory` shows you
+>   interactively ([[3 - Claude Code Configuration & Workflows#3.1 — CLAUDE.md hierarchy, scoping, and modular organization|3.1]]).
+>
+> *Source: course lesson material on Claude Code hooks (primary tier).*
+
 The decision rule: **choose hooks over prompt-based enforcement whenever a
 business rule requires guaranteed compliance.** If "usually" is not good enough,
 it goes in a hook. (Hooks are also central to [[3 - Claude Code Configuration & Workflows]];
@@ -387,6 +418,13 @@ the mechanism.
   `permissionDecision` of `allow`, `deny`, or `ask`. Picking PostToolUse for
   enforcement is a distractor that swaps the two events.
 
+- **Reaching for `PostCompact` to restore context after compaction ([[#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1.5]]).**
+  `PostCompact` fires at the right moment but its output never re-enters the
+  conversation. The hook that actually gets text back into context after
+  compaction is `SessionStart` with the `compact` matcher — the same
+  before/after swap as the PreToolUse/PostToolUse trap above, just for
+  compaction instead of tool calls.
+
 - **Reaching for adaptive decomposition — or one giant prompt — when the steps
   are already predictable ([[#1.6 Design task decomposition strategies for complex workflows|1.6]]).** When you can picture the exact steps, prompt
   chaining (a fixed sequential pipeline) is the fit; adaptive decomposition is
@@ -520,4 +558,16 @@ Question
 An agent hits a case it cannot resolve and must escalate to a human who never saw the conversation. What should it send, and why is dumping the raw transcript the wrong move?
 ?
 Send a structured handoff summary — the customer id, the root-cause analysis, the amount in question, and the recommended action — so the human can act without redoing the investigation. Because the human never saw the transcript, an unstructured dump forces them to re-derive everything from scratch.
+#flashcards/domain-1
+
+Question
+A long Claude Code session just ran `/compact`, and you want to automatically restore a short summary of what you were working on so the agent doesn't start cold. Would a `PostCompact` hook work, and if not, what should you use instead?
+?
+No — `PostCompact` fires after compaction but its output is not re-injected into the conversation. Use a `SessionStart` hook with the `compact` matcher instead: it fires right after compaction, and plain text it prints on success does get added back into context.
+#flashcards/domain-1
+
+Question
+You want Claude's turn to end only after your test suite has actually passed, not just after the model decides it is done. Which hook event lets you refuse the end of a turn, and what is its subagent equivalent?
+?
+A `Stop` hook — it fires when Claude wants to end its turn and can refuse, telling Claude it is not done yet. `SubagentStop` is the matching event for when a subagent, rather than the main conversation, finishes.
 #flashcards/domain-1
