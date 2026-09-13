@@ -48,7 +48,15 @@ Read the course manifest (`courses/<id>/course.yaml`) and the vault's
     plus a one-line summary, as in past rounds) or **plain** — no bold, no
     label/summary split; each option is presented as a single complete plain
     sentence or two with no distinguishing formatting at all, so the answer
-    can't be skimmed from shape or emphasis alone.
+    can't be skimmed from shape or emphasis alone. When presenting via
+    AskUserQuestion under plain formatting, put the full option sentence
+    itself directly in the option's `label` field (AskUserQuestion has no
+    hard length cap on `label` despite the tool's general "keep it short"
+    guidance — a full sentence is fine there) and leave `description` empty.
+    Never use a placeholder like "Option 1"/"Option 2" as the label with the
+    real text pushed into `description` — that renders as a meaningless
+    numbered stub above the actual content instead of showing the answer
+    text directly, which defeats the point of plain formatting entirely.
 
   For STYLE only (never for facts — content still comes only from the vault
   notes), use the two local mock-exam reviews in `courses/ccaf/` as exemplars
@@ -75,6 +83,22 @@ Read the course manifest (`courses/<id>/course.yaml`) and the vault's
   one letter holds the correct answer for much more than its fair share of
   questions (as a rough guide, more than ~40% on a round of 8+), reshuffle
   before presenting.
+
+  **Option length and detail must be balanced, not just answer placement.**
+  A well-known tell in badly-written multiple choice is that the correct
+  option is the longest, most hedged, or most thoroughly explained one,
+  while distractors are terse one-liners — this leaks the answer through
+  shape even when the correct letter itself is randomized. Write all four
+  options to a comparable length and level of detail: if the correct answer
+  needs to name a mechanism and explain why it's right, give at least one
+  distractor (ideally all three) a similarly complete explanation of why it
+  seems plausible and where it actually goes wrong, rather than a bare
+  dismissal. Before presenting each question, sanity-check option lengths
+  against each other — if the correct option is noticeably longer or more
+  elaborated than every distractor, rewrite the distractors (add the missing
+  "why this looks right" reasoning, or trim the correct answer) rather than
+  presenting it as-is. This check applies regardless of Option formatting
+  (normal or plain).
 - **(d) Mock-exam pointer** — link the external timed mocks from the manifest's
   practice tier (CyberSkill, CosX) for exam-day pacing; offer to debrief pasted
   results afterward.
