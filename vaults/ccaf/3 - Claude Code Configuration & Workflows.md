@@ -442,7 +442,7 @@ same customization every time, you have to keep passing the flag.
 An **[[Glossary#Output style|output style]]** is the persistent version of
 the same idea. You pick a style once — with [`/config`](<Claude Commands.md#/config>), or by setting the
 `outputStyle` field in a settings file — and Claude Code saves that choice to
-[`.claude/settings.local.json`](<Claude Commands.md#/config>) at the
+`.claude/settings.local.json` at the
 project level. Every future session in
 that project, interactive or not, starts with that style already active
 until you change it. Like `--append-system-prompt`, a style adds instructions
