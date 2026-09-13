@@ -273,8 +273,9 @@ getting an answer inline.
 That shift trades latency for cost. Batching gives **50% cost savings**
 compared with sending the same requests synchronously, and Claude processes
 the whole batch within an **up to 24-hour window** — but there is **no
-guaranteed latency SLA**, so you cannot count on any single result, or the
-batch as a whole, coming back quickly.
+guaranteed latency [[Glossary#SLA (Service Level Agreement)|SLA]]**, so you
+cannot count on any single result, or the batch as a whole, coming back
+quickly.
 
 That trade-off decides where it belongs. Batch is right for **non-blocking,
 latency-tolerant workloads**: overnight reports, weekly audits, nightly test

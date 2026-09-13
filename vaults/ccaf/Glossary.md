@@ -342,7 +342,7 @@ submit a whole set of requests as a single job and Claude works through them
 in the background, so you poll for or later retrieve the results rather than
 getting an inline reply. It costs 50% less than the same requests sent
 synchronously, and Claude processes the whole batch within an up to 24-hour
-window — but there is no guaranteed latency SLA, so it suits non-blocking,
+window — but there is no guaranteed latency [[Glossary#SLA (Service Level Agreement)|SLA]], so it suits non-blocking,
 latency-tolerant workloads (overnight reports, weekly audits) and is the
 wrong fit for a blocking workflow like a pre-merge check. It does not support
 multi-turn tool calling within a single request. See
@@ -525,6 +525,17 @@ re-inject context lost to compaction: unlike
 [[Glossary#PostCompact|PostCompact]], plain text it prints on success is added
 back into the conversation. See
 [[1 - Agentic Architecture & Orchestration#1.5 Apply Agent SDK hooks for tool call interception and data normalization|1 - Agentic Architecture & Orchestration]].
+
+### SLA (Service Level Agreement)
+
+A commitment about how a service will perform — most often, how fast it
+will respond. "No guaranteed latency SLA" on the
+[[Glossary#Message Batches API|Message Batches API]] means Anthropic makes
+no promise about how quickly any single batch, or any single result inside
+it, comes back beyond the outer up-to-24-hour processing window — it could
+finish in minutes or take the full window, so you cannot plan around a
+tighter number. See
+[[4 - Prompt Engineering & Structured Output#4.5 — Design efficient batch processing strategies|4 - Prompt Engineering & Structured Output]].
 
 ### .claude/settings.local.json
 
