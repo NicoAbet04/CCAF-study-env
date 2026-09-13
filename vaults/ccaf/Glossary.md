@@ -334,6 +334,21 @@ plus an `errorCategory` (transient, validation, business, or permission) and an
 explain, or escalate. A uniform "Operation failed" strips away that basis. See
 [[2 - Tool Design & MCP Integration]].
 
+### Message Batches API
+
+An asynchronous alternative to the standard
+Messages API: instead of one request per document sent synchronously, you
+submit a whole set of requests as a single job and Claude works through them
+in the background, so you poll for or later retrieve the results rather than
+getting an inline reply. It costs 50% less than the same requests sent
+synchronously, and Claude processes the whole batch within an up to 24-hour
+window — but there is no guaranteed latency SLA, so it suits non-blocking,
+latency-tolerant workloads (overnight reports, weekly audits) and is the
+wrong fit for a blocking workflow like a pre-merge check. It does not support
+multi-turn tool calling within a single request. See
+[[Glossary#custom_id|custom_id]] and
+[[4 - Prompt Engineering & Structured Output#4.5 — Design efficient batch processing strategies|4 - Prompt Engineering & Structured Output]].
+
 ### `.mcp.json` and `~/.claude.json`
 
 Two places to register MCP servers with

@@ -263,7 +263,7 @@ often what makes the rest of the loop trustworthy.
 ## 4.5 — Batch processing strategies
 
 Everything so far in this domain assumes you send one request and wait for
-one reply. The **Message Batches API** works differently: instead of calling
+one reply. The [[Glossary#Message Batches API|Message Batches API]] works differently: instead of calling
 the API once per document, you submit a whole set of requests as a single
 job — a hundred documents at once, say — and Claude works through them
 asynchronously in the background rather than one at a time in real time. You
