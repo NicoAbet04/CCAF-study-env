@@ -127,7 +127,7 @@ The shared, project-level settings file: permissions, [[Glossary#Hook|hook]]
 definitions, telemetry, plugin installs, and similar configuration for the
 whole team. Commit it so everyone who clones the repository gets the same
 behaviour. Its personal, git-ignored sibling is
-[[Glossary#.claude/settings.local.json|`.claude/settings.local.json`]],
+[[#.claude/settings.local.json|`.claude/settings.local.json`]],
 which overrides it for you alone in this one project; the user-level
 counterpart, `~/.claude/settings.json`, applies the same idea across every
 project on your machine instead of one. In the settings precedence,
