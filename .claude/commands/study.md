@@ -16,22 +16,65 @@ Read the course manifest (`courses/<id>/course.yaml`) and the vault's
   given domain if supplied, weighted toward Weak Areas topics), quiz one at a
   time via AskUserQuestion, and explain misses using the note content.
 - **(b) Scenario quiz** — invoke the `cert-exam` skill (77 community questions).
-- **(c) Generated scenario round** — write 5 FRESH scenario questions grounded
-  ONLY in the vault notes for the chosen domain, so the bank never goes stale
-  from memorization. Mark these `generated-not-verified`. For STYLE only (never
-  for facts — content still comes only from the vault notes), use the two
-  local mock-exam reviews in `courses/ccaf/` as exemplars of the official
-  exam's voice: one scenario stem, one correct answer, three plausible
-  distractors, and a one- or two-sentence "why this fails" for each wrong
-  option that names the specific misconception it represents rather than just
-  asserting it's wrong. `claudecertificationguide.md` is the MOST TRUSTED
-  exemplar (its answer key is verified and it flags its own doc-currency
-  checks) — prefer it as the primary model for phrasing, distractor shape, and
-  trap construction. `claudetestprep_exam.md` is lower-confidence (sourcing
-  unstated) — fine to draw structural variety from (e.g. its per-domain
-  section grouping, its "why the others fail" bullet style) but never copy a
-  factual claim from it without checking that claim against the vault note
-  first.
+- **(c) Generated scenario round** — write FRESH scenario questions grounded
+  ONLY in the vault notes, so the bank never goes stale from memorization.
+  Mark these `generated-not-verified`. Before writing any questions, ask the
+  following via AskUserQuestion (these are independent knobs, not a single
+  combined question):
+
+  - **Domain scope** — a specific domain number; all domains grouped by
+    domain (the default shape); or **randomized** — a mixed set drawn from
+    across domains that is NOT grouped or ordered by domain, so consecutive
+    questions can come from any domain in any order. Weight domain sampling
+    toward Weak Areas topics the same way the flashcard drill does.
+  - **Question count** — ask the user for a number, maximum **60**. If they
+    ask for more than 60, tell them the maximum is 60 and STOP — do not
+    generate a round, do not silently cap it and proceed.
+  - **Difficulty** — low, medium, or high. Low: single-fact recall dressed as
+    a short scenario, close to a flashcard. Medium: a scenario requiring one
+    inference step or distinguishing between two adjacent mechanisms (the
+    default shape used previously). High: multi-part or compound scenarios,
+    distractors that require noticing a subtler misconception, or scenarios
+    that combine two tasks/domains the way the real exam's harder items do.
+  - **Temperature** — low or high, governing how far a scenario departs from
+    material actually seen in the two local mock-exam reviews. Low temp:
+    scenarios can closely mirror a case shape already present in
+    `claudecertificationguide.md` / `claudetestprep_exam.md`, changed only in
+    surface details (names, numbers). High temp: invent genuinely new
+    scenario premises not modeled on any specific mock question — but every
+    fact and mechanism referenced must still trace to the vault notes; higher
+    temperature licenses new *scenarios*, never new *facts*.
+  - **Option formatting** — normal (each option gets a short bolded label
+    plus a one-line summary, as in past rounds) or **plain** — no bold, no
+    label/summary split; each option is presented as a single complete plain
+    sentence or two with no distinguishing formatting at all, so the answer
+    can't be skimmed from shape or emphasis alone.
+
+  For STYLE only (never for facts — content still comes only from the vault
+  notes), use the two local mock-exam reviews in `courses/ccaf/` as exemplars
+  of the official exam's voice: one scenario stem, one correct answer, three
+  plausible distractors, and a one- or two-sentence "why this fails" for each
+  wrong option that names the specific misconception it represents rather
+  than just asserting it's wrong (fold this "why this fails" into the option
+  text itself when Option formatting is set to plain, rather than dropping
+  it). `claudecertificationguide.md` is the MOST TRUSTED exemplar (its answer
+  key is verified and it flags its own doc-currency checks) — prefer it as
+  the primary model for phrasing, distractor shape, and trap construction.
+  `claudetestprep_exam.md` is lower-confidence (sourcing unstated) — fine to
+  draw structural variety from (e.g. its per-domain section grouping, its
+  "why the others fail" bullet style) but never copy a factual claim from it
+  without checking that claim against the vault note first.
+
+  **Correct-answer placement must be randomized.** Before presenting each
+  question, choose which option slot (A/B/C/D, or whatever the option
+  labeling is) holds the correct answer independently and at random — do not
+  default to writing the correct answer first and shuffling only in your
+  head, and do not let habit cluster correct answers on one letter. Across a
+  round of N questions, the correct-answer letters should look like a random
+  draw, not a pattern — spot-check your own round before presenting it: if
+  one letter holds the correct answer for much more than its fair share of
+  questions (as a rough guide, more than ~40% on a round of 8+), reshuffle
+  before presenting.
 - **(d) Mock-exam pointer** — link the external timed mocks from the manifest's
   practice tier (CyberSkill, CosX) for exam-day pacing; offer to debrief pasted
   results afterward.
