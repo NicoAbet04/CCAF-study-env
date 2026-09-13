@@ -25,7 +25,7 @@ domain is 15% of the exam and pairs naturally with
 
 The exam frames this domain as "making sound escalation and reliability
 decisions, including error handling and human-in-the-loop." Study it around the
-six tasks below, not around the RAG notebooks — the notebooks supply the
+six tasks below, not around the RAG notes — these notes supply the
 mechanics for
 [[#5.1 Preserve critical information across long interactions|5.1]] and
 [[#5.4 Manage context in large codebase exploration|5.4]], but the exam tests
@@ -314,7 +314,7 @@ actually means. Send the low-confidence extractions, and any drawn from
 ambiguous or contradictory source documents, to human review, so limited
 reviewer capacity goes where it is most needed.
 
-This task is the reliability counterpart to [[4 - Prompt Engineering & Structured Output|multi-instance and multi-pass review]]:
+This task is the reliability counterpart to [[4 - Prompt Engineering & Structured Output#4.6 — Multi-instance and multi-pass review architectures|multi-instance and multi-pass review]]:
 that earlier task is about designing the review pipeline itself — running
 several passes or instances to produce a well-checked output. This task picks
 up after that pipeline runs, deciding which of its outputs a human reviewer

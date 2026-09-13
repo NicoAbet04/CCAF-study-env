@@ -463,18 +463,6 @@ folder):
 - **Managed policy** — an `output-styles/` folder inside the managed settings
   directory
 
-Claude Code ships four built-in styles beyond Default: **Proactive**
-(executes immediately with minimal pausing), **Concise** (short, result-first
-answers), **Explanatory** (adds educational "Insights" alongside the work),
-and **Learning** (goes further than Explanatory by leaving `TODO(human)`
-markers in your code for you to fill in). A style change only takes effect
-after `/clear` or a new session, since the system prompt loads once at
-session start. It also shapes only the main conversation, because a
-[[Glossary#Subagent|subagent]] runs its own system prompt. A skill under
-`context: fork` is the exception, since a fork inherits the parent's full
-system prompt.
-*Verified against the [output styles docs](https://code.claude.com/docs/en/output-styles) (checked 2026-09-07).*
-
 ### Managed GitHub Code Review versus the GitHub Action
 
 For pull-request review specifically, take the **managed path**. Code Review is

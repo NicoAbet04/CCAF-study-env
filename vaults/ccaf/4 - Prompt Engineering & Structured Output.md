@@ -106,7 +106,7 @@ combination.
 When you need output that is *guaranteed* to match a shape, the most reliable
 approach is **tool use with a JSON schema**. You define a tool whose
 `input_schema` describes the fields you want, and Claude fills that schema when
-it "calls" the tool. Because tool use constrains the response to the schema you
+it "calls" the tool. Because `tool_use` constrains the response to the schema you
 declared, JSON syntax errors are eliminated entirely — no more missing commas
 or stray prose around a code block. You then read the structured data straight
 from the
@@ -144,19 +144,16 @@ document might not contain it**. Say you're extracting `contract_end_date`
 from a batch of scanned contracts. Some state the end date outright; others
 only say something like "renews annually," with no fixed end date at all. If
 `contract_end_date` is marked required, the model has no legal way to leave
-it blank on that second kind of contract — so it fabricates a plausible-
-looking date rather than violate the schema. Making the field nullable
-removes that pressure: the model can return `null`, and you know to route
-that document to a human instead of trusting a guess.
+it blank on that second kind of contract — so it fabricates a plausible-looking 
+date rather than violate the schema. Making the field nullable removes that pressure: 
+the model can return `null`, and you know to route that document to a human instead of trusting a guess.
 
 The second is giving open-ended categories an honest way out. If a
 `document_type` field is a fixed enum — say `invoice`, `receipt`,
 `purchase_order` — anything that doesn't cleanly match one of those still
 gets forced into the nearest option. Add an `"other"` value with a companion
 detail string, plus an `"unclear"` value for cases that are genuinely
-ambiguous rather than merely uncommon. Now a shipping manifest that isn't any
-of your three known types comes back as `other` with detail `"shipping
-manifest"`, instead of being silently misfiled as an `invoice`.
+ambiguous rather than merely uncommon.
 
 Alongside both habits, put format-normalization rules directly in the prompt
 — "dates as YYYY-MM-DD," "amounts as plain decimals with no currency
@@ -291,16 +288,6 @@ the result back, so an agentic loop that needs tools cannot run inside one batch
 request. And **`custom_id` fields correlate each request with its response**;
 because results do not come back in order, the `custom_id` is how you match them
 up.
-
-Putting batch into practice comes down to a few concrete habits. Match the API
-to the latency requirement — synchronous for pre-merge, batch for overnight.
-Calculate
-submission frequency from your SLA: with a 24-hour processing window, submitting
-on 4-hour intervals keeps you inside a 30-hour SLA. When a batch partially fails,
-resubmit **only** the failed documents, identified by `custom_id`, with
-appropriate fixes such as chunking a document that exceeded the context limit.
-And refine your prompt on a small sample set before committing a large volume, so
-you maximize first-pass success and avoid paying to resubmit.
 
 ## 4.6 — Multi-instance and multi-pass review architectures
 
